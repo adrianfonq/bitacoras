@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Dashboard Nautico//Glory app//ES
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Glory app
+X-WR-TIMEZONE:America/Argentina/Buenos_Aires
+BEGIN:VEVENT
+UID:marca-inicial-glory@dashboard-nautico
+DTSTAMP:20261001T194758Z
+SEQUENCE:0
+DTSTART;VALUE=DATE:20261001
+DTEND;VALUE=DATE:20261002
+SUMMARY:⚓ Glory app — calendario creado
+DESCRIPTION:Marca de la primera importación. Todavía no hay navegaciones 
+ reales cargadas: las va a escribir la app cuando las haya.\nEste evento se
+  puede borrar.
+TRANSP:TRANSPARENT
+END:VEVENT
+END:VCALENDAR
