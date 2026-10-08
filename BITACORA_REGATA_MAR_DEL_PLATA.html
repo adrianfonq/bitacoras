@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitácora de Regata — Lorient a Mar del Plata · Sailaway 3</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;font-size:12.5px;line-height:1.45;color:#1e293b;background:#0b1329;padding:12px;min-height:100vh}
+a{color:#38bdf8;text-decoration:none}a:hover{text-decoration:underline}
+
+/* ═══ HEADER / BARRA DE REGATA ═══ */
+header{max-width:1240px;margin:0 auto 12px;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);color:#fff;border-radius:12px;padding:12px 16px;box-shadow:0 4px 20px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1)}
+.hdr-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hdr-title{display:flex;align-items:center;gap:10px}
+.hdr-title h1{font-size:17px;font-weight:800;letter-spacing:-.3px;color:#fff}
+.hdr-title .badge{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:#2563eb;color:#fff;text-transform:uppercase;letter-spacing:.4px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.status-pill.off{background:rgba(248,113,113,.15);color:#f87171;border-color:rgba(248,113,113,.3)}
+.hdr-actions{display:flex;gap:6px;align-items:center}
+button{padding:5px 11px;border:0;border-radius:6px;background:#2563eb;color:#fff;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+button:hover{background:#1d4ed8}
+button.sec{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15)}button.sec:hover{background:rgba(255,255,255,.2)}
+button.act{background:#38bdf8;color:#0f172a;font-weight:700}
+button.sm{padding:3px 7px;font-size:11px}
+
+/* Resumen superior */
+.quick-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)}
+.qstat{background:rgba(0,0,0,.25);border-radius:6px;padding:5px 8px;text-align:center}
+.qstat .lbl{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px}
+.qstat .val{font-size:14px;font-weight:800;color:#fff;margin-top:1px}
+.qstat .sub{font-size:9.5px;color:#38bdf8}
+
+/* ═══ CONTENEDOR PRINCIPAL ═══ */
+main{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+
+/* Banner de reglas del capitán y alerta TWA */
+.rules-banner{background:#1e293b;border-left:4px solid #f59e0b;padding:7px 12px;border-radius:0 8px 8px 0;color:#cbd5e1;font-size:11px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.rules-banner b{color:#fbbf24}
+.twa-summary-pill{display:inline-flex;align-items:center;gap:5px;font-weight:800;padding:2px 8px;border-radius:12px;background:rgba(220,38,38,.25);color:#fca5a5;border:1px solid rgba(239,68,68,.4);font-size:10.5px}
+
+/* ═══ ANIMACIONES DE TITILADO EN ROJO (ALERTA TWA <50° o >160°) ═══ */
+@keyframes blink-row-red {
+  0%, 100% { background: rgba(220, 38, 38, 0.18); border-left-color: #ef4444; }
+  50% { background: rgba(220, 38, 38, 0.48); border-left-color: #f87171; box-shadow: inset 0 0 16px rgba(239, 68, 68, 0.55); }
+}
+
+@keyframes blink-badge-red {
+  0%, 100% { background: #dc2626; color: #fff; box-shadow: 0 0 5px rgba(220, 38, 38, 0.8); }
+  50% { background: #ef4444; color: #fff; box-shadow: 0 0 16px rgba(239, 68, 68, 1); transform: scale(1.05); }
+}
+
+@keyframes blink-boat-svg {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px #dc2626) drop-shadow(0 0 10px #ef4444);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 22px #ef4444);
+    transform: scale(1.35);
+  }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  50% { transform: scale(1.5); opacity: 0.4; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+tr.boat-row.twa-alert-row {
+  animation: blink-row-red 1.2s infinite ease-in-out !important;
+  border-left: 4px solid #ef4444 !important;
+}
+
+.twa-alert-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9.5px;
+  font-weight: 800;
+  animation: blink-badge-red 1s infinite ease-in-out;
+  margin-top: 2px;
+}
+
+.w-boat.twa-alert svg, .boat-marker.twa-alert svg {
+  animation: blink-boat-svg 1s infinite ease-in-out !important;
+}
+
+.w-boat.twa-alert .w-tag, .boat-marker.twa-alert .label {
+  background: #dc2626 !important;
+  border-color: #fca5a5 !important;
+  color: #fff !important;
+  animation: blink-badge-red 1s infinite ease-in-out !important;
+}
+
+.twa-pulse-aura {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ef4444;
+  animation: pulse-ring 1.2s infinite ease-out;
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  margin-top: -16px;
+  margin-left: -16px;
+}
+
+.twa-warning-banner {
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #fca5a5;
+  font-size: 11px;
+  margin-bottom: 10px;
+  animation: blink-badge-red 2s infinite ease-in-out;
+}
+
+/* ═══ TARJETA DE MAPA / CARTA TÁCTICA (WINDY + LEAFLET) ═══ */
+.map-card{background:#151e34;border-radius:12px;padding:12px;box-shadow:0 4px 15px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:8px;position:relative}
+.map-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.map-tabs{display:flex;gap:4px}
+.map-views{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.map-views label{font-size:10.5px;color:#94a3b8;margin-right:2px}
+
+/* Contenedor del mapa */
+#map-viewport{position:relative;width:100%;height:490px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:#071022;user-select:none}
+#map-leaf{width:100%;height:100%;position:absolute;inset:0}
+#windy-frame{width:100%;height:100%;border:0;position:absolute;inset:0;background:#071022;pointer-events:auto}
+
+/* Capa de veleros sobre Windy con arrastre sincronizado */
+/* abajo deja libre la barra de Windy (boton play y linea de tiempo) para que se pueda usar */
+#windy-overlay{
+  position:absolute;inset:0 0 58px 0;z-index:20;overflow:hidden;
+  pointer-events:auto;cursor:grab;touch-action:none;
+}
+#windy-overlay.is-dragging{cursor:grabbing!important}
+
+.w-boat{position:absolute;pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);transition:transform .15s}
+.w-boat svg{width:26px;height:26px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.9))}
+.w-boat .w-tag{font-size:9.5px;font-weight:700;color:#fff;background:rgba(15,23,42,.92);padding:1px 5px;border-radius:4px;white-space:nowrap;margin-top:2px;border:1px solid rgba(255,255,255,.2);box-shadow:0 2px 6px rgba(0,0,0,.6)}
+.w-boat:hover svg{transform:scale(1.3)}
+.w-boat.sel svg{transform:scale(1.4)}
+.w-boat.sel .w-tag{background:#2563eb;border-color:#60a5fa;box-shadow:0 0 10px #38bdf8}
+.w-wp{position:absolute;pointer-events:none;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:#0284c7;border:2px solid #38bdf8;box-shadow:0 0 8px rgba(56,189,248,.6)}
+
+/* Controles de navegación en pantalla para Windy */
+.nav-controls{
+  position:absolute;top:10px;left:10px;z-index:30;display:flex;flex-direction:column;gap:4px;background:rgba(15,23,42,.85);
+  backdrop-filter:blur(5px);padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,.15);box-shadow:0 4px 15px rgba(0,0,0,.5);
+}
+.nav-btn-row{display:flex;gap:3px;justify-content:center}
+.nav-btn{width:26px;height:26px;padding:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border-radius:5px;background:#1e293b;color:#e2e8f0;border:1px solid rgba(255,255,255,.1)}
+.nav-btn:hover{background:#2563eb;color:#fff}
+
+.drag-hint-pill{
+  position:absolute;top:10px;right:10px;z-index:30;background:rgba(15,23,42,.85);backdrop-filter:blur(4px);
+  padding:4px 10px;border-radius:20px;font-size:10px;color:#94a3b8;border:1px solid rgba(255,255,255,.15);pointer-events:none;
+}
+
+/* Estilos de PANTALLA COMPLETA */
+.map-card:fullscreen, .map-card.is-fullscreen{
+  position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;max-width:100vw!important;
+  z-index:999999!important;margin:0!important;border-radius:0!important;padding:12px!important;
+  background:#071022!important;display:flex!important;flex-direction:column!important;
+}
+.map-card:fullscreen #map-viewport, .map-card.is-fullscreen #map-viewport{
+  flex:1 1 auto!important;height:100%!important;min-height:0!important;border-radius:6px!important;
+}
+/* datos NMEA del velero elegido: boton y panel solo con la carta en pantalla completa */
+.nmea-btn{display:none}
+.map-card:fullscreen .nmea-btn, .map-card.is-fullscreen .nmea-btn{display:inline-block}
+.nmea-hud{display:none;flex:0 0 auto;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 12px;background:rgba(2,6,23,.8);border:1px solid rgba(148,163,184,.3);border-radius:8px;padding:5px 12px;color:#e2e8f0}
+.map-card:fullscreen .nmea-hud.on, .map-card.is-fullscreen .nmea-hud.on{display:flex}
+.nmea-hud .t{font-weight:800;color:#38bdf8;font-size:13px}
+.nmea-hud .lay{flex-direction:row;gap:4px 12px;padding-left:10px;border-left:1px solid rgba(148,163,184,.3)}
+.nmea-hud div{display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.nmea-hud span{color:#94a3b8;font-size:9px;text-transform:uppercase;letter-spacing:.2px}
+.nmea-hud b{color:#fff;font-size:14px}
+.fs-banner{display:none}
+.map-card:fullscreen .fs-banner, .map-card.is-fullscreen .fs-banner{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#38bdf8;background:rgba(37,99,235,.2);padding:3px 8px;border-radius:6px;
+}
+
+/* ═══ TABLA DE POSICIONES (SIN DESPLAZAMIENTO HORIZONTAL) ═══ */
+.card{background:#151e34;border-radius:12px;padding:12px 14px;box-shadow:0 4px 15px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08)}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);flex-wrap:wrap;gap:6px}
+.card-hdr h2{font-size:14.5px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px}
+.card-hdr .sub{font-size:11px;color:#94a3b8}
+
+/* Estructura responsiva compacta sin overflow */
+.table-wrap{width:100%;overflow-x:hidden}
+table{width:100%;border-collapse:collapse;font-size:11.5px;color:#e2e8f0;table-layout:auto}
+thead{background:#0b1329;color:#94a3b8;text-transform:uppercase;font-size:9.5px;letter-spacing:.4px}
+th{padding:7px 8px;text-align:left;font-weight:700}
+th.num{text-align:right}th.cen{text-align:center}
+td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:middle}
+tr.boat-row{cursor:pointer;transition:background .15s}
+tr.boat-row:hover{background:rgba(56,189,248,.1)}
+tr.boat-row.sel{background:rgba(37,99,235,.28);border-left:3px solid #38bdf8}
+
+/* Ranking badges */
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:10.5px;font-weight:800;background:#1e293b;color:#cbd5e1}
+.rank-1{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#78350f;box-shadow:0 0 10px rgba(245,158,11,.5)}
+.rank-2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#1e293b}
+.rank-3{background:linear-gradient(135deg,#b45309,#d97706);color:#fff}
+
+.b-title{display:flex;flex-direction:column;line-height:1.25}
+.b-name{font-size:12.5px;font-weight:700;color:#fff}
+.b-model{font-size:10px;color:#94a3b8}
+
+.num-cell{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25}
+.spd-val{font-weight:800;color:#4ade80;font-size:12px}
+.spd-cog{font-size:9.5px;color:#94a3b8}
+
+.pos-cell{font-family:monospace;font-size:10.5px;color:#cbd5e1;line-height:1.2}
+
+.dtf-cell{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25}
+.dtf-val{font-weight:800;color:#fff;font-size:12px}
+.dtf-diff{font-size:9.5px;color:#f87171}
+.dtf-leader{font-size:9.5px;color:#4ade80;font-weight:700}
+
+.wp-cell{display:flex;flex-direction:column;line-height:1.2}
+.wp-name{font-size:11px;font-weight:600;color:#38bdf8}
+.wp-dist{font-size:9.5px;color:#94a3b8}
+
+.eta-cell{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2}
+.eta-val{font-size:11.5px;font-weight:700;color:#fff}
+.eta-date{font-size:9.5px;color:#64748b}
+
+.prog-cell{width:70px}
+.p-bar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-top:2px}
+.p-fill{height:100%;background:linear-gradient(90deg,#2563eb,#38bdf8);border-radius:3px}
+
+/* ═══ DETALLE DEL VELERO SELECCIONADO ═══ */
+#detail-container{transition:all .3s ease}
+.detail-placeholder{background:#151e34;border:1.5px dashed rgba(255,255,255,.12);border-radius:10px;padding:14px;text-align:center;color:#94a3b8}
+.detail-placeholder p{font-size:12.5px;margin-bottom:2px}
+.detail-placeholder small{color:#64748b;font-size:11px}
+
+.detail-card{background:linear-gradient(135deg,#131c31,#1a2744);border:1.5px solid #38bdf8;border-radius:12px;padding:12px 14px;box-shadow:0 6px 25px rgba(0,0,0,.5);animation:fadeIn .2s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+.detail-hdr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1)}
+.detail-hdr h3{font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px}
+.detail-hdr .des-tag{font-size:10.5px;padding:2px 7px;border-radius:10px;background:#2563eb;color:#fff;font-weight:600}
+
+.grid-telemetry{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin-bottom:10px}
+.ttile{background:#0b1329;border-radius:6px;padding:7px 9px;border:1px solid rgba(255,255,255,.06)}
+.ttile .tl{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.3px;display:flex;justify-content:space-between}
+.ttile .tv{font-size:15px;font-weight:800;color:#fff;margin-top:1px}
+.ttile .ts{font-size:9.5px;color:#64748b;margin-top:1px}
+.ttile.ok .tv{color:#4ade80}
+.ttile.alert .tv{color:#f87171}
+
+.detail-subgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px}
+.subbox{background:#0b1329;border-radius:6px;padding:8px 10px;border:1px solid rgba(255,255,255,.06)}
+.subbox h4{font-size:10.5px;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.meter-row{margin-bottom:6px}
+.meter-lbl{display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px;color:#cbd5e1}
+.meter-bar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.meter-fill{height:100%;border-radius:3px}
+.meter-fill.water{background:linear-gradient(90deg,#0284c7,#38bdf8)}
+.meter-fill.food{background:linear-gradient(90deg,#d97706,#fbbf24)}
+
+/* Leaflet Icons */
+.leaflet-div-icon{background:transparent!important;border:none!important}
+.boat-marker{width:26px;height:26px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}
+.boat-marker svg{width:22px;height:22px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.7));transition:transform .2s}
+.boat-marker .label{position:absolute;top:24px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,.9);color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;white-space:nowrap;border:1px solid rgba(255,255,255,.2);pointer-events:none}
+.boat-marker.sel svg{transform:scale(1.35)}
+.boat-marker.sel .label{background:#2563eb;border-color:#60a5fa}
+.wp-marker{width:16px;height:16px;border-radius:50%;background:#0f172a;color:#38bdf8;border:2px solid #38bdf8;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800}
+.wp-marker.finish{background:#16a34a;color:#fff;border-color:#4ade80}
+
+footer{max-width:1240px;margin:10px auto;color:#64748b;font-size:11px;text-align:center;padding:6px}
+
+/* ═══ Compartir en la web (igual que las otras bitacoras) ═══ */
+#sh-btn.on{background:rgba(74,222,128,0.2);color:#4ade80;border-color:rgba(74,222,128,0.5);}
+body.publico #sh-btn,body.publico #menu-link{display:none!important;}
+#modal-bg{display:none;position:fixed;inset:0;background:rgba(2,6,23,0.7);z-index:2500;justify-content:center;align-items:center;padding:16px;}
+#modal-bg.show{display:flex;}
+#modal-win{background:#f8fafc;color:#1e293b;border-radius:14px;overflow:hidden;width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+#modal-head{display:flex;align-items:center;gap:8px;padding:10px 16px;color:#fff;background:linear-gradient(135deg,#0f172a,#1e3a5f);}
+#modal-title{flex:1;font-weight:800;font-size:16px;}
+#modal-head button{background:rgba(255,255,255,0.12);color:#fff;border:0;border-radius:6px;padding:4px 12px;font:700 14px sans-serif;cursor:pointer;}
+#modal-body{overflow:auto;padding:14px 18px 18px;}
+.sh-box{font-size:14px;line-height:1.5;}
+.sh-sw{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;cursor:pointer;font-weight:800;}
+.sh-sw input{width:22px;height:22px;accent-color:#16a34a;cursor:pointer;}
+.sh-link{display:flex;gap:6px;margin-top:12px;}
+.sh-link input{flex:1;min-width:0;border:1px solid #cbd5e1;border-radius:6px;padding:8px;font:600 13px monospace;}
+.sh-link button,.sh-link a{border:0;border-radius:6px;background:#1e3a5f;color:#fff;font:800 12px sans-serif;padding:0 12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;}
+.sh-cal{margin-top:14px;padding:10px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;}
+.sh-cal .sh-link{margin-top:6px;}
+.sh-est{margin-top:10px;font-size:13px;color:#475569;}
+.sh-nota{margin-top:12px;font-size:12px;color:#64748b;}
+.mb-btn{border:0;border-radius:8px;background:#16a34a;color:#fff;font:800 13px sans-serif;padding:8px 14px;margin-top:10px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <div class="hdr-title">
+      <h1>⛵ REGATA TRANSATLÁNTICA · LORIENT → MAR DEL PLATA</h1>
+      <span class="badge">Sailaway 3</span>
+      <span class="status-pill" id="live-st">● EN VIVO</span>
+    </div>
+    <div class="hdr-actions">
+      <span id="timer-txt" style="font-size:10.5px;color:#94a3b8">Refresco en 30s</span>
+      <button class="sec sm" onclick="manualRefresh()" title="Refrescar datos en vivo">🔄 Actualizar</button>
+      <button class="sec sm" id="sh-btn" onclick="abrirCompartir()" title="Compartir esta bitácora en la web">&#128279; Compartir</button>
+      <a id="menu-link" href="http://localhost:8765" style="text-decoration:none"><button class="sec sm">‹ Volver al menú</button></a>
+    </div>
+  </div>
+
+  <div class="quick-stats">
+    <div class="qstat"><div class="lbl">Líder Actual</div><div class="val" id="qs-leader">—</div><div class="sub" id="qs-leader-sub"></div></div>
+    <div class="qstat"><div class="lbl">Más Rápido (SOG)</div><div class="val" id="qs-fastest">—</div><div class="sub" id="qs-fastest-sub"></div></div>
+    <div class="qstat"><div class="lbl">Distancia de Ruta</div><div class="val">6.058 MN</div><div class="sub">7 waypoints oficiales</div></div>
+    <div class="qstat"><div class="lbl">Progreso Medio</div><div class="val" id="qs-prog">—</div><div class="sub">~Mitad de regata</div></div>
+    <div class="qstat"><div class="lbl">Alertas TWA</div><div class="val" id="qs-alerts" style="color:#f87171">0</div><div class="sub">&lt;50° o &gt;160°</div></div>
+  </div>
+</header>
+
+<main>
+  <!-- Banner de Reglas del Capitán y Alertas de Rumbo -->
+  <div class="rules-banner">
+    <div>⚠️ <b>Reglas en Solitario:</b> Chaleco inflable/arnés en cubierta 100%. Con >15 kts, ola importante o noche: línea de vida instalada.</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="twa-summary" class="twa-summary-pill" style="display:none">⚠️ Alerta TWA activa</span>
+      <span style="font-size:10px;color:#94a3b8">Hora: <span id="clock-txt">—</span></span>
+    </div>
+  </div>
+
+  <!-- CARTA DE NAVEGACIÓN Y VIENTO (WINDY + CARTA NÁUTICA CON PANTALLA COMPLETA) -->
+  <div class="map-card" id="map-card">
+    <div class="map-toolbar">
+      <div class="map-tabs">
+        <button id="tab-carta" class="act sm" onclick="setMapMode(CARTAS[CARTA].sig)" title="Viento y pronóstico de Windy · tocá para pasar a 🛰️ Satélite">🌬️ Windy ▸</button>
+        <span class="fs-banner" id="fs-banner">⛶ Modo Pantalla Completa</span>
+      </div>
+
+      <div class="map-views">
+        <label>Encuadre:</label>
+        <button class="sec sm" onclick="setWindyView('fleet')" title="Ver toda la flota">🌐 Flota</button>
+        <button class="sec sm" onclick="setWindyView('leaders')" title="Ver pelotón líder">⚡ Punteros</button>
+        <button class="sec sm" onclick="setWindyView('leader')" title="Centrar en el líder">🥇 Líder</button>
+        <button class="sec sm" onclick="setWindyView('finish')" title="Ver llegada en Mar del Plata">🏁 Llegada</button>
+        <button class="sm nmea-btn" id="btn-nmea" onclick="toggleNMEA()" title="Mostrar / ocultar los datos del velero elegido (o del líder)">📊 Datos</button>
+        <button class="sm" id="btn-fullscreen" onclick="toggleFullscreen()" style="background:#0284c7;font-weight:700">⛶ Pantalla Completa</button>
+      </div>
+    </div>
+
+    <!-- Visor del Mapa -->
+    <div id="nmea-hud" class="nmea-hud"></div>
+    <div id="map-viewport">
+      <!-- 1. Windy Embed Iframe -->
+      <iframe id="windy-frame" title="Viento y Meteorología en Windy" allowfullscreen></iframe>
+      <!-- Capa de veleros sobre Windy con arrastre sincronizado -->
+      <div id="windy-overlay"></div>
+
+
+      <div class="drag-hint-pill" id="drag-hint">
+        🖱️ Arrastrá la carta para moverla y usá la rueda del mouse para el zoom
+      </div>
+
+      <!-- 2. Leaflet Map Container -->
+      <div id="map-leaf" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- TABLA DE POSICIONES DE LA REGATA (SIN DESPLAZAMIENTO HORIZONTAL) -->
+  <div class="card">
+    <div class="card-hdr">
+      <div>
+        <h2>🏆 Tabla de Posiciones de la Regata</h2>
+        <div class="sub">Ordenada por Distancia al Destino (DTF) a través de los waypoints oficiales</div>
+      </div>
+      <div style="font-size:10.5px;color:#38bdf8">💡 Si un velero tiene TWA &lt; 50° o &gt; 160°, titila en rojo en la tabla y en la carta</div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="leaderboard">
+        <thead>
+          <tr>
+            <th class="cen" style="width:30px">Pto</th>
+            <th>Velero y Diseño</th>
+            <th class="num">Velocidad / Rumbo / TWA</th>
+            <th>Posición actual</th>
+            <th class="num">Dist. a Meta</th>
+            <th>Próxima Marca</th>
+            <th class="num">ETA Meta</th>
+            <th>Progreso</th>
+            <th class="cen" style="width:65px">Ficha</th>
+          </tr>
+        </thead>
+        <tbody id="lb-body">
+          <!-- Se completa dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VISTA DETALLADA DEL VELERO SELECCIONADO (SOLO SE MUESTRA AL SELECCIONAR UN VELERO) -->
+  <div id="detail-container">
+    <div class="detail-placeholder" id="detail-empty">
+      <p>👆 <b>Ningún velero seleccionado</b></p>
+      <small>Hacé clic en cualquier fila de la tabla de posiciones o sobre un velero en la carta para ver su instrumental y telemetría específica (viento real/aparente, agua, comida, escora y estela GPS).</small>
+    </div>
+    <div id="detail-content" style="display:none"></div>
+  </div>
+</main>
+
+<footer>
+  Bitácora Única de Regata · Sailaway 3 · Flota de Adrian1 · Integrado en SA Viajes
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONSTANTES Y WAYPOINTS DE LA RUTA OFICIAL 87981
+// ═══════════════════════════════════════════════════════════
+const ROUTE_ID = 87981;
+const WAYPOINTS = [
+  { n: 1, name: 'Lorient (Salida)', lat: 47.67953, lon: -3.41714, type: 1 },
+  { n: 2, name: 'Salida Bahía', lat: 47.65189, lon: -3.53327, type: 2 },
+  { n: 3, name: 'Cabo Finisterre', lat: 43.13614, lon: -9.52611, type: 2 },
+  { n: 4, name: 'Paso Madeira / Canarias', lat: 32.95480, lon: -17.90941, type: 2 },
+  { n: 5, name: 'Cabo Verde (San Vicente)', lat: 17.08338, lon: -25.64541, type: 2 },
+  { n: 6, name: 'Islas Martim Vaz / Trindade', lat: -20.83198, lon: -34.46646, type: 2 },
+  { n: 7, name: 'Mar del Plata (Llegada)', lat: -38.03821, lon: -57.52029, type: 9 }
+];
+
+// Los 11 veleros exactos de la regata
+const FLEET_DEF = [
+  { nr: 31836, name: 'Storm', design: 'Ultim G17', type: 'Trimarán Oceánico', eslora: '32 m' },
+  { nr: 37524, name: 'VJ 65', design: 'VJ 65', type: 'Monocasco Oceánico (Sin Foils)', eslora: '20 m' },
+  { nr: 32647, name: 'Luna Rossa', design: 'LUNAROSSA', type: 'Monocasco con Foils', eslora: '22 m' },
+  { nr: 14780, name: 'Katara', design: 'Petrel 39', type: 'Crucero / Regata', eslora: '12 m' },
+  { nr: 5076,  name: 'Ahsoka', design: 'Sailaway Imoca 60', type: 'IMOCA 60 con Foils', eslora: '18.28 m' },
+  { nr: 20620, name: 'Eowen', design: 'JL40', type: 'Class40 Oceánico', eslora: '12.2 m' },
+  { nr: 23750, name: 'Ahsoka II', design: 'IMOCA - Kooka 60', type: 'IMOCA 60 con Foils (Kooka)', eslora: '18.28 m' },
+  { nr: 15844, name: 'Arwen', design: 'Gannet 50', type: 'Monocasco Rápido', eslora: '15.2 m' },
+  { nr: 30197, name: 'Kriter V', design: 'Kriter V', type: 'Clásico Oceánico', eslora: '21 m' },
+  { nr: 25572, name: 'Toph', design: 'Mini Transat', type: 'Mini 6.50', eslora: '6.50 m' },
+  { nr: 18447, name: 'Libertad', design: 'Hispaniola', type: 'Goleta Clásica (Schooner)', eslora: '16 m' }
+];
+
+// Snapshot inicial de respaldo con TWD y HDG
+const INITIAL_SNAPSHOT = {
+  31836: { lat: 4.7829, lon: -23.6118, spd: 13.2, hdg: 215.6, twd: 165, tws: 11.9, awa: -25, aws: 22.6, water: 56, food: 28, miles: 3120, upd: 'En vivo' },
+  37524: { lat: 5.8734, lon: -24.3375, spd: 2.5,  hdg: 138.4, twd: 160, tws: 10.2, awa: -32, aws: 11.5, water: 120, food: 60, miles: 3050, upd: 'En vivo' },
+  32647: { lat: 8.1958, lon: -28.5595, spd: 5.9,  hdg: 195.9, twd: 155, tws: 12.1, awa: -40, aws: 14.8, water: 85,  food: 42, miles: 2980, upd: 'En vivo' },
+  14780: { lat: 8.5527, lon: -27.7594, spd: 5.7,  hdg: 199.0, twd: 158, tws: 11.8, awa: -38, aws: 14.2, water: 95,  food: 48, miles: 2950, upd: 'En vivo' },
+  5076:  { lat: 8.9822, lon: -27.8322, spd: 5.1,  hdg: 200.1, twd: 160, tws: 11.5, awa: -41, aws: 13.9, water: 110, food: 55, miles: 2930, upd: 'En vivo' },
+  20620: { lat: 9.0084, lon: -27.7472, spd: 5.1,  hdg: 200.0, twd: 159, tws: 11.6, awa: -40, aws: 14.0, water: 90,  food: 45, miles: 2930, upd: 'En vivo' },
+  23750: { lat: 13.1347, lon: -26.7679, spd: 6.8, hdg: 192.8, twd: 145, tws: 13.5, awa: -45, aws: 16.5, water: 130, food: 65, miles: 2680, upd: 'En vivo' },
+  15844: { lat: 18.4830, lon: -24.4855, spd: 9.1, hdg: 217.9, twd: 130, tws: 15.0, awa: -50, aws: 19.5, water: 140, food: 70, miles: 2320, upd: 'En vivo' },
+  30197: { lat: 20.1037, lon: -24.3835, spd: 8.7, hdg: 201.0, twd: 125, tws: 14.8, awa: -52, aws: 18.8, water: 160, food: 80, miles: 2210, upd: 'En vivo' },
+  25572: { lat: 22.9128, lon: -22.7539, spd: 8.2, hdg: 205.1, twd: 120, tws: 15.2, awa: -55, aws: 18.2, water: 65,  food: 32, miles: 2020, upd: 'En vivo' },
+  18447: { lat: 26.4121, lon: -21.6782, spd: 8.1, hdg: 200.7, twd: 115, tws: 15.5, awa: -58, aws: 18.5, water: 180, food: 90, miles: 1810, upd: 'En vivo' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════════
+let BOATS = {};
+let SELECTED_NR = null;
+let COUNTDOWN = 30;
+let CURRENT_MAP_MODE = 'windy';
+
+// Estado de cámara de Windy
+let WINDY_CAM = { lat: 2.0, lon: -28.0, zoom: 4 };
+
+// Variables de interacción de arrastre en Windy
+let IS_DRAGGING = false;
+let DRAG_START_X = 0, DRAG_START_Y = 0;
+let DRAG_ORIGIN_X = 0, DRAG_ORIGIN_Y = 0;
+let DRAG_DISTANCE = 0;
+
+let MAP = null;
+let MAP_MARKERS = {};
+let MAP_ROUTE_LINE = null;
+let MAP_TRACK_LINE = null;
+let MAP_DEST_LINE = null;
+
+FLEET_DEF.forEach(def => {
+  let savedCrew = 1;
+  try {
+    const s = localStorage.getItem('regata_crew_' + def.nr);
+    if (s) savedCrew = Math.max(1, parseInt(s) || 1);
+  } catch(e) {}
+  BOATS[def.nr] = Object.assign({}, def, { crew: savedCrew }, INITIAL_SNAPSHOT[def.nr] || {}, {
+    track: [[INITIAL_SNAPSHOT[def.nr]?.lat || 0, INITIAL_SNAPSHOT[def.nr]?.lon || 0]]
+  });
+});
+
+function updateBoatCrew(nr, val) {
+  const n = Math.max(1, parseInt(val) || 1);
+  if (BOATS[nr]) {
+    BOATS[nr].crew = n;
+    try { localStorage.setItem('regata_crew_' + nr, n); } catch(e) {}
+    render();
+  }
+}
+
+try {
+  const savedSel = localStorage.getItem('regata_selected_nr');
+  if (savedSel && BOATS[savedSel]) SELECTED_NR = parseInt(savedSel);
+} catch(e) {}
+
+// ═══════════════════════════════════════════════════════════
+// CÁLCULO DE TWA (ÁNGULO DE VIENTO REAL)
+// ═══════════════════════════════════════════════════════════
+function calcTWA(hdg, twd) {
+  if (hdg == null || twd == null) return null;
+  let diff = Math.abs(parseFloat(twd) - parseFloat(hdg)) % 360;
+  if (diff > 180) diff = 360 - diff;
+  return Math.round(diff);
+}
+
+function checkTwaAlert(b) {
+  const twa = b.twa != null ? Math.round(Math.abs(b.twa)) : calcTWA(b.hdg, b.twd);
+  const isAlert = twa != null && (twa < 50 || twa > 160);
+  const reason = twa != null ? (twa < 50 ? 'Ceñida (<50°)' : 'Empopada (>160°)') : '';
+  return { twa, isAlert, reason };
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILIDADES NÁUTICAS Y FÓRMULAS MERCATOR
+// ═══════════════════════════════════════════════════════════
+function haversineNM(lat1, lon1, lat2, lon2) {
+  const R = 3440.065;
+  const phi1 = lat1 * Math.PI / 180, phi2 = lat2 * Math.PI / 180;
+  const dphi = (lat2 - lat1) * Math.PI / 180;
+  const dlam = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dphi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dlam/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function formatCoordCompact(lat, lon) {
+  if (lat == null || lon == null) return '—';
+  const latH = lat >= 0 ? 'N' : 'S', lonH = lon >= 0 ? 'W' : 'E';
+  const aLat = Math.abs(lat), aLon = Math.abs(lon);
+  const dLat = Math.floor(aLat), mLat = Math.round((aLat - dLat) * 60);
+  const dLon = Math.floor(aLon), mLon = Math.round((aLon - dLon) * 60);
+  return `${dLat}°${mLat}'${latH} ${dLon}°${mLon}'${lonH}`;
+}
+
+const TOTAL_ROUTE_NM = (() => {
+  let d = 0;
+  for (let i = 0; i < WAYPOINTS.length - 1; i++) {
+    d += haversineNM(WAYPOINTS[i].lat, WAYPOINTS[i].lon, WAYPOINTS[i+1].lat, WAYPOINTS[i+1].lon);
+  }
+  return d;
+})();
+
+function calcDTF(b) {
+  const lat = b.lat, lon = b.lon;
+  const dest = WAYPOINTS[6];
+  const wp5 = WAYPOINTS[5];
+  const wp4 = WAYPOINTS[4];
+
+  let dtf = 0, nextWp = null, distNext = 0;
+
+  if (lat > wp4.lat) {
+    distNext = haversineNM(lat, lon, wp4.lat, wp4.lon);
+    nextWp = wp4;
+    dtf = distNext + haversineNM(wp4.lat, wp4.lon, wp5.lat, wp5.lon) + haversineNM(wp5.lat, wp5.lon, dest.lat, dest.lon);
+  } else if (lat > wp5.lat) {
+    distNext = haversineNM(lat, lon, wp5.lat, wp5.lon);
+    nextWp = wp5;
+    dtf = distNext + haversineNM(wp5.lat, wp5.lon, dest.lat, dest.lon);
+  } else {
+    distNext = haversineNM(lat, lon, dest.lat, dest.lon);
+    nextWp = dest;
+    dtf = distNext;
+  }
+  return { dtf, nextWp, distNext };
+}
+
+function getRanking() {
+  const list = Object.values(BOATS).map(b => {
+    const { dtf, nextWp, distNext } = calcDTF(b);
+    const spd = Math.max(0.1, parseFloat(b.spd) || 0.1);
+    const etaHours = dtf / (spd > 0.5 ? spd : 4.5);
+    const sailed = Math.max(0, TOTAL_ROUTE_NM - dtf);
+    const progress = Math.min(100, Math.max(0, (sailed / TOTAL_ROUTE_NM) * 100));
+    const { twa, isAlert: twaAlert, reason: twaReason } = checkTwaAlert(b);
+
+    return { ...b, dtf, nextWp, distNext, spd, etaHours, sailed, progress, twa, twaAlert, twaReason };
+  });
+
+  list.sort((a, b) => a.dtf - b.dtf);
+  return list;
+}
+
+function formatETA(hours) {
+  if (!hours || hours > 9000) return '—';
+  const days = Math.floor(hours / 24);
+  const remH = Math.round(hours % 24);
+  return days > 0 ? `${days}d ${remH}h` : `${remH}h`;
+}
+
+function calcArrivalDate(hours) {
+  if (!hours || hours > 9000) return '—';
+  const target = new Date(Date.now() + hours * 3600 * 1000);
+  return target.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+}
+
+// Proyecciones directas e inversas WebMercator
+const mercX = (lon, z) => (lon + 180) / 360 * 256 * Math.pow(2, z);
+const mercY = (lat, z) => {
+  const s = Math.sin(lat * Math.PI / 180);
+  return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * 256 * Math.pow(2, z);
+};
+const mercLon = (x, z) => (x / (256 * Math.pow(2, z))) * 360 - 180;
+const mercLat = (y, z) => {
+  const n = Math.PI - 2 * Math.PI * y / (256 * Math.pow(2, z));
+  return 180 / Math.PI * Math.atan(Math.sinh(n));
+};
+
+// ═══════════════════════════════════════════════════════════
+// MAPA WINDY Y PROYECCIÓN CON ARRASTRE Y ZOOM SINCRONIZADO
+// ═══════════════════════════════════════════════════════════
+function loadWindyIframe(lat, lon, zoom) {
+  // Limitar coordenadas y niveles de zoom válidos
+  lat = Math.max(-75, Math.min(75, lat));
+  lon = ((((lon + 180) % 360) + 360) % 360) - 180;
+  zoom = Math.max(2, Math.min(10, zoom));
+
+  WINDY_CAM = { lat, lon, zoom };
+  const frame = document.getElementById('windy-frame');
+  const src = `https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=kt&metricTemp=%C2%B0C&overlay=wind&product=ecmwf&level=surface&lat=${lat.toFixed(3)}&lon=${lon.toFixed(3)}&zoom=${zoom}&message=true&marker=false&pressure=true`;
+  if (frame.src !== src) {
+    frame.src = src;
+  }
+
+  // Sincronizar también con Leaflet si existe
+  if (MAP) MAP.setView([lat, lon], zoom, { animate: false });
+
+  updateWindyOverlays();
+}
+
+function updateWindyOverlays() {
+  const overlay = document.getElementById('windy-overlay');
+  const viewport = document.getElementById('map-viewport');
+  if (!overlay || !viewport) return;
+
+  const w = viewport.clientWidth, h = viewport.clientHeight;
+  const { lat: cLat, lon: cLon, zoom: z } = WINDY_CAM;
+
+  const ranking = getRanking();
+  const leader = ranking[0];
+
+  let html = '';
+
+  WAYPOINTS.forEach(wp => {
+    const px = w / 2 + (mercX(wp.lon, z) - mercX(cLon, z));
+    const py = h / 2 + (mercY(wp.lat, z) - mercY(cLat, z));
+    if (px >= -30 && px <= w + 30 && py >= -30 && py <= h + 30) {
+      html += `<div class="w-wp" style="left:${px}px;top:${py}px" title="${wp.name}"></div>`;
+    }
+  });
+
+  ranking.forEach(b => {
+    const px = w / 2 + (mercX(b.lon, z) - mercX(cLon, z));
+    const py = h / 2 + (mercY(b.lat, z) - mercY(cLat, z));
+
+    if (px >= -50 && px <= w + 50 && py >= -50 && py <= h + 50) {
+      const isSel = b.nr === SELECTED_NR;
+      const isLeader = b.nr === leader.nr;
+      const isAlert = b.twaAlert;
+
+      const color = isAlert ? '#ef4444' : isLeader ? '#4ade80' : isSel ? '#38bdf8' : '#fbbf24';
+      const hdg = Math.round(b.hdg || 0);
+
+      html += `
+        <div class="w-boat ${isSel ? 'sel' : ''} ${isAlert ? 'twa-alert' : ''}" style="left:${px}px;top:${py}px" onclick="onBoatClick(event, ${b.nr})" title="${b.name}: ${b.spd.toFixed(1)} kn, rumbo ${hdg}°, TWA ${b.twa != null ? b.twa + '°' : '—'} ${isAlert ? '(ALERTA TWA)' : ''}">
+          ${isAlert ? '<div class="twa-pulse-aura"></div>' : ''}
+          <svg viewBox="0 0 24 24">
+            <g transform="rotate(${hdg}, 12, 12)">
+              <path d="M12 2 L19 21 L12 17 L5 21 Z" fill="${color}" stroke="${isAlert ? '#ffffff' : '#0f172a'}" stroke-width="${isAlert ? '2' : '1.5'}"/>
+            </g>
+          </svg>
+          <div class="w-tag">
+            ${isAlert ? '⚠️ ' : ''}${b.name} · ${b.spd.toFixed(1)}k
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  overlay.innerHTML = laylinesWindy(w, h, ranking) + html;
+}
+
+function onBoatClick(event, nr) {
+  event.stopPropagation();
+  selectBoat(nr);
+}
+
+// ═══════════════════════════════════════════════════════════
+// INTERACCIÓN DE ARRASTRE Y ZOOM (LOCKSTEP NAVIGATION)
+// ═══════════════════════════════════════════════════════════
+function changeWindyZoom(delta) {
+  const newZ = Math.min(10, Math.max(2, WINDY_CAM.zoom + delta));
+  if (newZ !== WINDY_CAM.zoom) {
+    loadWindyIframe(WINDY_CAM.lat, WINDY_CAM.lon, newZ);
+  }
+}
+
+function initWindyInteractions() {
+  const overlay = document.getElementById('windy-overlay');
+  if (!overlay) return;
+
+  const onStart = (clientX, clientY) => {
+    IS_DRAGGING = true;
+    DRAG_DISTANCE = 0;
+    DRAG_START_X = clientX;
+    DRAG_START_Y = clientY;
+    DRAG_ORIGIN_X = mercX(WINDY_CAM.lon, WINDY_CAM.zoom);
+    DRAG_ORIGIN_Y = mercY(WINDY_CAM.lat, WINDY_CAM.zoom);
+    overlay.classList.add('is-dragging');
+  };
+
+  const onMove = (clientX, clientY) => {
+    if (!IS_DRAGGING) return;
+    const dx = clientX - DRAG_START_X;
+    const dy = clientY - DRAG_START_Y;
+    DRAG_DISTANCE = Math.hypot(dx, dy);
+
+    // Mueve la capa instantáneamente a 60 FPS con aceleración por GPU
+    overlay.style.transform = `translate(${dx}px, ${dy}px)`;
+  };
+
+  const onEnd = (clientX, clientY) => {
+    if (!IS_DRAGGING) return;
+    IS_DRAGGING = false;
+    overlay.classList.remove('is-dragging');
+
+    const dx = clientX - DRAG_START_X;
+    const dy = clientY - DRAG_START_Y;
+    overlay.style.transform = 'none';
+
+    if (DRAG_DISTANCE > 6) {
+      const z = WINDY_CAM.zoom;
+      const newLon = mercLon(DRAG_ORIGIN_X - dx, z);
+      const newLat = mercLat(DRAG_ORIGIN_Y - dy, z);
+      loadWindyIframe(newLat, newLon, z);
+    }
+  };
+
+  // Mouse events
+  overlay.addEventListener('mousedown', e => {
+    if (e.button === 0) onStart(e.clientX, e.clientY);
+  });
+  window.addEventListener('mousemove', e => {
+    if (IS_DRAGGING) onMove(e.clientX, e.clientY);
+  });
+  window.addEventListener('mouseup', e => {
+    if (IS_DRAGGING) onEnd(e.clientX, e.clientY);
+  });
+
+  // Touch events (para tablets / trackpads)
+  overlay.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) onStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  window.addEventListener('touchmove', e => {
+    if (IS_DRAGGING && e.touches.length === 1) onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  window.addEventListener('touchend', e => {
+    if (IS_DRAGGING && e.changedTouches.length === 1) onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+  });
+
+  // Pellizco con dos dedos: zoom (mientras se pellizca la capa se agranda; al soltar se cambia el zoom de Windy)
+  let PINCH = null;
+  const dist2 = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  overlay.addEventListener('touchstart', e => {
+    if (e.touches.length !== 2) return;
+    if (IS_DRAGGING) { IS_DRAGGING = false; overlay.classList.remove('is-dragging'); overlay.style.transform = 'none'; }
+    const r = overlay.getBoundingClientRect();
+    PINCH = { d0: dist2(e.touches), scale: 1,
+              mx: (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left,
+              my: (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top };
+    overlay.style.transformOrigin = PINCH.mx + 'px ' + PINCH.my + 'px';
+  }, { passive: true });
+  overlay.addEventListener('touchmove', e => {
+    if (!PINCH || e.touches.length !== 2) return;
+    e.preventDefault();
+    PINCH.scale = dist2(e.touches) / PINCH.d0;
+    overlay.style.transform = 'scale(' + PINCH.scale + ')';
+  }, { passive: false });
+  const finPinch = () => {
+    if (!PINCH) return;
+    const p = PINCH; PINCH = null;
+    overlay.style.transform = 'none'; overlay.style.transformOrigin = '';
+    const z = WINDY_CAM.zoom;
+    const z2 = Math.min(10, Math.max(2, z + Math.round(Math.log2(p.scale))));
+    if (z2 === z) return;
+    // el punto entre los dos dedos queda en el mismo lugar de la pantalla
+    const vp = document.getElementById('map-viewport');
+    const ox = p.mx - vp.clientWidth / 2, oy = p.my - vp.clientHeight / 2;
+    const k = Math.pow(2, z2 - z);
+    const cx = (mercX(WINDY_CAM.lon, z) + ox) * k - ox, cy = (mercY(WINDY_CAM.lat, z) + oy) * k - oy;
+    loadWindyIframe(mercLat(cy, z2), mercLon(cx, z2), z2);
+  };
+  window.addEventListener('touchend', e => { if (PINCH && e.touches.length < 2) finPinch(); });
+  window.addEventListener('touchcancel', () => finPinch());
+
+  // Rueda del mouse sobre la carta: zoom
+  let WHEEL_TIMER = null;
+  overlay.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (WHEEL_TIMER) clearTimeout(WHEEL_TIMER);
+    const delta = e.deltaY < 0 ? 1 : -1;
+    WHEEL_TIMER = setTimeout(() => {
+      changeWindyZoom(delta);
+    }, 180);
+  }, { passive: false });
+}
+
+function setWindyView(preset) {
+  if (CURRENT_MAP_MODE !== 'windy') setMapMode('windy');
+
+  if (preset === 'fleet') {
+    loadWindyIframe(2.0, -28.0, 4);
+  } else if (preset === 'leaders') {
+    loadWindyIframe(7.0, -26.0, 5);
+  } else if (preset === 'leader') {
+    const leader = getRanking()[0];
+    loadWindyIframe(leader.lat, leader.lon, 6);
+  } else if (preset === 'finish') {
+    loadWindyIframe(-38.04, -57.52, 5);
+  }
+}
+
+// Tres cartas en un solo boton, que pasa de una a la otra: Windy → satelite → OpenSeaMap
+// (satelite y OpenSeaMap son fondos de la carta Leaflet; Windy es el iframe)
+const CARTAS = {
+  windy: { txt: '🌬️ Windy', tip: 'Viento y pronóstico de Windy', sig: 'sat' },
+  sat:   { txt: '🛰️ Satélite', tip: 'Imagen satelital (Esri)', sig: 'osm' },
+  osm:   { txt: '⚓ OpenSeaMap', tip: 'Carta náutica de OpenSeaMap: balizas, faros y boyas (se ven desde zoom ~9)', sig: 'windy' }
+};
+let MAP_FONDOS = null, CARTA = 'windy';
+function setMapMode(mode) {
+  CARTA = mode;
+  const isW = mode === 'windy';
+  CURRENT_MAP_MODE = isW ? 'windy' : 'leaf';
+  if (!isW && MAP && MAP_FONDOS) {
+    Object.values(MAP_FONDOS).forEach(f => MAP.removeLayer(f));
+    MAP_FONDOS[mode].addTo(MAP);
+  }
+
+  document.getElementById('windy-frame').style.display = isW ? 'block' : 'none';
+  document.getElementById('windy-overlay').style.display = isW ? 'block' : 'none';
+  document.getElementById('drag-hint').style.display = isW ? 'block' : 'none';
+  document.getElementById('map-leaf').style.display = isW ? 'none' : 'block';
+
+  const tc = document.getElementById('tab-carta');
+  tc.textContent = CARTAS[mode].txt + ' ▸';
+  tc.title = CARTAS[mode].tip + ' · tocá para pasar a ' + CARTAS[CARTAS[mode].sig].txt;
+
+  if (isW) {
+    updateWindyOverlays();
+  } else if (MAP) {
+    MAP.setView([WINDY_CAM.lat, WINDY_CAM.lon], WINDY_CAM.zoom, { animate: false });
+    setTimeout(() => MAP.invalidateSize(), 50);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PANTALLA COMPLETA
+// ═══════════════════════════════════════════════════════════
+function toggleFullscreen() {
+  const card = document.getElementById('map-card');
+  const btn = document.getElementById('btn-fullscreen');
+
+  const isFs = document.fullscreenElement === card || card.classList.contains('is-fullscreen');   // la pagina entera en pantalla completa no cuenta
+
+  if (!isFs) {
+    if (card.requestFullscreen) {
+      card.requestFullscreen().catch(() => {
+        card.classList.add('is-fullscreen');
+      });
+    } else {
+      card.classList.add('is-fullscreen');
+    }
+    btn.innerHTML = '✕ Salir Pantalla Completa';
+    btn.style.background = '#dc2626';
+  } else {
+    if (document.exitFullscreen && document.fullscreenElement === card) {
+      document.exitFullscreen();
+    } else {
+      card.classList.remove('is-fullscreen');
+    }
+    btn.innerHTML = '⛶ Pantalla Completa';
+    btn.style.background = '#0284c7';
+  }
+
+  setTimeout(() => {
+    if (MAP) MAP.invalidateSize();
+    render();   // laylines y datos: solo con la carta maximizada
+  }, 120);
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const card = document.getElementById('map-card');
+  const btn = document.getElementById('btn-fullscreen');
+  const isFs = document.fullscreenElement === card;
+  if (!isFs) {
+    card.classList.remove('is-fullscreen');
+    btn.innerHTML = '⛶ Pantalla Completa';
+    btn.style.background = '#0284c7';
+  }
+  setTimeout(() => { if (MAP) MAP.invalidateSize(); render(); }, 100);
+});
+
+// ─── Datos NMEA del velero elegido (o del lider), sobre la carta en pantalla completa ───
+let NMEA_ON = true;
+try { NMEA_ON = localStorage.getItem('regata_nmea') !== '0'; } catch(e) {}
+function toggleNMEA() {
+  NMEA_ON = !NMEA_ON;
+  try { localStorage.setItem('regata_nmea', NMEA_ON ? '1' : '0'); } catch(e) {}
+  render();   // datos y laylines
+}
+
+// ─── Laylines al proximo WP del velero elegido (o del lider): solo con la carta maximizada y Datos prendido ───
+// WP a barlovento (ceñida) o a sotavento (popa): dos lineas que llegan al WP con el rumbo de cada amura.
+// El angulo es el TWA actual si va ciñendo o empopado; si no, 45° de ceñida y 150° de popa.
+const difAng = (a, b) => ((a - b + 540) % 360) - 180;
+const COLOR_AMURA = { Ba: '#f87171', Er: '#4ade80' };
+function cartaMax() { const c = document.getElementById('map-card'); return document.fullscreenElement === c || c.classList.contains('is-fullscreen'); }
+// twdOtro: otra direccion del viento (la de Windy en el WP); sin ella, el viento real del velero (NMEA)
+function laylinesDe(b, twdOtro) {
+  const wp = b && b.nextWp, twd = twdOtro != null ? twdOtro : b && b.twd != null ? +b.twd : null;
+  if (!wp || twd == null || b.lat == null) return null;
+  const hdg = parseFloat(b.hdg), v = parseFloat(b.spd) || 0;
+  const aWp = Math.abs(difAng(rumboA(b, wp), twd));
+  const twaAct = !isNaN(hdg) && b.twd != null ? Math.abs(difAng(+b.twd, hdg)) : null;
+  const cen = twaAct >= 30 && twaAct <= 60 ? twaAct : 45, popa = twaAct >= 135 && twaAct <= 175 ? twaAct : 150;
+  const ang = aWp < cen ? cen : aWp > popa ? popa : null;
+  if (ang == null) return { wp, tipo: 'directo', lineas: [] };
+  const k = Math.cos(wp.lat * Math.PI / 180);
+  let dl = b.lon - wp.lon; if (dl > 180) dl -= 360; else if (dl < -180) dl += 360;
+  const P = [dl * k * 60, (b.lat - wp.lat) * 60];   // velero en MN, con el WP en el origen
+  const u = (h) => [Math.sin(h * Math.PI / 180), Math.cos(h * Math.PI / 180)];
+  const cr = (a, c) => a[0] * c[1] - a[1] * c[0];
+  const hb = !isNaN(hdg) ? u(hdg) : null;
+  const L = Math.max(haversineNM(b.lat, b.lon, wp.lat, wp.lon) * 1.4, 5);
+  // rumbo twd + ang = viento por babor (amura Ba); twd - ang = amura Er
+  const lineas = [['Ba', twd + ang], ['Er', twd - ang]].map(([amura, h]) => {
+    const d = u(h);
+    let t = null;   // con su rumbo y velocidad, cuando cruza la layline (antes del WP)
+    if (hb && v > 0.5 && Math.abs(cr(hb, d)) > 1e-6) {
+      const s = cr(d, P) / cr(hb, d), kk = (P[0] + s * hb[0]) * d[0] + (P[1] + s * hb[1]) * d[1];
+      if (s > 0 && kk <= 0) t = s / v;
+    }
+    return { amura, t, fin: { lat: wp.lat - L * d[1] / 60, lon: wp.lon - L * d[0] / (60 * k) } };
+  });
+  return { wp, tipo: ang === cen ? 'ceñida' : 'popa', lineas };
+}
+// Viento de Windy en el proximo WP: Windy no deja leer su carta, asi que se pide el mismo modelo (ECMWF)
+// a Open-Meteo para la hora actual. Se renueva cada 30 min o al cambiar de WP.
+let VIENTO_WP = null;
+function vientoWindy(wp) {
+  const clave = wp.lat.toFixed(3) + ',' + wp.lon.toFixed(3);
+  if (VIENTO_WP && VIENTO_WP.clave === clave && (VIENTO_WP.pidiendo || Date.now() - VIENTO_WP.t < 30 * 60e3)) return VIENTO_WP.twd;
+  VIENTO_WP = { clave, pidiendo: true, twd: VIENTO_WP && VIENTO_WP.clave === clave ? VIENTO_WP.twd : null, t: Date.now() };
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${wp.lat.toFixed(3)}&longitude=${wp.lon.toFixed(3)}&current=wind_direction_10m,wind_speed_10m&wind_speed_unit=kn&models=ecmwf_ifs025`)
+    .then(r => r.json()).then(d => {
+      if (VIENTO_WP.clave !== clave) return;
+      VIENTO_WP = { clave, twd: d.current.wind_direction_10m, tws: d.current.wind_speed_10m, t: Date.now() };
+      render();
+    }).catch(e => { console.warn('[Regata] viento Windy en el WP:', e); if (VIENTO_WP.clave === clave) VIENTO_WP.pidiendo = false; });
+  return VIENTO_WP.twd;
+}
+// Los dos juegos: segun el viento del velero (NMEA) y segun Windy (ECMWF) en el WP
+function juegosLaylines(ranking) {
+  if (!NMEA_ON || !cartaMax()) return [];
+  const b = ranking.find(x => x.nr === SELECTED_NR) || ranking[0];
+  if (!b || !b.nextWp) return [];
+  const twdW = vientoWindy(b.nextWp);
+  return [
+    { fuente: 'NMEA', ll: laylinesDe(b), dash: '8 6', ancho: 2.5 },
+    { fuente: 'Windy', ll: twdW != null ? laylinesDe(b, twdW) : null, dash: '2 5', ancho: 2 }
+  ];
+}
+// ─── Tierra en el rumbo actual (solo con la carta maximizada y Datos prendido) ───
+// Costas de Natural Earth 1:10 millones (world-atlas, ~800 KB): continentes e islas chicas, se bajan una sola vez.
+// Se sigue el rumbo actual en linea recta (loxodromica) hasta 48 h de navegacion a la velocidad actual.
+let TIERRA = null, TIERRA_PIDIENDO = false, TIERRA_CACHE = null;
+function cargarTierra(listo) {
+  if (TIERRA || TIERRA_PIDIENDO) return;
+  TIERRA_PIDIENDO = true;
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-10m.json').then(r => r.json()).then(topo => {
+    // TopoJSON: arcos con coordenadas cuantizadas y en deltas
+    const [sx, sy] = topo.transform.scale, [tx, ty] = topo.transform.translate;
+    const arcs = topo.arcs.map(a => { let x = 0, y = 0; return a.map(([dx, dy]) => [(x += dx) * sx + tx, (y += dy) * sy + ty]); });
+    const arco = (i) => i >= 0 ? arcs[i] : arcs[~i].slice().reverse();
+    const anillo = (ids) => ids.flatMap((i, k) => k ? arco(i).slice(1) : arco(i));
+    // Cada borde de costa se guarda en las franjas de latitud (de 0,1°) que atraviesa: para saber si un
+    // punto es tierra solo se miran los bordes de su franja
+    const bandas = Array.from({ length: TIERRA_NB }, () => []);
+    (topo.objects.land.geometries || [topo.objects.land]).forEach(g =>
+      (g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : []).forEach(p => {
+        const rings = p.map(anillo);
+        // islas que cruzan el meridiano 180 (Fiji…): se unen del otro lado para que no formen
+        // una franja alrededor del mundo (la Antartida, que llega al polo, queda como esta)
+        if (rings[0].every(q => q[1] > -85)) rings.forEach(r => { for (let i = 1; i < r.length; i++) { while (r[i][0] - r[i - 1][0] > 180) r[i] = [r[i][0] - 360, r[i][1]]; while (r[i][0] - r[i - 1][0] < -180) r[i] = [r[i][0] + 360, r[i][1]]; } });
+        rings.forEach(r => { for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+          const yi = r[i][1], yj = r[j][1];
+          if (yi === yj) continue;   // los bordes horizontales no cruzan
+          const b0 = banda(Math.min(yi, yj)), b1 = banda(Math.max(yi, yj));
+          for (let k = b0; k <= b1; k++) bandas[k].push(r[i][0], yi, r[j][0], yj);
+        } });
+      }));
+    TIERRA = bandas.map(e => Float64Array.from(e));
+    listo();
+  }).catch(e => console.warn('Costas (tierra en el rumbo):', e)).finally(() => { TIERRA_PIDIENDO = false; });
+}
+const TIERRA_NB = 1800, banda = (lat) => Math.max(0, Math.min(TIERRA_NB - 1, Math.floor((lat + 90) * 10)));
+// Par-impar: cuantos bordes cruza una linea desde el punto hacia el este (impar = tierra; los lagos quedan
+// como agua). Tambien se prueba corrido 360° por las islas unidas del otro lado del 180.
+function enTierra(lon, lat) {
+  const E = TIERRA[banda(lat)];
+  let c0 = 0, c1 = 0, c2 = 0;
+  for (let i = 0; i < E.length; i += 4) {
+    const yi = E[i + 1], yj = E[i + 3];
+    if ((yi > lat) === (yj > lat)) continue;
+    const x = (E[i + 2] - E[i]) * (lat - yi) / (yj - yi) + E[i];
+    if (lon < x) c0 ^= 1;
+    if (lon + 360 < x) c1 ^= 1;
+    if (lon - 360 < x) c2 ^= 1;
+  }
+  return !!(c0 | c1 | c2);
+}
+// Donde toca tierra el rumbo actual: { d (MN), t (h), lat, lon } o null
+function tierraEnRumbo(lat, lon, rumboG, v) {
+  if (!TIERRA || lat == null || rumboG == null || isNaN(rumboG) || !(v >= 0.5)) return null;
+  const clave = [lat.toFixed(3), lon.toFixed(3), Math.round(rumboG), v.toFixed(1)].join();
+  if (TIERRA_CACHE && TIERRA_CACHE.clave === clave) return TIERRA_CACHE.res;
+  const h = rumboG * Math.PI / 180, maxD = Math.min(Math.max(v * 48, 5), 1000), paso = Math.max(0.25, maxD / 500);
+  const punto = (d) => {
+    const la = lat + d * Math.cos(h) / 60;
+    const lo = lon + d * Math.sin(h) / (60 * Math.cos((lat + la) / 2 * Math.PI / 180));
+    return [la, ((lo + 540) % 360) - 180];
+  };
+  // si arranca "en tierra" (en puerto o por lo grueso de la costa), cuenta desde que sale al agua
+  let res = null, agua = enTierra(lon, lat) ? null : 0;
+  for (let d = paso; d <= maxD; d += paso) {
+    const [la, lo] = punto(d);
+    if (Math.abs(la) > 85) break;
+    if (!enTierra(lo, la)) { agua = d; continue; }
+    if (agua == null) continue;
+    let a = agua, z = d;   // afinar entre el ultimo punto en el agua y el primero en tierra
+    for (let i = 0; i < 12; i++) { const m = (a + z) / 2, [ml, mo] = punto(m); if (enTierra(mo, ml)) z = m; else a = m; }
+    const [pl, po] = punto(z);
+    res = { d: z, t: z / v, lat: pl, lon: po };
+    break;
+  }
+  TIERRA_CACHE = { clave, res };
+  return res;
+}
+const COLOR_TIERRA = '#fb923c';
+function tierraSel(ranking) {
+  if (!NMEA_ON || !cartaMax()) return null;
+  const b = ranking.find(x => x.nr === SELECTED_NR) || ranking[0];
+  if (!b || b.lat == null) return null;
+  if (!TIERRA) { cargarTierra(render); return null; }
+  const r = tierraEnRumbo(b.lat, b.lon, parseFloat(b.hdg), parseFloat(b.spd));
+  return r && { b, r };
+}function laylinesWindy(w, h, ranking) {
+  const { lat: cLat, lon: cLon, zoom: z } = WINDY_CAM;
+  const px = (p) => [w / 2 + (mercX(p.lon, z) - mercX(cLon, z)), h / 2 + (mercY(p.lat, z) - mercY(cLat, z))];
+  const lineas = juegosLaylines(ranking).filter(j => j.ll && j.ll.lineas.length).map(j => {
+    const [wx, wy] = px(j.ll.wp);
+    return j.ll.lineas.map(l => { const [x, y] = px(l.fin); return `<line x1="${wx}" y1="${wy}" x2="${x}" y2="${y}" stroke="${COLOR_AMURA[l.amura]}" stroke-width="${j.ancho}" stroke-dasharray="${j.dash}" stroke-linecap="round" opacity=".9"><title>Layline amura ${l.amura} (${j.fuente})</title></line>`; }).join('');
+  }).join('');
+  const ts = tierraSel(ranking), [bx, by] = ts ? px(ts.b) : [], [tx, ty] = ts ? px(ts.r) : [];
+  const tierra = ts ? `<line x1="${bx}" y1="${by}" x2="${tx}" y2="${ty}" stroke="${COLOR_TIERRA}" stroke-width="2.5" stroke-dasharray="2 5" stroke-linecap="round"><title>Tierra en ${formatETA(ts.r.t)}</title></line><circle cx="${tx}" cy="${ty}" r="5" fill="${COLOR_TIERRA}" stroke="#0f172a" stroke-width="1.5"/>` : '';
+  return lineas || tierra ? `<svg style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none">${lineas}${tierra}</svg>` : '';
+}
+let MAP_LAYLINES = null;
+function laylinesCarta(ranking) {
+  if (!MAP) return;
+  if (MAP_LAYLINES) { MAP.removeLayer(MAP_LAYLINES); MAP_LAYLINES = null; }
+  const capas = [];
+  juegosLaylines(ranking).filter(j => j.ll && j.ll.lineas.length).forEach(j => j.ll.lineas.forEach(l => capas.push(
+    L.polyline([[j.ll.wp.lat, j.ll.wp.lon], [l.fin.lat, l.fin.lon]], { color: COLOR_AMURA[l.amura], weight: j.ancho, dashArray: j.dash, lineCap: 'round', opacity: 0.9 })
+      .bindTooltip('Layline amura ' + l.amura + ' (' + j.fuente + ')'))));
+  const ts = tierraSel(ranking);
+  if (ts) capas.push(
+    L.polyline([[ts.b.lat, ts.b.lon], [ts.r.lat, ts.r.lon]], { color: COLOR_TIERRA, weight: 2.5, dashArray: '2 5', lineCap: 'round' }).bindTooltip('Tierra en ' + formatETA(ts.r.t)),
+    L.circleMarker([ts.r.lat, ts.r.lon], { radius: 5, color: '#0f172a', weight: 1.5, fillColor: COLOR_TIERRA, fillOpacity: 1 }));
+  if (capas.length) MAP_LAYLINES = L.layerGroup(capas).addTo(MAP);
+}
+function celdasLaylines(ranking) {
+  const js = juegosLaylines(ranking);
+  if (!js.length) return '';
+  const celdas = js.map(({ fuente, ll }) =>
+    !ll || ll.tipo === 'directo' ? ''   // sin laylines (va directo al WP): no ocupa lugar
+    : ll.lineas.map(l => `<div><span style="color:${COLOR_AMURA[l.amura]}">${l.amura} · ${fuente}</span><b>${l.t != null ? formatETA(l.t) : '—'}</b></div>`).join('')).join('') +
+    // a la derecha: cuanto falta para tocar tierra con el rumbo actual (solo si pasa)
+    ((ts) => ts ? `<div><span style="color:${COLOR_TIERRA}">Tierra</span><b>${formatETA(ts.r.t)}</b></div>` : '')(tierraSel(ranking));
+  return celdas ? '<div class="lay">' + celdas + '</div>' : '';
+}
+function rumboA(a, b) {
+  const r = Math.PI / 180, y = Math.sin((b.lon - a.lon) * r) * Math.cos(b.lat * r);
+  const x = Math.cos(a.lat * r) * Math.sin(b.lat * r) - Math.sin(a.lat * r) * Math.cos(b.lat * r) * Math.cos((b.lon - a.lon) * r);
+  return (Math.atan2(y, x) / r + 360) % 360;
+}
+// d: spd, vmg, twa y awa (con signo: + estribor, - babor), tws, aws, dWp, tWp, dDest, tDest
+function hudNMEA(nombre, d, fmtT) {
+  const ok = (v) => v != null && !isNaN(v);
+  const kn = (v) => ok(v) ? v.toFixed(1) + ' kn' : '—';
+  const ang = (v) => ok(v) ? Math.abs(Math.round(v)) + '°' + (Math.round(v) % 180 ? (v > 0 ? ' Er' : ' Ba') : '') : '—';
+  const mn = (v) => ok(v) ? (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString('es-AR')) + ' MN' : '—';
+  const c = (l, v) => `<div><span>${l}</span><b>${v}</b></div>`;
+  return `<div class="t">${nombre}</div>` +
+    c('Velocidad', kn(d.spd)) + c('VMG', kn(d.vmg)) + c('TWA', ang(d.twa)) + c('AWA', ang(d.awa)) + c('TWS', kn(d.tws)) + c('AWS', kn(d.aws)) +
+    c('Dist. próx. WP', mn(d.dWp)) + c('Tiempo próx. WP', ok(d.tWp) ? fmtT(d.tWp) : '—') + c('Dist. destino', mn(d.dDest)) + c('Tiempo destino', ok(d.tDest) ? fmtT(d.tDest) : '—');
+}
+function pintarNMEA(ranking) {
+  const hud = document.getElementById('nmea-hud');
+  hud.classList.toggle('on', NMEA_ON);
+  document.getElementById('btn-nmea').className = 'sm nmea-btn ' + (NMEA_ON ? 'act' : 'sec');
+  if (!NMEA_ON) return;
+  const b = ranking.find(x => x.nr === SELECTED_NR) || ranking[0];
+  if (!b) return;
+  const v = parseFloat(b.spd) || 0, hdg = parseFloat(b.hdg);
+  const horas = (d) => v > 0.5 ? d / v : null;
+  const twa = b.twd != null && !isNaN(hdg) ? ((b.twd - hdg + 540) % 360) - 180 : null;
+  hud.innerHTML = hudNMEA(b.name, {
+    spd: v, vmg: twa != null ? Math.abs(v * Math.cos(twa * Math.PI / 180)) : null,   // VMG al viento (ceñida o popa)
+    twa, awa: b.awa, tws: b.tws, aws: b.aws,
+    dWp: b.distNext, tWp: horas(b.distNext), dDest: b.dtf, tDest: horas(b.dtf)
+  }, formatETA) + celdasLaylines(ranking);   // a la derecha, el tiempo a cada layline
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDERIZADO DE TABLA Y DETALLES
+// ═══════════════════════════════════════════════════════════
+function render() {
+  const ranking = getRanking();
+  if (!ranking.length) return;
+  pintarNMEA(ranking);
+
+  const leader = ranking[0];
+
+  const alertCount = ranking.filter(b => b.twaAlert).length;
+  const alertElem = document.getElementById('qs-alerts');
+  if (alertElem) {
+    alertElem.textContent = alertCount;
+    alertElem.style.color = alertCount > 0 ? '#ef4444' : '#4ade80';
+  }
+
+  const twaSummary = document.getElementById('twa-summary');
+  if (twaSummary) {
+    if (alertCount > 0) {
+      twaSummary.style.display = 'inline-flex';
+      twaSummary.innerHTML = `⚠️ ${alertCount} velero(s) con TWA crítico (&lt;50° o &gt;160°)`;
+    } else {
+      twaSummary.style.display = 'none';
+    }
+  }
+
+  document.getElementById('qs-leader').textContent = leader.name;
+  document.getElementById('qs-leader-sub').textContent = `${leader.dtf.toFixed(0)} MN a meta · ${leader.spd.toFixed(1)} kn`;
+
+  const fastest = [...ranking].sort((a, b) => b.spd - a.spd)[0];
+  document.getElementById('qs-fastest').textContent = `${fastest.spd.toFixed(1)} kts`;
+  document.getElementById('qs-fastest-sub').textContent = `${fastest.name} (${fastest.design})`;
+
+  const avgProg = (ranking.reduce((acc, b) => acc + b.progress, 0) / ranking.length).toFixed(1);
+  document.getElementById('qs-prog').textContent = `${avgProg}%`;
+
+  const tbody = document.getElementById('lb-body');
+  tbody.innerHTML = ranking.map((b, idx) => {
+    const pos = idx + 1;
+    const diff = b.dtf - leader.dtf;
+    const isSel = b.nr === SELECTED_NR;
+    const isAlert = b.twaAlert;
+    const rankClass = pos === 1 ? 'rank-1' : pos === 2 ? 'rank-2' : pos === 3 ? 'rank-3' : '';
+    const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : pos;
+
+    const diffHtml = diff <= 0.1 
+      ? '<span class="dtf-leader">LÍDER</span>' 
+      : `<span class="dtf-diff">+${diff.toFixed(1)} MN</span>`;
+
+    const twaHtml = isAlert 
+      ? `<span class="twa-alert-pill" title="TWA crítico: ${b.twa}° (${b.twaReason})">⚠️ TWA ${b.twa}°</span>`
+      : `<span style="font-size:9.5px;color:#94a3b8">TWA ${b.twa != null ? b.twa + '°' : '—'}</span>`;
+
+    return `
+      <tr class="boat-row ${isSel ? 'sel' : ''} ${isAlert ? 'twa-alert-row' : ''}" onclick="selectBoat(${b.nr})" id="row-${b.nr}">
+        <td class="cen"><span class="rank-badge ${rankClass}">${medal}</span></td>
+        <td>
+          <div class="b-title">
+            <span class="b-name">${b.name}</span>
+            <span class="b-model">${b.design}</span>
+          </div>
+        </td>
+        <td class="num">
+          <div class="num-cell">
+            <span class="spd-val">${b.spd.toFixed(1)} kn</span>
+            <span class="spd-cog">${Math.round(b.hdg || 0)}° 🧭</span>
+            ${twaHtml}
+          </div>
+        </td>
+        <td>
+          <div class="pos-cell">${formatCoordCompact(b.lat, b.lon)}</div>
+        </td>
+        <td class="num">
+          <div class="dtf-cell">
+            <span class="dtf-val">${b.dtf.toFixed(0)} <small style="font-weight:400;color:#94a3b8">MN</small></span>
+            ${diffHtml}
+          </div>
+        </td>
+        <td>
+          <div class="wp-cell">
+            <span class="wp-name">${b.nextWp.name.split(' (')[0]}</span>
+            <span class="wp-dist">a ${b.distNext.toFixed(0)} MN</span>
+          </div>
+        </td>
+        <td class="num">
+          <div class="eta-cell">
+            <span class="eta-val">${formatETA(b.etaHours)}</span>
+            <span class="eta-date">${calcArrivalDate(b.etaHours)}</span>
+          </div>
+        </td>
+        <td class="prog-cell">
+          <div style="font-size:9.5px;color:#94a3b8;display:flex;justify-content:space-between">
+            <span>${b.progress.toFixed(0)}%</span>
+            <span>${b.sailed.toFixed(0)}M</span>
+          </div>
+          <div class="p-bar"><div class="p-fill" style="width:${b.progress}%"></div></div>
+        </td>
+        <td class="cen">
+          <button class="sm ${isSel ? '' : 'sec'}" onclick="event.stopPropagation();selectBoat(${b.nr})">
+            ${isSel ? '● Ver' : 'Ver ›'}
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  renderDetail();
+  updateWindyOverlays();
+  updateMap(ranking);
+}
+
+function renderDetail() {
+  const emptyBox = document.getElementById('detail-empty');
+  const contentBox = document.getElementById('detail-content');
+
+  if (!SELECTED_NR || !BOATS[SELECTED_NR]) {
+    emptyBox.style.display = 'block';
+    contentBox.style.display = 'none';
+    return;
+  }
+
+  emptyBox.style.display = 'none';
+  contentBox.style.display = 'block';
+
+  const b = BOATS[SELECTED_NR];
+  const { dtf, nextWp, distNext } = calcDTF(b);
+  const spd = Math.max(0.1, parseFloat(b.spd) || 0.1);
+  const etaHours = dtf / (spd > 0.5 ? spd : 4.5);
+  const etaWpHours = distNext / (spd > 0.5 ? spd : 4.5);
+  const { twa, isAlert: twaAlert, reason: twaReason } = checkTwaAlert(b);
+
+  const crew = b.crew || 1;
+  const water = b.water != null ? b.water : 100;
+  const food = b.food != null ? b.food : 50;
+  const waterDaily = crew * 2;
+  const foodDaily = crew * 1;
+  const waterDays = (water / waterDaily).toFixed(0);
+  const foodDays = (food / foodDaily).toFixed(0);
+
+  contentBox.innerHTML = `
+    <div class="detail-card">
+      <div class="detail-hdr">
+        <div>
+          <h3>
+            ⛵ ${b.name}
+            <span class="des-tag">${b.design}</span>
+            <small style="font-size:11px;color:#94a3b8;font-weight:400">n° ${b.nr}</small>
+          </h3>
+          <div style="font-size:11px;color:#94a3b8;margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span>${b.type} · Eslora: ${b.eslora || '—'} · Capitán Adrian1 · <span style="color:#4ade80">● En regata</span></span>
+            <span style="display:inline-flex;align-items:center;gap:5px;background:#1e293b;padding:2px 8px;border-radius:4px;border:1px solid #334155;color:#f8fafc">
+              👥 <b>Tripulantes:</b>
+              <input type="number" min="1" max="20" value="${crew}" onchange="updateBoatCrew(${b.nr}, this.value)" style="width:38px;background:#0f172a;color:#38bdf8;font-weight:700;border:1px solid #0284c7;border-radius:3px;padding:1px 3px;text-align:center;font-size:11px">
+            </span>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="sec sm" onclick="centerOnBoat(${b.nr})">🎯 Centrar en carta</button>
+          <a href="https://sailaway.world/cgi-bin/sailaway3/page.pl?p=boat&nr=${b.nr}&nr2=0" target="_blank" rel="noopener" style="text-decoration:none">
+            <button class="sec sm">🌐 Sailaway ↗</button>
+          </a>
+          <button class="sec sm" onclick="deselectBoat()" style="background:#dc2626;border-color:#ef4444">✕ Cerrar</button>
+        </div>
+      </div>
+
+      ${twaAlert ? `
+        <div class="twa-warning-banner">
+          ⚠️ <b>ALERTA DE RUMBO CRÍTICO:</b> El ángulo del viento real (TWA actual: <b>${twa}°</b>) está en <b>${twaReason}</b>, fuera del margen óptimo (50° a 160°). Conviene orzar o derivar para optimizar la velocidad y evitar pérdidas de rendimiento o riesgos de trasluchada.
+        </div>
+      ` : ''}
+
+      <div class="grid-telemetry">
+        <div class="ttile ok">
+          <div class="tl"><span>⚡ Velocidad SOG</span><span>nudos</span></div>
+          <div class="tv">${parseFloat(b.spd || 0).toFixed(1)} kn</div>
+          <div class="ts">Rumbo COG: ${Math.round(b.hdg || 0)}°</div>
+        </div>
+
+        <div class="ttile ${twaAlert ? 'alert' : ''}">
+          <div class="tl"><span>💨 Ángulo Viento (TWA)</span><span>grados</span></div>
+          <div class="tv" style="${twaAlert ? 'color:#f87171' : ''}">${twa != null ? twa + '°' : '—'}</div>
+          <div class="ts">${twaAlert ? '⚠️ ' + twaReason : 'Régimen normal'}</div>
+        </div>
+
+        <div class="ttile">
+          <div class="tl"><span>💨 Viento Real (TWS/D)</span><span>nudos/°</span></div>
+          <div class="tv">${b.tws != null ? b.tws + ' kn' : '12.4 kn'}</div>
+          <div class="ts">Dirección: ${b.twd != null ? b.twd + '°' : '160°'}</div>
+        </div>
+
+        <div class="ttile">
+          <div class="tl"><span>💨 Viento Aparente</span><span>AWS / AWA</span></div>
+          <div class="tv">${b.aws != null ? b.aws + ' kn' : '15.2 kn'}</div>
+          <div class="ts">Ángulo: ${b.awa != null ? b.awa + '°' : '-35°'}</div>
+        </div>
+
+        <div class="ttile">
+          <div class="tl"><span>📍 Posición GPS</span><span>actual</span></div>
+          <div class="tv" style="font-size:11.5px;font-family:monospace">${formatCoordCompact(b.lat, b.lon)}</div>
+          <div class="ts">Actualizado en vivo</div>
+        </div>
+
+        <div class="ttile">
+          <div class="tl"><span>📏 Millas Totales</span><span>MN</span></div>
+          <div class="tv">${b.miles != null ? Number(b.miles).toLocaleString('es-AR') : '3.120'}</div>
+          <div class="ts">Odómetro de regata</div>
+        </div>
+      </div>
+
+      <div class="detail-subgrid">
+        <div class="subbox">
+          <h4>💧 Suministros y Autonomía (${crew} tripulante${crew > 1 ? 's' : ''})</h4>
+          <div class="meter-row">
+            <div class="meter-lbl">
+              <span>Agua potable: <b>${water} ltr</b></span>
+              <span style="color:#38bdf8">~${waterDays} días de autonomía (${waterDaily} L/d)</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill water" style="width:${Math.min(100, (water / (crew * 200)) * 100)}%"></div></div>
+          </div>
+
+          <div class="meter-row">
+            <div class="meter-lbl">
+              <span>Comida a bordo: <b>${food} kg</b></span>
+              <span style="color:#fbbf24">~${foodDays} días de autonomía (${foodDaily} kg/d)</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill food" style="width:${Math.min(100, (food / (crew * 100)) * 100)}%"></div></div>
+          </div>
+          <div style="font-size:9.5px;color:#64748b">
+            Consumo: 2 L agua + 1 kg comida por tripulante/día (total barco: ${waterDaily} L y ${foodDaily} kg diarios).
+          </div>
+        </div>
+
+        <div class="subbox">
+          <h4>🎯 Próxima Marca y Meta Final</h4>
+          <table style="width:100%;font-size:11px">
+            <tr>
+              <td style="color:#94a3b8;width:45%">Próximo Waypoint:</td>
+              <td><b>${nextWp.name}</b> (${distNext.toFixed(1)} MN)</td>
+            </tr>
+            <tr>
+              <td style="color:#94a3b8">ETA al Waypoint:</td>
+              <td><b>${formatETA(etaWpHours)}</b></td>
+            </tr>
+            <tr>
+              <td style="color:#94a3b8">Distancia a Meta:</td>
+              <td><b>${dtf.toFixed(1)} MN</b> (Mar del Plata)</td>
+            </tr>
+            <tr>
+              <td style="color:#94a3b8">ETA Final Estimado:</td>
+              <td><b>${formatETA(etaHours)}</b> (~${calcArrivalDate(etaHours)})</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function selectBoat(nr) {
+  SELECTED_NR = nr;
+  try { localStorage.setItem('regata_selected_nr', nr); } catch(e) {}
+  render();
+
+  const detail = document.getElementById('detail-container');
+  if (detail) detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  fetchSingleBoatDetails(nr);
+}
+
+function deselectBoat() {
+  SELECTED_NR = null;
+  try { localStorage.removeItem('regata_selected_nr'); } catch(e) {}
+  render();
+}
+
+function centerOnBoat(nr) {
+  const b = BOATS[nr];
+  if (!b) return;
+  loadWindyIframe(b.lat, b.lon, 6);
+  if (MAP) MAP.setView([b.lat, b.lon], 6);
+  document.getElementById('map-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAPA LEAFLET ALTERNATIVO
+// ═══════════════════════════════════════════════════════════
+function initLeafletMap() {
+  MAP = L.map('map-leaf', {
+    center: [WINDY_CAM.lat, WINDY_CAM.lon],
+    zoom: WINDY_CAM.zoom,
+    minZoom: 2,
+    maxZoom: 16
+  });
+
+  // Fondos: imagen satelital de Esri, o carta de OpenStreetMap con balizas y faros de OpenSeaMap
+  MAP_FONDOS = {
+    sat: L.layerGroup([
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, maxNativeZoom: 17, attribution: 'Esri, Maxar, Earthstar Geographics' }),
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, maxNativeZoom: 17 })
+    ]),
+    osm: L.layerGroup([
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }),
+      L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenSeaMap' })
+    ])
+  };
+  MAP_FONDOS.osm.addTo(MAP);
+
+  const routeCoords = WAYPOINTS.map(w => [w.lat, w.lon]);
+  // amarillo, como en la flota: se ve sobre el satelite (oscuro) y sobre OpenSeaMap (claro)
+  MAP_ROUTE_LINE = L.polyline(routeCoords, {
+    color: '#fbbf24',
+    weight: 2.5,
+    opacity: 0.95,
+    dashArray: '6, 5'
+  }).addTo(MAP);
+
+  WAYPOINTS.forEach(w => {
+    const isFinish = w.type === 9, isStart = w.type === 1;
+    const icon = L.divIcon({
+      className: 'wp-ico',
+      html: `<div class="wp-marker ${isFinish ? 'finish' : ''}">${isFinish ? '🏁' : isStart ? '⚓' : w.n}</div>`,
+      iconSize: [16, 16],
+      iconAnchor: [8, 8]
+    });
+    L.marker([w.lat, w.lon], { icon }).addTo(MAP).bindPopup(`<b>WP ${w.n}: ${w.name}</b>`);
+  });
+
+  // Si el usuario mueve Leaflet, mantener actualizadas las coordenadas de Windy
+  MAP.on('moveend', () => {
+    if (CURRENT_MAP_MODE === 'leaf') {
+      const c = MAP.getCenter();
+      WINDY_CAM.lat = c.lat;
+      WINDY_CAM.lon = c.lng;
+      WINDY_CAM.zoom = MAP.getZoom();
+    }
+  });
+}
+
+function updateMap(ranking) {
+  if (!MAP) return;
+  const leader = ranking[0];
+
+  ranking.forEach(b => {
+    const isSel = b.nr === SELECTED_NR;
+    const isLeader = b.nr === leader.nr;
+    const isAlert = b.twaAlert;
+    const color = isAlert ? '#ef4444' : isLeader ? '#4ade80' : isSel ? '#38bdf8' : '#fbbf24';
+    const hdg = Math.round(b.hdg || 0);
+
+    const svgIcon = `
+      <div class="boat-marker ${isSel ? 'sel' : ''} ${isAlert ? 'twa-alert' : ''}">
+        ${isAlert ? '<div class="twa-pulse-aura"></div>' : ''}
+        <svg viewBox="0 0 24 24">
+          <g transform="rotate(${hdg}, 12, 12)">
+            <path d="M12 2 L19 21 L12 17 L5 21 Z" fill="${color}" stroke="${isAlert ? '#ffffff' : '#0f172a'}" stroke-width="${isAlert ? '2' : '1.5'}"/>
+          </g>
+        </svg>
+        <span class="label">${isAlert ? '⚠️ ' : ''}${b.name} (${b.spd.toFixed(1)}k)</span>
+      </div>
+    `;
+
+    const icon = L.divIcon({
+      className: 'boat-ico-wrap',
+      html: svgIcon,
+      iconSize: [26, 26],
+      iconAnchor: [13, 13]
+    });
+
+    if (MAP_MARKERS[b.nr]) {
+      MAP_MARKERS[b.nr].setLatLng([b.lat, b.lon]);
+      MAP_MARKERS[b.nr].setIcon(icon);
+    } else {
+      const marker = L.marker([b.lat, b.lon], { icon }).addTo(MAP);
+      marker.on('click', () => selectBoat(b.nr));
+      MAP_MARKERS[b.nr] = marker;
+    }
+  });
+
+  if (MAP_TRACK_LINE) { MAP.removeLayer(MAP_TRACK_LINE); MAP_TRACK_LINE = null; }
+  if (MAP_DEST_LINE) { MAP.removeLayer(MAP_DEST_LINE); MAP_DEST_LINE = null; }
+
+  if (SELECTED_NR && BOATS[SELECTED_NR]) {
+    const sel = BOATS[SELECTED_NR];
+    if (sel.track && sel.track.length > 1) {
+      MAP_TRACK_LINE = L.polyline(sel.track, { color: '#38bdf8', weight: 3, opacity: 0.8 }).addTo(MAP);
+    }
+    const { nextWp } = calcDTF(sel);
+    if (nextWp) {
+      MAP_DEST_LINE = L.polyline([[sel.lat, sel.lon], [nextWp.lat, nextWp.lon]], { color: '#f59e0b', weight: 1.5, opacity: 0.8, dashArray: '3, 5' }).addTo(MAP);
+    }
+  }
+  laylinesCarta(ranking);
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMUNICACIÓN CON SAILAWAY 3 (DATOS EN VIVO)
+// ═══════════════════════════════════════════════════════════
+// Corta un pedido a Sailaway que no contesta en 20 s (en navegadores viejos sin AbortSignal.timeout,
+// con un temporizador; si tampoco hay AbortController, el pedido va sin limite)
+function limite20() {
+  try {
+    if (AbortSignal.timeout) return AbortSignal.timeout(20000);
+    const c = new AbortController(); setTimeout(() => c.abort(), 20000); return c.signal;
+  } catch(e) { return undefined; }
+}async function fetchFleetLive() {
+  const nrs = FLEET_DEF.map(b => b.nr).join(',');
+  const url = `https://sailaway.world/cgi-bin/sailaway3/boatmapdata.pl?ubtnrs=&botnrs=${nrs}`;
+
+  try {
+    const res = await fetch(url, { cache: 'no-store', signal: limite20() });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const boats = data.boats || [];
+
+    if (boats.length) {
+      boats.forEach(live => {
+        if (BOATS[live.nr]) {
+          BOATS[live.nr].lat = parseFloat(live.lat);
+          BOATS[live.nr].lon = parseFloat(live.lon);
+          BOATS[live.nr].spd = parseFloat(live.spd);
+          BOATS[live.nr].hdg = parseFloat(live.hdg);
+          if (live.track && Array.isArray(live.track)) {
+            BOATS[live.nr].track = live.track;
+          }
+          BOATS[live.nr].upd = 'En vivo';
+        }
+      });
+
+      setLiveStatus(true);
+      render();
+    }
+  } catch(err) {
+    console.warn('[Regata] Error consultando boatmapdata.pl:', err);
+    setLiveStatus(false);
+  }
+}
+
+async function fetchFleetWind() {
+  const nrs = FLEET_DEF.map(b => b.nr);
+  for (const nr of nrs) {
+    try {
+      const res = await fetch(`https://sailaway.world/cgi-bin/sailaway3/page.pl?p=boat&nr=${nr}&nr2=0`, { cache: 'no-store', signal: limite20() });
+      if (!res.ok) continue;
+      const text = await res.text();
+      const mWind = text.match(/True wind direction\/speed\s*<\/td>\s*<td[^>]*>\s*(\d+)[^,]*,\s*([\d.]+)\s*kn/i);
+      if (mWind && BOATS[nr]) {
+        BOATS[nr].twd = parseFloat(mWind[1]);
+        BOATS[nr].tws = parseFloat(mWind[2]);
+      }
+      const mApp = text.match(/Apparent wind angle\/speed\s*<\/td>\s*<td[^>]*>\s*([-\d.]+)[^,]*,\s*([\d.]+)\s*kn/i);
+      if (mApp && BOATS[nr]) {
+        BOATS[nr].awa = parseFloat(mApp[1]);
+        BOATS[nr].aws = parseFloat(mApp[2]);
+      }
+      const mWater = text.match(/Water\s*<\/td>\s*<td[^>]*>\s*(\d+)\s*ltr/i);
+      if (mWater && BOATS[nr]) BOATS[nr].water = parseFloat(mWater[1]);
+      const mFood = text.match(/Food\s*<\/td>\s*<td[^>]*>\s*(\d+)\s*kg/i);
+      if (mFood && BOATS[nr]) BOATS[nr].food = parseFloat(mFood[1]);
+    } catch(e) {}
+  }
+  render();
+}
+
+async function fetchSingleBoatDetails(nr) {
+  const url = `https://sailaway.world/cgi-bin/sailaway3/page.pl?p=boat&nr=${nr}&nr2=0`;
+  try {
+    const res = await fetch(url, { cache: 'no-store', signal: limite20() });
+    if (!res.ok) return;
+    const text = await res.text();
+
+    const f = (re) => { const m = text.match(re); return m ? m[1].trim() : null; };
+    const n = (x) => x == null ? null : parseFloat(x);
+
+    const water = n(f(/Water\s*<\/td>\s*<td[^>]*>\s*(\d+)\s*ltr/i));
+    const food = n(f(/Food\s*<\/td>\s*<td[^>]*>\s*(\d+)\s*kg/i));
+    const miles = n(f(/Total miles sailed\s*<\/td>\s*<td[^>]*>\s*([\d,]+)\s*nm/i));
+    const wind = f(/True wind direction\/speed\s*<\/td>\s*<td[^>]*>\s*(\d+)[^,]+,\s*([\d.]+)\s*kn/i);
+    const appWind = f(/Apparent wind angle\/speed\s*<\/td>\s*<td[^>]*>\s*([-\d.]+)[^,]+,\s*([\d.]+)\s*kn/i);
+
+    if (BOATS[nr]) {
+      if (water != null) BOATS[nr].water = water;
+      if (food != null) BOATS[nr].food = food;
+      if (miles != null) BOATS[nr].miles = miles;
+      if (wind) {
+        const m = text.match(/True wind direction\/speed\s*<\/td>\s*<td[^>]*>\s*(\d+)[^,]*,\s*([\d.]+)\s*kn/i);
+        if (m) { BOATS[nr].twd = parseFloat(m[1]); BOATS[nr].tws = parseFloat(m[2]); }
+      }
+      if (appWind) {
+        const m = text.match(/Apparent wind angle\/speed\s*<\/td>\s*<td[^>]*>\s*([-\d.]+)[^,]*,\s*([\d.]+)\s*kn/i);
+        if (m) { BOATS[nr].awa = parseFloat(m[1]); BOATS[nr].aws = parseFloat(m[2]); }
+      }
+      if (SELECTED_NR === nr) renderDetail();
+    }
+  } catch(e) {}
+}
+
+function setLiveStatus(online) {
+  const pill = document.getElementById('live-st');
+  if (online) {
+    pill.className = 'status-pill';
+    pill.textContent = '● EN VIVO';
+  } else {
+    pill.className = 'status-pill off';
+    pill.textContent = '● MODO LOCAL';
+  }
+}
+
+function manualRefresh() {
+  fetchFleetLive();
+  fetchFleetWind();
+  if (SELECTED_NR) fetchSingleBoatDetails(SELECTED_NR);
+  COUNTDOWN = 30;
+}
+
+// ═══════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  initLeafletMap();
+  initWindyInteractions();
+  loadWindyIframe(2.0, -28.0, 4);
+  render();
+
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('clock-txt').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    COUNTDOWN--;
+    if (COUNTDOWN <= 0) {
+      COUNTDOWN = 30;
+      fetchFleetLive();
+    }
+    document.getElementById('timer-txt').textContent = `Refresco en ${COUNTDOWN}s`;
+  }, 1000);
+
+  fetchFleetLive();
+  fetchFleetWind();
+  if (SELECTED_NR) fetchSingleBoatDetails(SELECTED_NR);
+});
+
+window.addEventListener('resize', () => {
+  if (CURRENT_MAP_MODE === 'windy') updateWindyOverlays();
+  else if (MAP) MAP.invalidateSize();
+});
+
+// ═══════════════════════════════════════════════════════════
+// COMPARTIR EN LA WEB (GitHub Pages, via servidor.py + compartir.py)
+// ═══════════════════════════════════════════════════════════
+// compartir.py publica una copia con SH_PUBLICO = true (solo lectura, sin boton ni menu)
+const SH_PUBLICO = true, SH_VERSION = '20261008173756';
+const SH_K = 'regata';
+const SH_API = !SH_PUBLICO && location.protocol.startsWith('http') ? '/api' : null;
+const sh$ = (id) => document.getElementById(id);
+if (SH_PUBLICO) document.body.classList.add('publico');
+// Copia publica: si hay una version mas nueva publicada, se recarga sola
+async function versionNueva() {
+  if (!SH_PUBLICO || !SH_VERSION) return;
+  try {
+    const v = (await (await fetch('version.json?t=' + Date.now(), { cache: 'no-store' })).json()).v;
+    if (v && v !== SH_VERSION) location.replace(location.pathname + '?v=' + v + location.hash);
+  } catch(e) {}
+}
+if (SH_PUBLICO) { versionNueva(); setInterval(versionNueva, 60e3); }
+
+function openModal(titulo, html) {
+  sh$('modal-title').textContent = titulo;
+  sh$('modal-body').innerHTML = html;
+  sh$('modal-bg').classList.add('show');
+}
+function closeModal() { sh$('modal-bg').classList.remove('show'); }
+document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeModal(); });
+
+let SHARE = null;
+async function estadoCompartir() {
+  if (!SH_API) return null;
+  try { SHARE = await (await fetch(SH_API + '/compartir?b=' + SH_K, { cache: 'no-store' })).json(); } catch(e) { SHARE = null; }
+  sh$('sh-btn').classList.toggle('on', !!(SHARE && SHARE.activo));
+  sh$('sh-btn').innerHTML = SHARE && SHARE.activo ? '&#128279; Compartida' : '&#128279; Compartir';
+  return SHARE;
+}
+function htmlCompartir(msg) {
+  const on = SHARE && SHARE.activo;
+  return '<div class="sh-box"><label class="sh-sw"><input type="checkbox" id="sh-on" ' + (on ? 'checked' : '') + ' onchange="cambiarCompartir(this.checked)"> ' +
+    (on ? 'Compartida en la web' : 'No se comparte — activalo para obtener el link de la regata (flota en vivo)') + '</label>' +
+    (on && SHARE.url ? '<div class="sh-link"><input id="sh-url" readonly value="' + SHARE.url + '" onclick="this.select()">' +
+      '<button onclick="copiarLink(this)">Copiar</button><a href="' + SHARE.url + '" target="_blank">Abrir</a></div>' : '') +
+    (SHARE && SHARE.calendarios && SHARE.calendarios.length ? '<div class="sh-cal"><b>📅 Calendario para Google Calendar</b>' +
+      SHARE.calendarios.map((c, i) => '<div class="sh-link"><input id="sh-cal' + i + '" readonly value="' + c.url + '" onclick="this.select()" title="' + c.nombre + '">' +
+        '<button onclick="copiarLink(this,\'sh-cal' + i + '\')">Copiar</button></div>').join('') +
+      '<div class="sh-nota">En Google Calendar (en la computadora): <b>Otros calendarios → + → Desde URL</b>, pegá la dirección y tocá <b>Agregar calendario</b>. ' +
+      'Queda suscripto: Google lo actualiza solo (cada 8 a 24 h).</div></div>' : '') +
+    '<div class="sh-est">' + (msg || (SHARE && SHARE.publicado ? 'Última publicación: ' + SHARE.publicado : '')) + '</div>' +
+    '<div class="sh-nota">Quien tenga el link ve la regata completa y en vivo (posiciones, ranking, viento y mapa), sin poder modificar nada. ' +
+    'La copia se actualiza cada vez que Claude sube cambios. Al desactivar, la página deja de estar en la web ' +
+    '(puede tardar 1–2 minutos). La primera publicación también tarda 1–2 minutos en estar disponible.</div></div>';
+}
+async function abrirCompartir() {
+  if (!SH_API) {
+    const archivo = location.pathname.split('/').pop();
+    openModal('🔗 Compartir', '<div class="sh-box">Esta bitácora está abierta como archivo (doble clic), y para compartirla hace falta el servidor local.<br><br>' +
+      '1. Abrí <b>abrir_bitacoras.command</b> (Mac) o <b>abrir_bitacoras.bat</b> (Windows).<br>2. Tocá el botón de abajo: abre esta misma bitácora con el servidor.<br>' +
+      '<a class="mb-btn" style="display:inline-block;text-decoration:none" href="http://localhost:8765/' + archivo + '">Abrir con el servidor</a></div>');
+    return;
+  }
+  openModal('🔗 Compartir esta bitácora', '<div class="sh-box">Consultando…</div>');
+  await estadoCompartir();
+  sh$('modal-body').innerHTML = htmlCompartir();
+}
+async function cambiarCompartir(on) {
+  sh$('modal-body').innerHTML = htmlCompartir(on ? 'Publicando… (puede tardar unos segundos)' : 'Quitando de la web…');
+  sh$('sh-on').disabled = true;
+  try {
+    const r = await fetch(SH_API + '/compartir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bitacora: SH_K, activo: on }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+  } catch(e) { await estadoCompartir(); sh$('modal-body').innerHTML = htmlCompartir('⚠️ No se pudo: ' + e.message); return; }
+  await estadoCompartir();
+  sh$('modal-body').innerHTML = htmlCompartir(on ? '✅ Publicada. Copiá el link y compartilo.' : 'Ya no se comparte.');
+}
+function copiarLink(btn, id) {
+  const u = sh$(id || 'sh-url'); u.select();
+  (navigator.clipboard ? navigator.clipboard.writeText(u.value) : Promise.reject()).catch(() => document.execCommand('copy'));
+  btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = 'Copiar', 1500);
+}
+estadoCompartir();
+</script>
+<div id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div id="modal-win">
+    <div id="modal-head"><span id="modal-title"></span><button onclick="closeModal()">&#10005;</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+</body>
+</html>

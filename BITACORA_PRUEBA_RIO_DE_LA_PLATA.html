@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitacora - Viaje de prueba — río de la plata</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--dashh:200px;--navh:52px}
+html,body{overflow-x:clip;width:100%}
+body{font-family:'Inter',sans-serif;font-size:12.5px;line-height:1.45;color:#1e293b;background:#dfe6ed;padding:8px;}
+
+/* ═══ DASHBOARD ═══ */
+#dash{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:linear-gradient(135deg,#0f172a,#1e3a5f);
+  color:#e2e8f0;padding:6px 12px;
+  box-shadow:0 3px 15px rgba(0,0,0,0.4);
+  font-size:11.5px;
+  max-height:75vh;overflow-y:auto;
+}
+#dash-title{
+  text-align:center;font-size:13px;font-weight:800;color:#fff;
+  letter-spacing:1px;padding:2px 0;margin-bottom:4px;
+  border-bottom:1px solid rgba(255,255,255,0.15);
+}
+/* datos NMEA: cada fila se estira hasta ocupar todo el ancho (tambien la ultima), en pantalla grande o celular */
+#dash-grid{display:flex;flex-wrap:wrap;gap:4px;align-items:stretch;}
+#dash-grid > .dbox{flex:1 1 76px;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+.dbox .dsub{font-size:8.5px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dbox{background:rgba(255,255,255,0.08);border-radius:5px;padding:4px 8px;text-align:center;}
+.dbox .dlbl{font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#d-wpeta{letter-spacing:-0.2px;}
+.dbox .dval{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media (max-width:600px){
+  #dash{padding:5px 8px;}
+  #dash-grid > .dbox{flex-basis:62px;padding:3px 4px;}
+  .dbox .dlbl{font-size:8px;letter-spacing:0.2px;}
+  .dbox .dval{font-size:12px;}
+  .dbox .dsub{font-size:8px;}
+}
+/* celular en vertical: los datos en dos filas justas (6 por fila) */
+@media (max-width:600px) and (orientation:portrait){
+  #dash-grid > .dbox{flex:1 1 calc((100% - 20px) / 6);max-width:calc((100% - 20px) / 6);padding:3px 2px;}
+  .dbox .dlbl{font-size:7px;letter-spacing:0;}
+  .dbox .dval{font-size:11px;}
+  .dbox .dsub{font-size:7px;}
+}
+.dbox .dval.warn{color:#fbbf24;}
+.dbox .dval.ok{color:#4ade80;}
+.dbox .dval.crit{color:#f87171;}
+.dbox .dval.nd{color:#64748b;}
+.dbox.dbtn{border:1px solid rgba(148,163,184,0.35);color:inherit;font:inherit;cursor:pointer;}
+.dbox.dbtn:hover{background:rgba(56,189,248,0.2);}
+.dbox.dbtn .dlbl{color:#cbd5e1;font-weight:800;}
+#d-sum.ok{border-color:#4ade80;} #d-sum.warn{border-color:#fbbf24;} #d-sum.crit{border-color:#f87171;}
+.dbox.dmap{border:1px solid rgba(56,189,248,0.45);background:rgba(56,189,248,0.15);color:inherit;font:inherit;cursor:pointer;}
+.dbox.dmap .dlbl{color:#38bdf8;font-weight:800;}
+.dbox.dmap:hover{background:rgba(56,189,248,0.32);}
+#map-boats{display:flex;gap:4px;}
+
+/* barcos (arriba de todo) */
+#dash-boats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:5px;font-size:10.5px;}
+.boat-row{
+  flex:1 1 320px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;cursor:pointer;
+  background:rgba(255,255,255,0.05);border:1px solid transparent;border-radius:4px;padding:3px 8px;transition:background 0.15s;
+}
+.boat-row:hover{background:rgba(56,189,248,0.15);}
+.boat-row.sel{background:rgba(56,189,248,0.18);border-color:#38bdf8;}
+.boat-row .bname{font-weight:700;color:#38bdf8;min-width:90px;}
+.boat-row span{color:#cbd5e1;}
+.boat-row .bpar{margin-left:auto;color:#94a3b8;font-size:10px;}
+.boat-row .bmap{background:rgba(56,189,248,0.15);color:#38bdf8;border:0;border-radius:4px;padding:2px 7px;font:600 10px 'Inter',sans-serif;cursor:pointer;}
+.boat-row .bmap:hover{background:rgba(56,189,248,0.35);}
+
+/* parametros de consumo del velero elegido */
+#dash-estado{
+  display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;
+  font-size:12px;color:#e2e8f0;margin-bottom:5px;padding:5px 10px;
+  background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.35);border-radius:6px;
+}
+#dash-estado .st-lbl{font-size:9px;font-weight:800;letter-spacing:0.6px;text-transform:uppercase;color:#0f172a;background:#fbbf24;border-radius:3px;padding:2px 6px;}
+#dash-estado b{color:#94a3b8;font-weight:600;}
+#dash-estado .st-est{font-weight:800;color:#fbbf24;}
+
+#dash-live{
+  font-size:9.5px;font-weight:600;letter-spacing:0.3px;margin-left:8px;
+  padding:1px 7px;border-radius:9px;vertical-align:middle;
+  background:rgba(148,163,184,0.2);color:#cbd5e1;
+}
+#dash-title{position:relative;}
+#dash-acts{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;gap:6px;}
+#sh-btn.on{background:rgba(74,222,128,0.2);color:#4ade80;border-color:rgba(74,222,128,0.5);}
+#fs-btn,#sh-btn{background:rgba(255,255,255,0.1);color:#e2e8f0;border:1px solid rgba(255,255,255,0.2);
+  border-radius:6px;padding:2px 9px;font:700 10px 'Inter',sans-serif;letter-spacing:0.3px;cursor:pointer;}
+#sh-btn:hover,#fs-btn:hover{background:rgba(255,255,255,0.22);}
+@media (max-width:700px){#dash-acts{position:static;transform:none;display:inline-flex;margin-left:8px;}}
+#dash-live.on{background:rgba(74,222,128,0.18);color:#4ade80;}
+#dash-live.off{background:rgba(248,113,113,0.18);color:#f87171;}
+
+/* secciones plegables del panel: estadisticas y tramos */
+.dsec{margin:0;padding:0;border:0;}
+#dash-secs{margin-top:5px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.1);}
+#dash-tabs{display:flex;flex-wrap:wrap;gap:6px;}
+#dash-tabs.abierto{margin-bottom:4px;}
+.dsec-btn{background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);border-radius:12px;color:#38bdf8;font:700 10px 'Inter',sans-serif;letter-spacing:0.3px;cursor:pointer;padding:2px 10px;}
+.dsec-btn:hover{background:rgba(56,189,248,0.22);}
+.dsec-btn.act{background:#38bdf8;color:#0f172a;border-color:#38bdf8;}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:3px;}
+.sbox{background:rgba(255,255,255,0.06);border-radius:4px;padding:1px 6px;text-align:center;}
+.slbl{font-size:7.5px;line-height:1.1;color:#94a3b8;text-transform:uppercase;letter-spacing:0.2px;}
+.sval{font-size:11px;font-weight:700;color:#fff;}
+.st-hitos{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;}
+.chip{font-size:9px;background:rgba(255,255,255,0.06);color:#94a3b8;border-radius:9px;padding:1px 7px;}
+.chip.done{background:rgba(74,222,128,0.18);color:#4ade80;}
+
+#rs-body{overflow-x:auto;overflow-y:hidden;}
+#dash-tramos table{width:100%;min-width:max-content;table-layout:auto;border-collapse:separate;border-spacing:1px 2px;margin:0;font-size:9.5px;border-radius:0;background:none;}
+#dash-tramos th,#dash-tramos td{white-space:nowrap;padding:0 7px;line-height:1.35;text-align:center;background:rgba(255,255,255,0.06);color:#cbd5e1;border:0;text-transform:none;font-weight:500;font-size:9.5px;border-radius:3px;}
+#dash-tramos th.rs-l{position:sticky;left:0;z-index:1;text-align:left;background:#22436c;color:#94a3b8;font-size:8.5px;text-transform:uppercase;letter-spacing:0.4px;}
+#dash-tramos th.rs-h{color:#38bdf8;font-weight:700;}
+#dash-tramos .cur{background:rgba(251,191,36,0.22)!important;color:#fbbf24!important;}
+
+/* ventana del mapa */
+#map-bg{display:none;position:fixed;inset:0;background:rgba(2,6,23,0.7);z-index:2000;justify-content:center;align-items:center;padding:16px;}
+#map-bg.show{display:flex;}
+#map-win{background:#0f172a;border-radius:12px;overflow:hidden;width:100%;max-width:1100px;height:85vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+#map-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;color:#e2e8f0;font-size:12px;background:linear-gradient(135deg,#0f172a,#1e3a5f);}
+#map-title{font-weight:800;font-size:14px;color:#fff;flex:1;}
+#map-info{color:#94a3b8;order:10;flex-basis:100%;font-size:11px;}
+#map-head button{background:rgba(255,255,255,0.1);color:#e2e8f0;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;}
+#map-head button.act{background:#2563eb;color:#fff;}
+#map-head #map-close{font-size:14px;padding:3px 10px;}
+#map-body{flex:1;position:relative;}
+#map-leaf,#map-windy{position:absolute;inset:0;border:0;width:100%;height:100%;}
+#map-windy{display:none;}
+#map-modos{display:flex;gap:2px;background:rgba(255,255,255,0.06);border-radius:7px;padding:2px;}
+#map-modos button{background:transparent!important;}
+#map-modos button.act{background:#16a34a!important;color:#fff!important;}
+/* datos NMEA del velero: boton y panel solo con el mapa en pantalla completa */
+.nmea-btn{display:none!important;}
+#map-win:fullscreen .nmea-btn,#map-win:-webkit-full-screen .nmea-btn{display:inline-block!important;}
+.nmea-hud{display:none;flex:0 0 auto;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 12px;background:#020617;border-top:1px solid rgba(148,163,184,.25);padding:5px 12px;color:#e2e8f0;}
+#map-win:fullscreen .nmea-hud.on,#map-win:-webkit-full-screen .nmea-hud.on{display:flex;}
+.nmea-hud .t{font-weight:800;color:#38bdf8;font-size:13px;}
+.nmea-hud .lay{flex-direction:row;gap:4px 12px;padding-left:10px;border-left:1px solid rgba(148,163,184,.3);}
+#map-lay-ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:4;}
+.nmea-hud div{display:flex;flex-direction:column;align-items:center;line-height:1.15;}
+.nmea-hud span{color:#94a3b8;font-size:9px;text-transform:uppercase;letter-spacing:.2px;}
+.nmea-hud b{color:#fff;font-size:14px;}
+#map-win:fullscreen{max-width:none;width:100vw;height:100vh;border-radius:0;}
+#map-win:-webkit-full-screen{max-width:none;width:100vw;height:100vh;border-radius:0;}
+#map-boat-ov{display:none;position:absolute;width:34px;height:34px;pointer-events:none;z-index:5;filter:drop-shadow(0 0 3px rgba(0,0,0,0.8));}
+.boat-ico{background:none;border:none;}
+
+#dash-spacer{height:200px;}
+
+/* ═══ ETAPAS (una pagina por etapa, completa en la ventana) ═══ */
+#etapas{scroll-margin-top:var(--dashh);}
+#et-nav{
+  position:sticky;top:var(--dashh);z-index:900;
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  max-width:1200px;margin:0 auto;padding:6px 12px;
+  background:#0f172a;color:#e2e8f0;border-radius:0 0 12px 12px;box-shadow:0 4px 14px rgba(0,0,0,0.3);
+}
+#et-nav button{border:0;border-radius:8px;padding:8px 16px;font:800 13px 'Inter',sans-serif;cursor:pointer;background:#1e3a5f;color:#fff;}
+#et-nav button:hover:not(:disabled){background:#2d5a8e;}
+#et-nav button:disabled{opacity:0.35;cursor:default;}
+#et-nav #et-act{background:#f59e0b;color:#0f172a;}
+#et-nav #et-act.here{background:#16a34a;color:#fff;opacity:1;}
+#et-min{padding:8px 12px!important;background:#334155!important;}
+#etapas.compacto #et-nav{padding:3px 12px;}
+#etapas.compacto #et-nav > :not(#et-label):not(#et-min){display:none;}
+#etapas.compacto #et-label{font-size:12px;text-align:left;cursor:pointer;}
+#etapas.compacto #et-min{padding:2px 10px!important;font-size:11px!important;}
+#etapas.compacto .pg-hero,#etapas.compacto .pg-plan{display:none;}
+.pg-tabs.min .tb{display:none!important;}
+.pg-tabs.min{flex:1 1 auto;align-self:flex-start;width:100%;}
+.pg-main:has(.pg-tabs.min){min-height:0!important;}
+.pg:has(.pg-tabs.min){min-height:0!important;height:auto!important;}
+.pl-chips{display:contents;}
+.chp input[type=date]{border:0;background:transparent;font:900 clamp(12px,2vh,17px) 'Inter',sans-serif;color:var(--dk);padding:0;width:100%;cursor:pointer;}
+.chp.ed{border-color:var(--md);}
+/* ventanas: estado, puertos, suministros */
+.est-box > span{display:block;padding:7px 2px;border-bottom:1px solid #e2e8f0;font-size:15px;}
+.est-box .st-lbl{display:none!important;}
+.est-box .st-est{font-weight:900;font-size:18px;color:#b45309;}
+.est-box b{color:#475569;}
+.mb-btn{border:0;border-radius:8px;background:#1e3a5f;color:#fff;font:800 13px 'Inter',sans-serif;padding:8px 14px;cursor:pointer;margin-top:12px;}
+#modal-win.ancha{max-width:min(1500px,98vw);}
+table.pt{table-layout:auto;width:100%;font-size:13px;}
+table.pt th{background:#1e293b;color:#fff;font-size:10.5px;padding:5px 6px;white-space:nowrap;}
+table.pt td{padding:3px 6px;white-space:normal;border-bottom:1px solid #e2e8f0;vertical-align:middle;}
+table.pt td:nth-child(-n+4){white-space:nowrap;}
+table.pt td:nth-child(n+8){font-size:12px;color:#475569;}
+table.pt tr.act td{background:#fef3c7;}
+table.pt tr.done td{color:#16a34a;}
+table.pt input{border:1px solid #cbd5e1;border-radius:5px;padding:3px 4px;font:600 12.5px 'Inter',sans-serif;}
+table.pt input[type=number]{width:74px;}
+table.pt label.llego{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:#1e3a5f;cursor:pointer;white-space:nowrap;}
+table.pt label.llego input{width:16px;height:16px;accent-color:#16a34a;}
+table.pt .fase td{background:#e2e8f0;font-weight:900;color:#1e3a5f;font-size:11px;text-transform:uppercase;}
+.pt-nota{font-size:12px;color:#64748b;margin:0 0 8px;}
+.sm-boats{display:flex;gap:6px;margin-bottom:10px;}
+.sm-boats button{border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:5px 12px;font:800 12px 'Inter',sans-serif;cursor:pointer;}
+.sm-boats button.act{background:#1e3a5f;color:#fff;border-color:#1e3a5f;}
+.sm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-bottom:12px;}
+.sm-c{background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:8px 12px;}
+.sm-c.ok{border-color:#4ade80;} .sm-c.warn{border-color:#fbbf24;} .sm-c.crit{border-color:#f87171;}
+.sm-c .l{font-size:11px;font-weight:800;color:#64748b;text-transform:uppercase;}
+.sm-c .v{font-size:26px;font-weight:900;color:#0f172a;}
+.sm-c .s{font-size:12px;color:#475569;}
+.sm-par{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;}
+.sm-par label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:#64748b;}
+.sm-par input{width:110px;border:1px solid #cbd5e1;border-radius:6px;padding:5px 6px;font:700 14px 'Inter',sans-serif;}
+.sm-sum{font-size:13px;color:#334155;margin-top:8px;}
+#et-label{flex:1;text-align:center;font-weight:800;font-size:14px;min-width:150px;}
+#et-sel{max-width:320px;background:#1e3a5f;color:#fff;border:0;border-radius:8px;padding:8px;font:600 12px 'Inter',sans-serif;}
+
+.pg{display:none;flex-direction:column;max-width:1200px;margin:8px auto 0;
+  height:max(360px,calc(100vh - var(--dashh) - var(--navh) - 26px));
+  background:var(--bg);border:3px solid var(--bd);border-radius:16px;overflow:hidden;}
+.pg.show{display:flex;}
+.pg-hero{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:2px 20px;
+  background:linear-gradient(135deg,var(--dk),var(--md));color:#fff;padding:clamp(6px,1.2vh,14px) 26px;}
+.pg-fase{font-size:clamp(10px,1.5vh,13px);font-weight:700;opacity:0.85;letter-spacing:0.8px;text-transform:uppercase;}
+.pg-name{font-size:clamp(24px,5vh,46px);font-weight:900;line-height:1.05;letter-spacing:-1px;}
+.pg-name small{font-size:clamp(11px,1.8vh,15px);font-weight:800;letter-spacing:1.5px;opacity:0.85;margin-left:10px;vertical-align:middle;}
+.pg-sub{font-size:clamp(12px,2.2vh,18px);font-weight:600;opacity:0.92;}
+/* franja del plan (arriba), pestañas (medio), datos reales + carga (abajo) */
+.pg-plan,.pg-foot{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;padding:clamp(5px,1vh,10px) 20px;}
+.pg-plan{border-bottom:2px solid var(--bd);}
+.pg-foot{border-top:2px solid var(--bd);background:rgba(255,255,255,0.55);}
+.chp{flex:1 1 90px;display:flex;flex-direction:column;justify-content:center;background:#fff;border:2px solid var(--bd);border-radius:9px;padding:2px 10px;min-width:0;}
+.chp.real{border-style:dashed;}
+.chp.wide{flex:2 1 170px;}
+.chp .cl{font-size:clamp(8.5px,1.3vh,10.5px);font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chp .cv{font-size:clamp(13px,2.3vh,19px);font-weight:900;color:var(--dk);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chp.wide .cv,.chp.real .cv{font-size:clamp(11px,1.9vh,15px);}
+.chp .cv.nd{color:#94a3b8;}
+.chp.pg-cargar{flex:2 1 200px;background:#ecfeff;border:2px solid #22d3ee;}
+.chp.pg-cargar .cl{color:#155e75;}
+.chp.pg-cargar .cv{color:#155e75;font-size:clamp(13px,2.2vh,18px);}
+.chp.pg-cargar .s{display:none;}
+.chp.pg-plan .pg-hito{flex:2 1 200px;display:flex;align-items:center;padding:2px 12px;font-size:clamp(11px,1.8vh,14px);font-weight:800;background:#fef3c7;color:#78350f;border-left:5px solid #f59e0b;border-radius:8px;}
+.pg-plan .pg-poi{flex:1 1 170px;}
+.pg-main{flex:1;min-height:0;display:flex;padding:clamp(6px,1.2vh,12px) 20px;}
+/* pestañas de la etapa: pronostico / consejos / notas */
+.pg-tabs{flex:1;min-height:0;display:flex;flex-direction:column;background:#fff;border-radius:10px;border-left:6px solid var(--md);overflow:hidden;}
+.tb-head{display:flex;gap:2px;background:#f1f5f9;padding:4px 4px 0;}
+.tb-head button{flex:1;border:0;border-radius:7px 7px 0 0;padding:clamp(4px,0.9vh,8px) 6px;font:800 clamp(11px,1.8vh,14px) 'Inter',sans-serif;cursor:pointer;background:transparent;color:#64748b;}
+.tb-head button.act{background:#fff;color:var(--dk);}
+.tb-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#16a34a;vertical-align:middle;margin-left:3px;}
+.tb{display:none;flex:1;min-height:0;overflow:auto;padding:clamp(6px,1.2vh,12px) 14px;font-size:clamp(12px,2vh,15px);line-height:1.45;color:#0f172a;}
+.tb.show{display:block;}
+.tb-notas{font-size:clamp(13px,2.4vh,18px);font-weight:500;}
+.tb .pg-list{font-size:inherit;margin-left:18px;}
+.tb .pg-list li{margin:4px 0;}
+/* version publica (compartida): solo lectura */
+.f-real{color:#16a34a;font-weight:700;}
+.f-calc{color:#64748b;font-style:italic;}
+#aviso-flot{position:fixed;left:50%;bottom:18px;transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:3000;background:#0f172a;color:#e2e8f0;border:1px solid #38bdf8;border-radius:10px;padding:9px 16px;font-size:13px;box-shadow:0 6px 24px rgba(0,0,0,.5);transition:all .25s;max-width:90vw;text-align:center;}
+#aviso-flot.on{opacity:1;transform:translate(-50%,0);}
+body.publico:not(.capitan) .cap-form,body.publico:not(.capitan) .lg-form,body.publico:not(.capitan) .cap-n button,body.publico:not(.capitan) .lg-x,body.publico #sh-btn,body.publico .cap-aviso{display:none!important;}
+.sh-box{font-size:14px;line-height:1.5;}
+.sh-sw{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;cursor:pointer;font-weight:800;}
+.sh-sw input{width:22px;height:22px;accent-color:#16a34a;cursor:pointer;}
+.sh-link{display:flex;gap:6px;margin-top:12px;}
+.sh-link input{flex:1;min-width:0;border:1px solid #cbd5e1;border-radius:6px;padding:8px;font:600 13px monospace;}
+.sh-link button,.sh-link a{border:0;border-radius:6px;background:#1e3a5f;color:#fff;font:800 12px 'Inter',sans-serif;padding:0 12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;}
+.sh-cal{margin-top:14px;padding:10px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;}
+.sh-cal .sh-link{margin-top:6px;}
+.sh-est{margin-top:10px;font-size:13px;color:#475569;}
+.sh-nota{margin-top:12px;font-size:12px;color:#64748b;}
+.cap-h{margin-top:14px;padding-top:8px;border-top:2px dashed #e2e8f0;font-size:12px;font-weight:900;color:var(--dk);text-transform:uppercase;letter-spacing:0.4px;}
+.cap-h small{font-weight:600;text-transform:none;letter-spacing:0;color:#64748b;}
+.cap-list{margin:6px 0;}
+.cap-n{display:flex;gap:8px;align-items:flex-start;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:6px 10px;margin-bottom:5px;font-size:14px;line-height:1.4;}
+.cap-n .ct{flex:1;white-space:pre-wrap;}
+.cap-n small{display:block;color:#92400e;font-size:11px;margin-top:2px;}
+.cap-n button,.lg-x{border:0;background:none;color:#94a3b8;cursor:pointer;font-size:13px;padding:0 2px;}
+.cap-n button:hover,.lg-x:hover{color:#dc2626;}
+.cap-form{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;}
+.cap-form select{border:1px solid #cbd5e1;border-radius:6px;padding:4px;font:600 12px 'Inter',sans-serif;}
+.cap-form textarea{flex:1 1 220px;border:1px solid #cbd5e1;border-radius:6px;padding:5px 8px;font:14px 'Inter',sans-serif;resize:vertical;}
+.cap-form button{border:0;border-radius:6px;background:var(--dk);color:#fff;font:800 12px 'Inter',sans-serif;padding:0 14px;cursor:pointer;}
+.cap-aviso{font-size:11px;color:#b45309;margin-top:3px;}
+.lg-form{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;align-items:center;}
+.lg-form input{flex:1 1 150px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#fff;padding:3px 6px;font:11px 'Inter',sans-serif;}
+.lg-form button{background:#38bdf8;color:#0f172a;border:0;border-radius:4px;padding:3px 10px;font:800 10.5px 'Inter',sans-serif;cursor:pointer;}
+.lg-form .cap-aviso{flex-basis:100%;margin:0;color:#fbbf24;}
+table.lg tr.cap td{background:rgba(251,191,36,0.1);}
+.cn-g{font-size:11px;font-weight:900;color:var(--dk);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 2px;border-bottom:1px solid #cffafe;}
+.auto-h{font-size:11px;font-weight:800;color:#0e7490;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;}
+.pr-auto:not(:empty),.cn-auto:not(:empty){background:#ecfeff;border:1px solid #a5f3fc;border-radius:8px;padding:6px 10px 4px;margin-bottom:10px;}
+.pr-upd{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;}
+.pr-live{margin-top:10px;border-top:2px dashed #e2e8f0;padding-top:8px;}
+.pr-live h4{font-size:12px;font-weight:900;color:var(--dk);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;display:flex;gap:8px;align-items:center;}
+.pr-live h4 button{margin-left:auto;border:0;border-radius:6px;background:#e2e8f0;color:#334155;font:700 11px 'Inter',sans-serif;padding:2px 8px;cursor:pointer;}
+.pr-live table{table-layout:auto;font-size:12px;margin:0;}
+.pr-live th{background:#1e293b;color:#fff;font-size:10px;padding:3px 6px;}
+.pr-live td{padding:2px 6px;white-space:nowrap;}
+.pr-live td.w1{color:#b45309;font-weight:800;}
+.pr-live td.w2{color:#dc2626;font-weight:900;}
+.pr-live .arr{display:inline-block;font-size:13px;}
+.pr-live .nota{font-size:11px;color:#64748b;margin-top:4px;}
+
+/* detalle de un punto de interes */
+.pg-card.poi{cursor:pointer;transition:transform 0.1s,box-shadow 0.1s;}
+.pg-card.poi:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.12);}
+.poi-more{margin-top:4px;font-size:12px;font-weight:800;color:var(--md,#2d5a8e);}
+.poi-det{display:none;}
+.pg-sec h3 small{font-size:12px;font-weight:600;color:#64748b;}
+.pd-back{border:0;border-radius:6px;background:#e2e8f0;color:#334155;font:700 12px 'Inter',sans-serif;padding:4px 10px;cursor:pointer;margin-bottom:10px;}
+.pd-name{font-size:24px;font-weight:900;color:var(--dk,#1e3a5f);margin-bottom:8px;}
+.pd-gal{display:grid;grid-template-columns:2fr 1fr;grid-auto-rows:150px;gap:6px;margin-bottom:12px;}
+.pd-gal a{display:block;border-radius:10px;overflow:hidden;background:#e2e8f0;}
+.pd-gal a:first-child{grid-row:span 2;}
+.pd-gal img{width:100%;height:100%;object-fit:cover;display:block;}
+.pd-gal .cargando{grid-column:1/-1;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:13px;background:#f1f5f9;border-radius:10px;}
+.pd-txt p{font-size:15px;line-height:1.55;margin:0 0 8px;}
+.pd-wiki{margin-top:10px;padding:10px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;line-height:1.5;color:#334155;}
+.pd-wiki b{color:#0f172a;}
+.pd-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.pd-links a{font-size:12px;font-weight:700;background:#1e3a5f;color:#fff;text-decoration:none;border-radius:6px;padding:5px 10px;}
+.pd-cred{font-size:10px;color:#94a3b8;margin-top:6px;}
+@media (max-width:700px){.pd-gal{grid-template-columns:1fr;grid-auto-rows:190px}.pd-gal a:first-child{grid-row:auto}}
+
+.pg-poi{flex:0 0 auto;border:0;border-radius:10px;padding:clamp(8px,1.6vh,14px) 16px;font:800 clamp(13px,2.3vh,17px) 'Inter',sans-serif;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--dk),var(--md));}
+.pg-poi:hover:not(:disabled){filter:brightness(1.15);}
+.pg-poi:disabled{opacity:0.45;cursor:default;}
+.poi-src{display:none;}
+@media (max-width:800px){
+  .pg{height:auto;min-height:360px;}
+  .pg-body{grid-template-columns:1fr;overflow:visible;}
+  }
+
+/* ventana de datos del puerto / historial */
+#modal-bg{display:none;position:fixed;inset:0;background:rgba(2,6,23,0.7);z-index:2500;justify-content:center;align-items:center;padding:16px;}
+#modal-bg.show{display:flex;}
+#modal-win{background:#f8fafc;border-radius:14px;overflow:hidden;width:100%;max-width:900px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+#modal-head{display:flex;align-items:center;gap:8px;padding:10px 16px;color:#fff;background:linear-gradient(135deg,#0f172a,#1e3a5f);}
+#modal-title{flex:1;font-weight:800;font-size:16px;}
+#modal-head button{background:rgba(255,255,255,0.12);color:#fff;border:0;border-radius:6px;padding:4px 12px;font:700 14px 'Inter',sans-serif;cursor:pointer;}
+#modal-body{overflow:auto;padding:14px 18px 18px;}
+.pg-sec{margin-bottom:16px;}
+.pg-sec h3{font-size:16px;font-weight:900;color:var(--dk,#1e3a5f);margin-bottom:8px;padding-bottom:4px;border-bottom:3px solid var(--bd,#3b7dd8);}
+.pg-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;}
+.pg-card{background:#fff;border:2px solid var(--bd,#3b7dd8);border-radius:10px;padding:8px 12px;font-size:14px;line-height:1.45;}
+.pg-row{font-size:14px;margin-bottom:6px;padding:7px 12px;background:#fff;border-radius:8px;border:1px solid #e2e8f0;}
+.pg-row b:first-child{color:var(--dk,#1e3a5f);}
+.pg-list{margin:0 0 0 20px;font-size:14px;}
+.pg-list li{margin:3px 0;}
+.pg-vacio{color:#64748b;font-style:italic;}
+
+/* log de eventos (plegable en el panel) */
+#lg-body{max-height:20vh;overflow:auto;}
+table.lg{width:100%;table-layout:auto;border-collapse:separate;border-spacing:2px;margin:0;font-size:10px;border-radius:0;}
+table.lg th,table.lg td{background:rgba(255,255,255,0.06);color:#cbd5e1;border:0;padding:2px 8px;text-align:left;text-transform:none;font-size:10px;border-radius:3px;font-weight:500;}
+table.lg th{color:#94a3b8;font-size:8.5px;text-transform:uppercase;letter-spacing:0.4px;}
+
+/* ═══ CONTENIDO (historial dentro de la ventana) ═══ */
+a{color:#2563eb}b{color:#0f172a}
+.sh{font-weight:600;font-size:0.88em;color:#334155;padding:4px 0 2px;margin-top:5px;border-bottom:1px dashed #cbd5e1;}
+p{margin:2px 0;word-wrap:break-word}
+code{font-size:0.84em;background:rgba(0,0,0,0.06);padding:1px 3px;border-radius:3px;font-family:monospace}
+.qt{padding:5px 10px;margin:3px 0;font-style:italic;font-size:0.9em;border-left:3px solid #f59e0b;background:rgba(245,158,11,0.08);border-radius:0 4px 4px 0;}
+ul{margin:3px 0 3px 15px;padding:0}ul.sub{margin:1px 0 1px 12px}
+li{margin:1px 0;line-height:1.4}li.ck{list-style:none;margin-left:-15px}li.done{color:#16a34a}li.todo{color:#94a3b8}
+table{width:100%;border-collapse:collapse;margin:5px 0;font-size:0.84em;border-radius:6px;overflow:hidden;table-layout:fixed;word-wrap:break-word;}
+thead{background:#1e293b;color:#fff}
+th{padding:5px;text-align:left;font-weight:600;font-size:0.82em;text-transform:uppercase}
+td{padding:3px 5px;border-bottom:1px solid rgba(0,0,0,0.04);word-wrap:break-word;overflow-wrap:break-word}
+tr:nth-child(even){background:rgba(0,0,0,0.02)}
+hr{border:none;height:1px;background:rgba(0,0,0,0.06);margin:6px 0}
+
+@media print{
+  #dash,#dash-spacer,#et-nav,#modal-bg{display:none!important}
+  body{background:#fff;padding:4px;font-size:10pt}
+  .pg{display:block!important;height:auto;break-after:page}
+  .pg-hero,thead{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ DASHBOARD FIJO ═══ -->
+<div id="dash">
+  <div id="dash-title">BITÁCORA — VIAJE DE PRUEBA — RÍO DE LA PLATA<span id="dash-live">conectando…</span><span id="dash-acts"><button id="sh-btn" onclick="abrirCompartir()" title="Compartir esta bitácora en la web">&#128279; Compartir</button><button id="fs-btn" onclick="toggleFS()" title="Pantalla completa (F11)">&#x26F6; Pantalla completa</button></span></div>
+
+  <!-- 1. Barcos -->
+  <div id="dash-boats"><div class="boat-row" id="br-b0" onclick="openSuministros('b0')" title="Suministros y consumo"><span class="bname">★ Glory II</span><span id="d-b0-pos">—</span> | <span id="d-b0-upd">—</span><span class="bpar">&#129530; Suministros</span></div></div>
+
+  <!-- estado del viaje -->
+  <div id="src-estado" style="display:none"><span class="st-lbl">Estado del viaje</span><span class="st-est">🟢 NAVEGANDO</span><span><b>Fase:</b> Navegando — etapa 6 (La Paloma → Mar del Plata)</span><span><b>Activo:</b> Glory II</span><span><b>Próximo:</b> LLEGAR a Mar del Plata</span><span><b>Rumbo:</b> <span id="d-rumbo">193°</span></span><span><b>Modo:</b> Mayor y génova amurado a babor</span></div>
+
+  <!-- 2. Datos NMEA -->
+  <div id="dash-grid">
+    <button class="dbox dbtn" onclick="openEstado()" title="Estado del viaje"><div class="dlbl">Fase ▾</div><div class="dval" id="d-fase">NAVEGANDO</div></button>
+    <button class="dbox dbtn" onclick="openPuertos()" title="Puertos, millas y fechas"><div class="dlbl">Puerto ▾</div><div class="dval" id="d-puerto">4 / 6</div></button>
+    <div class="dbox"><div class="dlbl">Millas</div><div class="dval" id="d-millas">0</div></div>
+    <div class="dbox"><div class="dlbl">Velocidad</div><div class="dval" id="d-vel">0.0 kts</div></div>
+    <div class="dbox"><div class="dlbl">Próx. WP</div><div class="dval" id="d-nwpdist">—</div><div class="dsub" id="d-nwpname">ruta del juego</div></div>
+    <div class="dbox"><div class="dlbl">Tiempo próx. WP</div><div class="dval" id="d-nwptime">—</div></div>
+    <div class="dbox"><div class="dlbl">Dist. etapa</div><div class="dval" id="d-wpdist">—</div><div class="dsub" id="d-wpname"></div></div>
+    <div class="dbox"><div class="dlbl">Tiempo etapa</div><div class="dval" id="d-wptime">—</div><div class="dsub" id="d-wpeta"></div></div>
+    <div class="dbox"><div class="dlbl">TWA</div><div class="dval" id="d-twa">—</div></div>
+    <div class="dbox"><div class="dlbl">TWS</div><div class="dval" id="d-tws">—</div></div>
+    <button class="dbox dbtn" id="d-sum" onclick="openSuministros(ACTIVE.key)" title="Agua, comida, combustible y consumo"><div class="dlbl">Suministros</div><div class="dval">&#129530;</div><div class="dsub" id="d-sum-sub"></div></button>
+    <button class="dbox dmap" onclick="openMap(ACTIVE.key)" title="Mapa: posición, track, ruta del juego y viento"><div class="dlbl">Mapa</div><div class="dval">&#128506;</div></button>
+  </div>
+
+  <!-- 3-5. Estadisticas, log y tramos: botones en una fila, se abre uno por vez -->
+  <div id="dash-secs">
+    <div id="dash-tabs"></div>
+    <div class="dsec" id="dash-stats"><button class="dsec-btn" id="st-btn" data-label="Estadísticas acumuladas · hitos 2/3" onclick="toggleSec('st')"></button><div id="st-body"><div class="st-grid"><div class="sbox"><div class="slbl">Millas navegadas</div><div class="sval">~243 MN</div></div><div class="sbox"><div class="slbl">Días en el mar</div><div class="sval">4</div></div><div class="sbox"><div class="slbl">Días en puerto</div><div class="sval">3 (Juan Lacaze 30 Sep, Piriápolis 04 Oct, La Paloma 06 Oct)</div></div><div class="sbox"><div class="slbl">Puertos visitados</div><div class="sval">4 / 6</div></div><div class="sbox"><div class="slbl">Países visitados</div><div class="sval">1 / 2 (Uruguay)</div></div><div class="sbox"><div class="slbl">Velocidad máxima registrada</div><div class="sval">8,2 kn (en zarpada de La Paloma)</div></div><div class="sbox"><div class="slbl">Racha más larga en el mar</div><div class="sval">~9 h 38 min</div></div><div class="sbox"><div class="slbl">Mayor distancia en un tramo</div><div class="sval">~69 MN (Piriápolis → La Paloma)</div></div><div class="sbox"><div class="slbl">Itinerarios turísticos completados</div><div class="sval">0</div></div><div class="sbox"><div class="slbl">Velocidad máxima</div><div class="sval">8,2 kn</div></div><div class="sbox"><div class="slbl">Mayor distancia diaria</div><div class="sval">69 MN</div></div><div class="sbox"><div class="slbl">Tramo más largo sin parar</div><div class="sval">69 MN · ~9 h 38 min</div></div></div><div class="st-hitos"><span class="chip done">☑ 🇺🇾 Primer puerto en Uruguay</span><span class="chip done">☑ 🌊 Salida al Atlántico abierto (La Paloma → Mar del Plata)</span><span class="chip">☐ 🏁 Viaje de prueba completado</span></div></div></div>
+    <div class="dsec" id="dash-log"><button class="dsec-btn" id="lg-btn" data-label="Log de eventos (12)" data-base="12" onclick="toggleSec('lg')"></button><div id="lg-body"><div class="lg-form"><input id="lg-ev" placeholder="Evento (ej: ⛵ Rizo en la mayor)"><input id="lg-det" placeholder="Detalles"><input id="lg-ubi" placeholder="Ubicación (se completa sola)"><button onclick="guardarEvento()">+ Agregar</button><span class="cap-aviso"></span></div><table class="lg"><tr><th>Fecha</th><th>Ubicación</th><th>Evento</th><th>Detalles</th></tr><tr><td>07 Oct 2026 10:30</td><td>La Paloma</td><td>⛵ Zarpada a Mar del Plata</td><td>Cruce al Atlántico abierto (etapa 6). Rumbo 193°, viento ENE 15 kn, vel. 8,1 kn. Suministros: 73 ltr agua, 36 kg comida</td></tr><tr><td>05 Oct 2026 19:30</td><td>La Paloma</td><td>⚓ Llegada a La Paloma</td><td>~69 MN en ~9 h 38 min. Fondeado en puerto. Descanso el 06 Oct</td></tr><tr><td>05 Oct 2026 09:52</td><td>Piriápolis</td><td>⛵ Zarpada a La Paloma</td><td>Tramo costero de 69 MN</td></tr><tr><td>03 Oct 2026 16:29</td><td>Piriápolis</td><td>⚓ Llegada a Piriápolis</td><td>47 MN navegadas. Descanso el 04 Oct</td></tr><tr><td>03 Oct 2026 08:30</td><td>Montevideo (Punta Carretas)</td><td>⛵ Zarpada a Piriápolis</td><td>Ceñida abierta, rumbo 090°, viento NE 12,5 kn, vel. 6,6 kn</td></tr><tr><td>01 Oct 2026 (antes de las 22:11)</td><td>Montevideo (Punta Carretas)</td><td>⚓ Llegada a Montevideo</td><td>Fondeado frente a Punta Carretas, a ~3 MN del puerto. ~62 MN desde Juan Lacaze. Suministros: 76 ltr agua, 38 kg comida. Mañana 02 Oct descanso</td></tr><tr><td>01 Oct 2026 10:39</td><td>Juan Lacaze</td><td>⛵ Zarpada a Montevideo</td><td>Con mayor y mesana a tope y J1; salida de través y enseguida casi a la aleta</td></tr><tr><td>29 Sep 2026 16:57</td><td>Juan Lacaze</td><td>⚓ Llegada a Juan Lacaze</td><td>52 MN en 6 h 16 min (8,3 kn de media). Suministros: 80 ltr agua, 40 kg comida. Mañana 30 Sep descanso</td></tr><tr><td>29 Sep 2026 14:50</td><td>Al través de Colonia</td><td>📍 Posición</td><td>S34°29.6' O57°51.6' · 8,0 kn · viento SO 17 kn · faltan 21,7 MN a Juan Lacaze (ETA ~17:30)</td></tr><tr><td>29 Sep 2026 ~14:30</td><td>Isla Farallón</td><td>🏝️ Paso por la Isla Farallón</td><td>Frente a Colonia</td></tr><tr><td>29 Sep 2026 10:41</td><td>Buenos Aires (Club CNV)</td><td>⛵ Inicio de la travesía</td><td>Zarpó del Club CNV rumbo a Juan Lacaze (45 MN)</td></tr><tr><td>29 Sep 2026</td><td>Buenos Aires</td><td>🎬 Proyecto creado</td><td>Itinerario de prueba y planificación completa</td></tr></table></div></div>
+    <div class="dsec" id="dash-tramos"><button class="dsec-btn" id="rs-btn" data-label="Tramos (resumen)" onclick="toggleSec('rs')"></button><div id="rs-body"><table><tr><th class="rs-l">Tramo</th><th class="rs-h">Buenos Aires → Juan Lacaze</th><th class="rs-h">Juan Lacaze → Montevideo</th><th class="rs-h">Montevideo → Piriápolis</th><th class="rs-h">Piriápolis → La Paloma</th><th class="rs-h cur">La Paloma → Mar del Plata</th><th class="rs-h">Mar del Plata → Buenos Aires</th></tr><tr><th class="rs-l">Partida → Llegada</th><td class="">29 Sep → 29 Sep</td><td class="">01 Oct → 01 Oct</td><td class="">03 Oct → 03 Oct</td><td class="">05 Oct → 05 Oct</td><td class="cur">07 Oct → 09 Oct</td><td class="">12 Oct → 14 Oct</td></tr><tr><th class="rs-l">MN · días</th><td class=""><b style="color:inherit">45 MN</b> · 1 d</td><td class=""><b style="color:inherit">67 MN</b> · 1 d</td><td class=""><b style="color:inherit">47 MN</b> · 1 d</td><td class=""><b style="color:inherit">69 MN</b> · 1 d</td><td class="cur"><b style="color:inherit">259 MN</b> · 2 d</td><td class=""><b style="color:inherit">293 MN</b> · 2 d</td></tr></table></div></div>
+  </div>
+</div>
+
+<!-- Ventana del mapa -->
+<div id="map-bg" onclick="if(event.target===this)closeMap()">
+  <div id="map-win">
+    <div id="map-head">
+      <span id="map-title"></span><span id="map-boats"></span>
+      <span id="map-info"></span>
+      <span id="map-modos"><button id="map-m-libre" onclick="setMapModo('libre')" title="El mapa no se mueve solo">Libre</button><button id="map-m-centrar" onclick="setMapModo('centrar')" title="Sigue al barco">Centrar</button><button id="map-m-wp" onclick="setMapModo('wp')" title="Barco y próximo waypoint en pantalla">Centrado + WP</button></span>
+      <button id="map-carta" class="act" onclick="sigCarta()"></button>
+      <button id="map-nmea" class="nmea-btn" onclick="toggleNMEA()" title="Mostrar / ocultar los datos del velero">&#128202; Datos</button>
+      <button id="map-fs" onclick="toggleMapFS()" title="Mapa en pantalla completa">&#x26F6;</button>
+      <a id="map-link-windy" target="_blank" rel="noopener" title="Abrir pronóstico completo en Windy.com en pestaña nueva" style="display:none;background:rgba(255,255,255,0.1);color:#38bdf8;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;text-decoration:none;align-items:center;gap:4px;">&#8599; Windy.com</a>
+      <button id="map-close" onclick="closeMap()">&#10005;</button>
+    </div>
+    <div id="nmea-hud" class="nmea-hud"></div>
+    <div id="map-body">
+      <div id="map-leaf"></div>
+      <iframe id="map-windy" title="Viento en Windy"></iframe>
+      <svg id="map-lay-ov"></svg>
+      <div id="map-boat-ov"></div>
+    </div>
+  </div>
+</div>
+
+<div id="dash-spacer"></div>
+
+<!-- ═══ ETAPAS ═══ -->
+<div id="etapas">
+  <div id="et-nav">
+    <button id="et-prev" onclick="stepEtapa(-1)">&#9664; Anterior</button>
+    <button id="et-act" onclick="goActive()">&#9733; Etapa activa</button>
+    <span id="et-label"></span>
+    <select id="et-sel" onchange="goEtapa(+this.value,true)" title="Ir a una etapa"><option value="0">1. Salida desde Buenos Aires</option><option value="1">2. Buenos Aires → Juan Lacaze</option><option value="2">3. Juan Lacaze → Montevideo</option><option value="3">4. Montevideo → Piriápolis</option><option value="4">5. Piriápolis → La Paloma</option><option value="5">6. La Paloma → Mar del Plata</option><option value="6">7. Mar del Plata → Buenos Aires</option></select>
+    <button id="et-next" onclick="stepEtapa(1)">Siguiente &#9654;</button>
+    <button id="et-min" onclick="toggleCompacto()" title="Minimizar / expandir la barra de etapa y la primera fila">&#9650;</button>
+  </div>
+  <section class="pg" data-n="1" data-name="Salida desde Buenos Aires" data-port="Buenos Aires" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8">
+<div class="pg-hero"><div><div class="pg-fase">VIAJE DE PRUEBA — GLORY II: Buenos Aires → Buenos Aires</div><div class="pg-name">Salida desde Buenos Aires<small>(ORIGEN) · ETAPA 1 DE 7</small></div></div><div class="pg-sub">🇦🇷 Argentina · 34°35'S / 58°22'O</div></div>
+<div class="pg-plan"><div class="pl-chips" data-n="1"></div><button class="pg-poi" onclick="openPoi(this)">📍 Puntos de interés de Buenos Aires</button></div>
+<div class="pg-main"><div class="pg-tabs"><div class="tb-head"><button data-t="pron" onclick="setTab('pron')">🌬 Pronóstico</button><button data-t="cons" onclick="setTab('cons')">🧭 Consejos</button><button data-t="notas" onclick="setTab('notas')">📝 Notas</button></div><div class="tb tb-pron"><div class="pr-auto"></div><div class="pg-vacio">Sin pronóstico escrito todavía: se carga cuando la etapa entra en el rango de los modelos (~16 días).</div><div class="pr-live" data-n="1"></div></div><div class="tb tb-cons"><div class="cn-auto"></div><div class="pg-vacio">Sin consejos todavía: se escriben para la etapa activa y las dos siguientes.</div></div><div class="tb tb-notas">Zarpada desde el Río de la Plata, rumbo este hacia la costa uruguaya<div class="cap-h">✏️ Notas del capitán <small>— ideas para mejorar el programa y cosas que te pasen navegando (Claude las lee)</small></div><div class="cap-list" data-n="1"></div><div class="cap-form"><select class="cap-cat"><option value="navegacion">⛵ Aprendizaje de navegación</option><option value="mejora">💡 Mejora del programa</option><option value="otro">📝 Otro</option></select><textarea class="cap-txt" rows="2" placeholder="Escribí una nota…"></textarea><button onclick="guardarNota(this, 1)">Guardar</button></div><div class="cap-aviso"></div></div></div></div>
+<div class="poi-src" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8"><div class="pg-sec pg-vacio">Todavía no hay puntos de interés cargados para este puerto.</div></div>
+</section>
+<section class="pg" data-n="2" data-name="Buenos Aires → Juan Lacaze" data-port="Juan Lacaze" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8">
+<div class="pg-hero"><div><div class="pg-fase">VIAJE DE PRUEBA — GLORY II: Buenos Aires → Buenos Aires</div><div class="pg-name">Buenos Aires → Juan Lacaze<small>ETAPA 2 DE 7</small></div></div><div class="pg-sub">🇺🇾 Uruguay · 34°26'S / 57°26'O</div></div>
+<div class="pg-plan"><div class="pl-chips" data-n="2"></div><button class="pg-poi" onclick="openPoi(this)">📍 Puntos de interés de Juan Lacaze (2)</button></div>
+<div class="pg-main"><div class="pg-tabs"><div class="tb-head"><button data-t="pron" onclick="setTab('pron')">🌬 Pronóstico <i class="tb-dot"></i></button><button data-t="cons" onclick="setTab('cons')">🧭 Consejos <i class="tb-dot"></i></button><button data-t="notas" onclick="setTab('notas')">📝 Notas</button></div><div class="tb tb-pron"><div class="pr-auto"></div><div class="pr-upd">✍️ Pronóstico escrito · actualizado 29 Sep 11:30 · Open-Meteo sobre la derrota · confianza alta</div><ul class="pg-list"><li><b>Salida (10:41):</b> SO 12 kn con ráfagas de hasta <b>30 kn</b> — aire inestable, rachas fuertes y cortas.</li><li><b>Mitad del tramo (~14 h):</b> OSO 12 kn, ráfagas 25 kn.</li><li><b>Llegada a Juan Lacaze (~17:40):</b> SO 11 kn, ráfagas 25 kn.</li><li><b>Ola:</b> 0,4–0,5 m, corta y empinada (ola de río).</li><li><b>Resumen:</b> viento por la aleta/popa todo el tramo (rumbo ~075°, viento del SO), media moderada pero ráfagas que duplican la media.</li></ul><div class="pr-live" data-n="2"></div></div><div class="tb tb-cons"><div class="cn-auto"></div><div class="pr-upd">✍️ Consejos escritos · para hoy — tramo Buenos Aires → Juan Lacaze</div><ul class="pg-list"><li><b>Ráfagas de 25–30 kn con media de 12:</b> navegá con <b>un rizo en la mayor</b> o con el génova enrollado a ~70%. Las ráfagas son las que rompen cosas; la media la vas a aprovechar igual.</li><li><b>Popa cerrada = peligro de trasluchada:</b> con viento del SO y rumbo ~075°, el ángulo al viento anda en 150–170°. En Sailaway el piloto por rumbo no perdona una rolada: poné el <b>piloto por ángulo de viento (TWA) a ~150°</b> o, si vas por rumbo, armá la retenida de botavara (preventer).</li><li><b>VMG en popa:</b> en vez de ir a 175° directo, hacé 2–3 bordes a 150–155°. Recorrés más millas pero el barco va más rápido y estable, y llegás a la misma hora o antes.</li><li><b>Profundidad:</b> el Río de la Plata tiene 3–6 m en casi todo el tramo. <b>El viento del SO/O baja el nivel del río (bajante)</b>; hoy puede haber menos agua de la que dice la carta. Mirá la sonda al acercarte a Juan Lacaze y entrá por el canal balizado.</li><li><b>Ola de río:</b> 0,5 m corta hace cabecear; con popa el barco puede 'orzar solo' al bajar una ola. Si ves que el piloto corrige mucho, bajá un poco de vela.</li><li><b>Hora de llegada:</b> a 6,5 kn llegás ~17:40; el sol se pone ~19:00. Tenés margen de luz, pero no te demores en la salida del canal de Buenos Aires.</li></ul></div><div class="tb tb-notas">Pueblo tranquilo del departamento de Colonia, ideal para el primer descanso<div class="cap-h">✏️ Notas del capitán <small>— ideas para mejorar el programa y cosas que te pasen navegando (Claude las lee)</small></div><div class="cap-list" data-n="2"></div><div class="cap-form"><select class="cap-cat"><option value="navegacion">⛵ Aprendizaje de navegación</option><option value="mejora">💡 Mejora del programa</option><option value="otro">📝 Otro</option></select><textarea class="cap-txt" rows="2" placeholder="Escribí una nota…"></textarea><button onclick="guardarNota(this, 2)">Guardar</button></div><div class="cap-aviso"></div></div></div></div>
+<div class="poi-src" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8"><div class="pg-sec"><h3>📍 Puntos a conocer <small>— tocá uno para ver fotos y detalle</small></h3><div class="pg-cards"><div class="pg-card poi" onclick="poiDetail(this)" data-name="Ciudad textil histórica" data-wiki="es:Juan Lacaze" data-foto="Juan Lacaze Colonia Uruguay" data-map="Ciudad textil histórica, Juan Lacaze"><div>🏭 <b>Ciudad textil histórica</b> — recorrer el casco y la rambla frente al río.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Juan Lacaze nació como <b>Puerto Sauce</b> y creció alrededor de dos industrias grandes: la textil Campomar y la papelera Fanapel, hoy cerradas. Las chimeneas y los galpones siguen marcando el paisaje del pueblo.</p><p>La <b>rambla</b> corre frente al río con playas de arena y barrancas bajas; al atardecer el sol cae sobre el agua, algo raro en la costa uruguaya. El puerto es chico y tranquilo, ideal para un primer descanso.</p><p>Para el día de descanso: caminar la rambla hasta la playa, comer en los boliches del centro y reponer agua y algo de comida fresca.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Colonia del Sacramento" data-wiki="es:Colonia del Sacramento" data-foto="Barrio Histórico Colonia del Sacramento" data-map="Colonia del Sacramento, Juan Lacaze"><div>🏛️ <b>Colonia del Sacramento</b> (a ~20 MN) — Barrio Histórico, Patrimonio de la Humanidad. Si sobra tiempo, vale una escapada.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Fundada por los portugueses en 1680 frente a Buenos Aires, fue disputada durante un siglo entre España y Portugal. Su <b>Barrio Histórico</b> es Patrimonio de la Humanidad (UNESCO, 1995).</p><p>Imperdibles: la <b>Calle de los Suspiros</b> (empedrado portugués con desagüe al centro), el <b>Portón de Campo</b> con su puente levadizo, el <b>faro</b> junto a las ruinas del convento de San Francisco (se puede subir) y la costanera al atardecer.</p><p>Desde Juan Lacaze está a unos 45 km: se llega en ómnibus o auto en menos de una hora, así que entra en el día de descanso.</p></div></div></div></div><div class="pg-row"><b>Navegación local:</b> Río muy poco profundo: seguir los canales balizados y mirar el calado. Con viento del sudeste (sudestada) el río se pone picado.</div><div class="pg-sec"><h3>📝 Eventos durante la navegación</h3><ul class="pg-list"><li>29 Sep ~14:30 — Paso por la <b>Isla Farallón</b></li><li>29 Sep 14:50 — <b>Al través de Colonia</b> (S34°29.6' O57°51.6'), 8,0 kn rumbo 086°, viento real 213° / 17 kn (más fuerte que los 11–12 kn pronosticados). 41 MN totales, faltan 21,7 MN</li><li>29 Sep 16:57 — ⚓ <b>Llegada a Juan Lacaze.</b> 52 MN en 6 h 16 min (media 8,3 kn; 7 MN más que lo planificado por los bordes de popa)</li></ul></div></div>
+</section>
+<section class="pg" data-n="3" data-name="Juan Lacaze → Montevideo" data-port="Montevideo" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8">
+<div class="pg-hero"><div><div class="pg-fase">VIAJE DE PRUEBA — GLORY II: Buenos Aires → Buenos Aires</div><div class="pg-name">Juan Lacaze → Montevideo<small>ETAPA 3 DE 7</small></div></div><div class="pg-sub">🇺🇾 Uruguay · 34°54'S / 56°13'O</div></div>
+<div class="pg-plan"><div class="pl-chips" data-n="3"></div><button class="pg-poi" onclick="openPoi(this)">📍 Puntos de interés de Montevideo (3)</button></div>
+<div class="pg-main"><div class="pg-tabs"><div class="tb-head"><button data-t="pron" onclick="setTab('pron')">🌬 Pronóstico <i class="tb-dot"></i></button><button data-t="cons" onclick="setTab('cons')">🧭 Consejos <i class="tb-dot"></i></button><button data-t="notas" onclick="setTab('notas')">📝 Notas</button></div><div class="tb tb-pron"><div class="pr-auto"></div><div class="pr-upd">✍️ Pronóstico escrito · actualizado 29 Sep 11:30 · Open-Meteo · confianza media-alta (2 días)</div><ul class="pg-list"><li><b>Salida 01 Oct (09:00):</b> SSO 10 kn, ráfagas 18 kn.</li><li><b>Media mañana a media tarde:</b> SO 14–15 kn, ráfagas 19 kn.</li><li><b>Llegada a Montevideo (~19:00):</b> SO 12–13 kn, ráfagas 17 kn.</li><li><b>Ola:</b> crece de 0,5 m a <b>1 m</b> a medida que el río se abre hacia Montevideo.</li><li><b>Resumen:</b> viento de través (rumbo ~115°, viento del SSO–SO): el tramo más rápido del viaje si se mantiene.</li></ul><div class="pr-live" data-n="3"></div></div><div class="tb tb-cons"><div class="cn-auto"></div><div class="pr-upd">✍️ Consejos escritos · tramo Juan Lacaze → Montevideo (01 Oct)</div><ul class="pg-list"><li><b>Regla del capitán — seguridad en solitario:</b> chaleco autoinflable con arnés puesto para salir a cubierta el 100% del día, sea cual sea el viento y la ola. Con navegación riesgosa (15 kn o más, olas importantes o de noche): línea de vida instalada y estrobo a mano.</li><li><b>Salí a las 08:00, no a las 09:00:</b> son ~10 h a 6,5 kn y el sol se pone ~19:05. Entrar a Montevideo de día es mucho más cómodo por el tráfico del puerto comercial.</li><li><b>Través = velocidad:</b> con SO 14–15 kn de través llevá <b>toda la vela</b>; es el mejor ángulo del barco. Si las ráfagas pasan de 20 kn, aflojá un poco la mayor en vez de rizar.</li><li><b>No bajes al centro del río:</b> al sur de la derrota están los bancos del medio del Río de la Plata (Banco Ortiz), con muy poca agua. Seguí los waypoints por la costa uruguaya.</li><li><b>Ola creciente:</b> a partir de la mitad del tramo la ola llega a ~1 m de través; el barco va a rolar. Tripulante solo: revisá que el piloto no se vaya de rumbo en cada ola.</li><li><b>Dónde amarrar:</b> además del puerto de Montevideo, el <b>Puerto del Buceo</b> (Yacht Club Uruguayo) está sobre la rambla, más tranquilo y con servicios para veleros.</li><li><b>Aprovisionamiento:</b> Montevideo es el mejor lugar del viaje para cargar agua y comida antes de la costa atlántica.</li></ul></div><div class="tb tb-notas">Capital de Uruguay; mejor puerto para aprovisionar antes de la costa<div class="cap-h">✏️ Notas del capitán <small>— ideas para mejorar el programa y cosas que te pasen navegando (Claude las lee)</small></div><div class="cap-list" data-n="3"></div><div class="cap-form"><select class="cap-cat"><option value="navegacion">⛵ Aprendizaje de navegación</option><option value="mejora">💡 Mejora del programa</option><option value="otro">📝 Otro</option></select><textarea class="cap-txt" rows="2" placeholder="Escribí una nota…"></textarea><button onclick="guardarNota(this, 3)">Guardar</button></div><div class="cap-aviso"></div></div></div></div>
+<div class="poi-src" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8"><div class="pg-sec"><h3>📍 Puntos a conocer <small>— tocá uno para ver fotos y detalle</small></h3><div class="pg-cards"><div class="pg-card poi" onclick="poiDetail(this)" data-name="Mercado del Puerto" data-wiki="es:Mercado del Puerto" data-foto="Mercado del Puerto Montevideo" data-map="Mercado del Puerto, Montevideo"><div>🍖 <b>Mercado del Puerto</b> — parrillas históricas frente al puerto.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Estructura de hierro forjado traída de Inglaterra e inaugurada en 1868. Adentro funciona desde hace más de un siglo como el gran <b>templo de la parrilla</b> montevideana.</p><p>Pedí un asado a la leña en el mostrador y probá el <b>medio y medio</b> (mitad vino blanco, mitad espumante), la bebida clásica del lugar. Los sábados al mediodía se llena.</p><p>Está a pasos del puerto: si amarrás ahí, es la primera parada natural después de llegar.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Ciudad Vieja" data-wiki="es:Ciudad Vieja (Montevideo)" data-foto="Ciudad Vieja Montevideo" data-map="Ciudad Vieja, Montevideo"><div>🏛️ <b>Ciudad Vieja</b> — Teatro Solís, Plaza Independencia y calles peatonales.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>El casco colonial de Montevideo, sobre la península. Se recorre a pie por la <b>peatonal Sarandí</b>, desde la <b>Puerta de la Ciudadela</b> (resto de la muralla) hasta el puerto.</p><p>En la <b>Plaza Independencia</b> están el Palacio Salvo, el mausoleo de Artigas y, a un costado, el <b>Teatro Solís</b> (1856), uno de los teatros más antiguos de Sudamérica, con visitas guiadas.</p><p>Buen lugar para cambiar plata, comprar repuestos y cenar temprano antes de zarpar.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="La Rambla" data-wiki="es:Rambla de Montevideo" data-foto="Rambla de Montevideo" data-map="La Rambla, Montevideo"><div>🌊 <b>La Rambla</b> — más de 20 km de costanera, ideal para caminar al atardecer.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Más de 20 km de costanera continua desde la Ciudad Vieja hasta Carrasco, bordeando playas urbanas como Pocitos y Ramírez. Es el living de Montevideo: mate, bicicleta y atardecer.</p><p>Pasa frente al <b>Puerto del Buceo</b>, sede del Yacht Club Uruguayo: si amarrás ahí, tenés la rambla en la puerta.</p></div></div></div></div><div class="pg-sec"><h3>📝 Eventos durante la navegación</h3><ul class="pg-list"><li>01 Oct 10:39 — Zarpada de Juan Lacaze con mayor y mesana a tope y J1</li><li>01 Oct 11:28 — S34°29.8' O57°20.6', 8,0 kn rumbo 127°, a 6,3 MN de Juan Lacaze; faltan 61,5 MN (ETA ~19:10)</li><li>01 Oct (antes de las 22:11) — ⚓ <b>Llegada a Montevideo:</b> fondeado frente a Punta Carretas (S34°55.9' O56°09.9'), a ~3 MN del puerto. ~62 MN desde Juan Lacaze. Suministros: 76 ltr agua, 38 kg comida</li><li>03 Oct 08:30 — ⛵ <b>Zarpada de Montevideo rumbo a Piriápolis:</b> salida frente a Punta Carretas en ceñida abierta / descuartelar, rumbo ~090° (rumbo magnético en piloto 102°), viento verdadero NE (029° / 12,5 kn), velocidad 6,4–6,8 kn sobre el fondo. Suministros: 76 ltr agua, 37 kg comida</li></ul></div></div>
+</section>
+<section class="pg" data-n="4" data-name="Montevideo → Piriápolis" data-port="Piriápolis" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8">
+<div class="pg-hero"><div><div class="pg-fase">VIAJE DE PRUEBA — GLORY II: Buenos Aires → Buenos Aires</div><div class="pg-name">Montevideo → Piriápolis<small>ETAPA 4 DE 7</small></div></div><div class="pg-sub">🇺🇾 Uruguay · 34°52'S / 55°16'O</div></div>
+<div class="pg-plan"><div class="pl-chips" data-n="4"></div><button class="pg-poi" onclick="openPoi(this)">📍 Puntos de interés de Piriápolis (3)</button></div>
+<div class="pg-main"><div class="pg-tabs"><div class="tb-head"><button data-t="pron" onclick="setTab('pron')">🌬 Pronóstico <i class="tb-dot"></i></button><button data-t="cons" onclick="setTab('cons')">🧭 Consejos <i class="tb-dot"></i></button><button data-t="notas" onclick="setTab('notas')">📝 Notas</button></div><div class="tb tb-pron"><div class="pr-auto"></div><div class="pr-upd">✍️ Pronóstico escrito · actualizado 29 Sep 11:30 · Open-Meteo · confianza media (4 días)</div><ul class="pg-list"><li><b>Salida 03 Oct (09:00):</b> NE 12 kn, ráfagas 18 kn.</li><li><b>Mediodía:</b> NE 11 kn, ráfagas 19 kn.</li><li><b>Tarde, llegando a Piriápolis:</b> rola al <b>E y cae a 5–6 kn</b> (ráfagas 17 kn).</li><li><b>Ola:</b> 0,7–0,8 m.</li><li><b>Resumen:</b> ceñida a la mañana y viento casi de proa a la tarde (rumbo ~090°). Tramo lento: contar con bordes.</li></ul><div class="pr-live" data-n="4"></div></div><div class="tb tb-cons"><div class="cn-auto"></div><div class="pr-upd">✍️ Consejos escritos · tramo Montevideo → Piriápolis (03 Oct)</div><ul class="pg-list"><li><b>Regla del capitán — seguridad en solitario:</b> chaleco autoinflable con arnés puesto para salir a cubierta el 100% del día, sea cual sea el viento y la ola. Con navegación riesgosa (15 kn o más, olas importantes o de noche): línea de vida instalada y estrobo a mano.</li><li><b>Salí temprano para usar el NE de la mañana:</b> a la tarde el viento rola al E y cae a 5–6 kn, casi de proa. Cada milla que ganes al este antes del mediodía es una milla que no vas a tener que bordear.</li><li><b>Ceñida con NE 12 kn:</b> ajustá las escotas bien cerradas, génova completo. Ángulo al viento real ~45–50°; más cerrado el barco se frena.</li><li><b>Estrategia de bordes:</b> cuando rote al E, hacé bordes largos más que cortos: cada virada en Sailaway cuesta velocidad. Elegí la amura que te acerque a la costa (norte) para tener agua más plana.</li><li><b>Resguardos:</b> dale amplio margen a la <b>Isla de Flores</b> (frente a la costa este de Montevideo) y, en los bordes hacia el sur, <b>no pases de 35°05'S</b>: más al sur está el Banco Inglés, con muy poca agua y muchos naufragios (verificalo en la carta del juego).</li><li><b>Llegada:</b> Piriápolis tiene puerto deportivo protegido por el Cerro San Antonio; con viento del E se entra cómodo.</li></ul></div><div class="tb tb-notas">Balneario al pie de los cerros, con puerto deportivo<div class="cap-h">✏️ Notas del capitán <small>— ideas para mejorar el programa y cosas que te pasen navegando (Claude las lee)</small></div><div class="cap-list" data-n="4"></div><div class="cap-form"><select class="cap-cat"><option value="navegacion">⛵ Aprendizaje de navegación</option><option value="mejora">💡 Mejora del programa</option><option value="otro">📝 Otro</option></select><textarea class="cap-txt" rows="2" placeholder="Escribí una nota…"></textarea><button onclick="guardarNota(this, 4)">Guardar</button></div><div class="cap-aviso"></div></div></div></div>
+<div class="poi-src" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8"><div class="pg-sec"><h3>📍 Puntos a conocer <small>— tocá uno para ver fotos y detalle</small></h3><div class="pg-cards"><div class="pg-card poi" onclick="poiDetail(this)" data-name="Castillo de Piria" data-wiki="es:Castillo de Piria" data-foto="Castillo de Piria" data-map="Castillo de Piria, Piriápolis"><div>🏰 <b>Castillo de Piria</b> — la casona del fundador de la ciudad.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Residencia de <b>Francisco Piria</b>, el empresario que fundó Piriápolis a fines del siglo XIX con la idea de crear un balneario europeo en Uruguay.</p><p>Hoy es museo: salas de época, jardines y una historia llena de excentricidades (Piria era aficionado a la alquimia). Queda a unos kilómetros del centro, camino al Cerro Pan de Azúcar.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Cerro San Antonio" data-wiki="" data-foto="Cerro San Antonio Piriapolis" data-map="Cerro San Antonio, Piriápolis"><div>⛰️ <b>Cerro San Antonio</b> — subida corta con vista de toda la bahía.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>El cerro que cierra la bahía de Piriápolis y protege el puerto. Se sube caminando o con la <b>aerosilla</b> desde la rambla.</p><p>Arriba hay una capilla y un mirador con vista a toda la bahía, el puerto y la ciudad. Al atardecer se ve el sol hundirse detrás de las sierras.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Cerro Pan de Azúcar" data-wiki="es:Cerro Pan de Azúcar (Uruguay)" data-foto="Cerro Pan de Azucar Uruguay cruz" data-map="Cerro Pan de Azúcar, Piriápolis"><div>🥾 <b>Cerro Pan de Azúcar</b> — el trekking clásico de la zona, cerca del pueblo.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Uno de los cerros más altos de Uruguay (~390 m), coronado por una <b>gran cruz</b> de hormigón visible desde lejos, incluso desde el mar.</p><p>La subida lleva 1–1,5 h por un sendero que se pone empinado y con piedra suelta al final. Al pie está la <b>reserva de fauna autóctona</b>, con animales de la región.</p><p>Llevar agua y calzado firme; con viento fuerte la cumbre es muy expuesta.</p></div></div></div></div><div class="pg-sec"><h3>📝 Eventos durante la navegación</h3><ul class="pg-list"><li>03 Oct 16:29 — ⚓ <b>Llegada a Piriápolis:</b> detectada por datos en vivo. 47 MN navegadas. Descanso el 04 Oct</li><li>05 Oct 09:52 — ⛵ <b>Zarpada de Piriápolis rumbo a La Paloma:</b> salida detectada por datos en vivo</li></ul></div></div>
+</section>
+<section class="pg" data-n="5" data-name="Piriápolis → La Paloma" data-port="La Paloma" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8">
+<div class="pg-hero"><div><div class="pg-fase">VIAJE DE PRUEBA — GLORY II: Buenos Aires → Buenos Aires</div><div class="pg-name">Piriápolis → La Paloma<small>ETAPA 5 DE 7</small></div></div><div class="pg-sub">🇺🇾 Uruguay · 34°40'S / 54°09'O</div></div>
+<div class="pg-plan"><div class="pl-chips" data-n="5"></div><div class="pg-hito">🌊 SALIDA AL ATLÁNTICO ABIERTO (próximo tramo)</div><button class="pg-poi" onclick="openPoi(this)">📍 Puntos de interés de La Paloma (3)</button></div>
+<div class="pg-main"><div class="pg-tabs"><div class="tb-head"><button data-t="pron" onclick="setTab('pron')">🌬 Pronóstico <i class="tb-dot"></i></button><button data-t="cons" onclick="setTab('cons')">🧭 Consejos</button><button data-t="notas" onclick="setTab('notas')">📝 Notas</button></div><div class="tb tb-pron"><div class="pr-auto"></div><div class="pr-upd">✍️ Pronóstico escrito · actualizado 29 Sep 11:30 · Open-Meteo · confianza media-baja (6 días)</div><ul class="pg-list"><li><b>05 Oct:</b> E–ENE flojo, 3–9 kn (ráfagas hasta 18 kn al anochecer). Ola 0,6–1 m.</li><li><b>Resumen:</b> viento de proa y flojo: tramo largo en horas. Revisar de nuevo el 03–04 Oct.</li></ul><div class="pr-live" data-n="5"></div></div><div class="tb tb-cons"><div class="cn-auto"></div><div class="pg-vacio">Sin consejos todavía: se escriben para la etapa activa y las dos siguientes.</div></div><div class="tb tb-notas">Último puerto uruguayo antes de cruzar al lado argentino. Costa exigente: mirar la entrada y el pronóstico<div class="cap-h">✏️ Notas del capitán <small>— ideas para mejorar el programa y cosas que te pasen navegando (Claude las lee)</small></div><div class="cap-list" data-n="5"></div><div class="cap-form"><select class="cap-cat"><option value="navegacion">⛵ Aprendizaje de navegación</option><option value="mejora">💡 Mejora del programa</option><option value="otro">📝 Otro</option></select><textarea class="cap-txt" rows="2" placeholder="Escribí una nota…"></textarea><button onclick="guardarNota(this, 5)">Guardar</button></div><div class="cap-aviso"></div></div></div></div>
+<div class="poi-src" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8"><div class="pg-sec"><h3>📍 Puntos a conocer <small>— tocá uno para ver fotos y detalle</small></h3><div class="pg-cards"><div class="pg-card poi" onclick="poiDetail(this)" data-name="Faro de La Paloma" data-wiki="es:Faro de Cabo de Santa María (Uruguay)" data-foto="Faro de La Paloma Cabo Santa Maria" data-map="Faro de La Paloma, La Paloma"><div>💡 <b>Faro de La Paloma</b> — vista de la costa y de los bancos de arena.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>El faro del <b>Cabo Santa María</b>, del siglo XIX, marca la punta rocosa donde termina la costa del Río de la Plata y empieza el Atlántico abierto.</p><p>Se puede subir en horario de visita: la vista abarca la bahía de La Paloma, las playas y los bajos de piedra que rodean el cabo, útil para entender la entrada antes de salir.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Laguna de Rocha" data-wiki="es:Laguna de Rocha" data-foto="Laguna de Rocha" data-map="Laguna de Rocha, La Paloma"><div>🦆 <b>Laguna de Rocha</b> — área protegida con aves y buen paseo.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Laguna costera separada del mar por una barra de arena que se abre y se cierra. Es <b>paisaje protegido</b> y un lugar clave para aves: cisnes de cuello negro, flamencos y garzas.</p><p>En la barra viven pescadores artesanales en ranchos de paja. Muy linda para una caminata tranquila en el día de descanso.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Cabo Polonio" data-wiki="es:Cabo Polonio" data-foto="Cabo Polonio faro lobos marinos" data-map="Cabo Polonio, La Paloma"><div>🏖️ <b>Cabo Polonio</b> (por tierra) — dunas y lobos marinos, sin electricidad.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Parque nacional con un pueblito sin calles ni luz de red, entre dunas enormes. Se llega sólo en <b>camiones 4x4</b> desde la entrada sobre la ruta 10.</p><p>Junto al faro vive una de las <b>colonias de lobos marinos</b> más grandes de la región. De noche, sin luz artificial, el cielo es espectacular.</p><p>Desde La Paloma está a ~1 h por tierra: se puede ir y volver en el día de descanso.</p></div></div></div></div><div class="pg-sec"><h3>📝 Eventos durante la navegación</h3><ul class="pg-list"><li>05 Oct 19:30 — ⚓ <b>Llegada a La Paloma:</b> ~69 MN desde Piriápolis. Fondeado en puerto. Descanso el 06 Oct</li><li>07 Oct 10:30 — ⛵ <b>Zarpada de La Paloma rumbo a Mar del Plata:</b> zarpada al Atlántico abierto, rumbo 193°, viento ENE 15 kn, velocidad 8,1 kn. Suministros: 73 ltr agua, 36 kg comida</li></ul></div></div>
+</section>
+<section class="pg" data-n="6" data-name="La Paloma → Mar del Plata" data-port="Mar del Plata" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8">
+<div class="pg-hero"><div><div class="pg-fase">VIAJE DE PRUEBA — GLORY II: Buenos Aires → Buenos Aires</div><div class="pg-name">La Paloma → Mar del Plata<small>ETAPA 6 DE 7</small></div></div><div class="pg-sub">🇦🇷 Argentina · 38°02'S / 57°32'O</div></div>
+<div class="pg-plan"><div class="pl-chips" data-n="6"></div><button class="pg-poi" onclick="openPoi(this)">📍 Puntos de interés de Mar del Plata (3)</button></div>
+<div class="pg-main"><div class="pg-tabs"><div class="tb-head"><button data-t="pron" onclick="setTab('pron')">🌬 Pronóstico <i class="tb-dot"></i></button><button data-t="cons" onclick="setTab('cons')">🧭 Consejos</button><button data-t="notas" onclick="setTab('notas')">📝 Notas</button></div><div class="tb tb-pron"><div class="pr-auto"></div><div class="pr-upd">✍️ Pronóstico escrito · actualizado 29 Sep 11:30 · Open-Meteo · confianza baja (8–10 días)</div><ul class="pg-list"><li><b>07–09 Oct:</b> ENE–E 10–17 kn, ráfagas 17–28 kn, más fuerte al llegar a Mar del Plata. Ola ~1 m.</li><li><b>Resumen:</b> por ahora, viento de largo (rumbo ~220°, viento del E): buena señal para el cruce, pero falta mucho y puede cambiar.</li></ul><div class="pr-live" data-n="6"></div></div><div class="tb tb-cons"><div class="cn-auto"></div><div class="pg-vacio">Sin consejos todavía: se escriben para la etapa activa y las dos siguientes.</div></div><div class="tb tb-notas">Cruce del Río de la Plata por mar abierto. Punto más al sur del viaje<div class="cap-h">✏️ Notas del capitán <small>— ideas para mejorar el programa y cosas que te pasen navegando (Claude las lee)</small></div><div class="cap-list" data-n="6"></div><div class="cap-form"><select class="cap-cat"><option value="navegacion">⛵ Aprendizaje de navegación</option><option value="mejora">💡 Mejora del programa</option><option value="otro">📝 Otro</option></select><textarea class="cap-txt" rows="2" placeholder="Escribí una nota…"></textarea><button onclick="guardarNota(this, 6)">Guardar</button></div><div class="cap-aviso"></div></div></div></div>
+<div class="poi-src" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8"><div class="pg-sec"><h3>📍 Puntos a conocer <small>— tocá uno para ver fotos y detalle</small></h3><div class="pg-cards"><div class="pg-card poi" onclick="poiDetail(this)" data-name="Lobos marinos del puerto" data-wiki="es:Puerto de Mar del Plata" data-foto="lobos marinos puerto Mar del Plata" data-map="Lobos marinos del puerto, Mar del Plata"><div>🦭 <b>Lobos marinos del puerto</b> — la banquina de los pescadores.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>En la <b>banquina de los pescadores</b> y la escollera sur vive una colonia de lobos marinos que duerme sobre las rocas, a metros de la gente.</p><p>Alrededor: las lanchas amarillas de pesca, las cantinas del puerto (pescado frito, rabas) y el ruido de la actividad pesquera.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Playa Grande y Cabo Corrientes" data-wiki="es:Cabo Corrientes (Mar del Plata)" data-foto="Cabo Corrientes Mar del Plata" data-map="Playa Grande y Cabo Corrientes, Mar del Plata"><div>🏖️ <b>Playa Grande y Cabo Corrientes</b> — paseo por la costa.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>El <b>Cabo Corrientes</b> es la punta rocosa que divide las playas céntricas de Playa Grande. Sobre el cabo corre el paseo costero con vista al mar abierto.</p><p>Desde el mar, es el punto a respetar al entrar o salir de Mar del Plata: rompientes y restingas cerca de la costa.</p></div></div><div class="pg-card poi" onclick="poiDetail(this)" data-name="Torreón del Monje" data-wiki="es:Torreón del Monje" data-foto="Torreón del Monje Mar del Plata" data-map="Torreón del Monje, Mar del Plata"><div>🏛️ <b>Torreón del Monje</b> y el centro histórico.</div><div class="poi-more">📷 Ver fotos y detalle ›</div><div class="poi-det"><p>Construcción de 1904 con aire de castillo medieval, unida a la costa por un puente sobre el boulevard marítimo. Cuenta la leyenda de un monje que dio origen al nombre.</p><p>Hoy es confitería con vista al mar: un clásico para tomar algo después de llegar.</p></div></div></div></div></div>
+</section>
+<section class="pg" data-n="7" data-name="Mar del Plata → Buenos Aires" data-port="Buenos Aires" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8">
+<div class="pg-hero"><div><div class="pg-fase">VIAJE DE PRUEBA — GLORY II: Buenos Aires → Buenos Aires</div><div class="pg-name">Mar del Plata → Buenos Aires<small>(DESTINO FINAL) 🏁 · ETAPA 7 DE 7</small></div></div><div class="pg-sub">🇦🇷 Argentina · 34°35'S / 58°22'O</div></div>
+<div class="pg-plan"><div class="pl-chips" data-n="7"></div><div class="pg-hito">✅ ¡VIAJE DE PRUEBA COMPLETADO!</div><button class="pg-poi" onclick="openPoi(this)">📍 Puntos de interés de Buenos Aires</button></div>
+<div class="pg-main"><div class="pg-tabs"><div class="tb-head"><button data-t="pron" onclick="setTab('pron')">🌬 Pronóstico <i class="tb-dot"></i></button><button data-t="cons" onclick="setTab('cons')">🧭 Consejos</button><button data-t="notas" onclick="setTab('notas')">📝 Notas</button></div><div class="tb tb-pron"><div class="pr-auto"></div><div class="pr-upd">✍️ Pronóstico escrito · actualizado 29 Sep 11:30 · Open-Meteo · confianza muy baja (12–14 días)</div><ul class="pg-list"><li><b>11–12 Oct:</b> los modelos muestran un <b>frente frío con SO–OSO de 22–26 kn y ráfagas de 35 kn</b> la noche del 11 al 12, después calma y rotación al E–ENE.</li><li><b>Resumen:</b> es una señal a vigilar, no un pronóstico. Si se confirma cerca de la fecha, conviene esperar en Mar del Plata a que pase el frente.</li></ul><div class="pr-live" data-n="7"></div></div><div class="tb tb-cons"><div class="cn-auto"></div><div class="pg-vacio">Sin consejos todavía: se escriben para la etapa activa y las dos siguientes.</div></div><div class="tb tb-notas">🏁 <b>LLEGADA FINAL.</b> Fin del viaje de prueba (plan 14 Oct; zarpada de Mar del Plata el lunes 12 Oct para esperar que pase el frente frío del 11 al 12). Remontar el Río de la Plata por el canal balizado, cuidando el calado.<div class="cap-h">✏️ Notas del capitán <small>— ideas para mejorar el programa y cosas que te pasen navegando (Claude las lee)</small></div><div class="cap-list" data-n="7"></div><div class="cap-form"><select class="cap-cat"><option value="navegacion">⛵ Aprendizaje de navegación</option><option value="mejora">💡 Mejora del programa</option><option value="otro">📝 Otro</option></select><textarea class="cap-txt" rows="2" placeholder="Escribí una nota…"></textarea><button onclick="guardarNota(this, 7)">Guardar</button></div><div class="cap-aviso"></div></div></div></div>
+<div class="poi-src" style="--dk:#1e3a5f;--md:#2d5a8e;--bg:#edf2f8;--bd:#3b7dd8"><div class="pg-sec pg-vacio">Todavía no hay puntos de interés cargados para este puerto.</div></div>
+</section>
+</div>
+
+<!-- Historial de actualizaciones (se abre desde Parámetros) -->
+<div id="src-historial" style="display:none"><table><thead><tr><th>Fecha</th><th>Cambio</th></tr></thead><tbody><tr><td>29 Sep 2026</td><td>Creación de la bitácora de prueba con 7 puertos</td></tr><tr><td>29 Sep 2026</td><td>Salida adelantada al 29 Sep: llegada a Buenos Aires el 12 Oct (margen hasta el 14 Oct)</td></tr><tr><td>29 Sep 2026</td><td>Cronograma recalculado con tiempos reales: llegada a Juan Lacaze el mismo 29 Sep, descanso el 30 Sep y llegada final a Buenos Aires el 13 Oct</td></tr><tr><td>29 Sep 2026</td><td>Pronóstico (Open-Meteo) para todas las etapas, consejos de navegación para las etapas 2–4 y puntos de interés con detalle y fotos</td></tr><tr><td>29 Sep 2026</td><td>Travesía iniciada a las 10:41 desde el Club CNV (salida real cargada en la etapa 1)</td></tr><tr><td>30 Sep 2026</td><td>Regla del capitán (nota de la etapa 3): chaleco con arnés siempre en cubierta; línea de vida y estrobo con navegación riesgosa. Aplicada a los consejos automáticos y escritos</td></tr><tr><td>01 Oct 2026</td><td>Zarpada de Juan Lacaze 10:39 (eventos del log del capitán): estado NAVEGANDO, etapa 3</td></tr><tr><td>02 Oct 2026</td><td>Llegada a Montevideo cargada a mano (fondeado frente a Punta Carretas, fuera del radio de detección): estado EN PUERTO, ~62 MN del tramo según el log de Sailaway</td></tr><tr><td>03 Oct 2026</td><td>Zarpada de Montevideo 08:30 rumbo a Piriápolis: estado NAVEGANDO, etapa 4, rumbo 090°, velocidad ~6.6 kn</td></tr><tr><td>05 Oct 2026</td><td>Llegada a Piriápolis y zarpada hacia La Paloma (69 MN)</td></tr><tr><td>07 Oct 2026</td><td>Zarpada de La Paloma rumbo a Mar del Plata: inicio del cruce al Atlántico abierto (etapa 6). Estado NAVEGANDO, rumbo 193°, vel. 8,1 kn</td></tr><tr><td>08 Oct 2026</td><td>Salida de Mar del Plata reprogramada al lunes 12 Oct (llegada final a Buenos Aires el 14 Oct) para esperar mejor ventana meteorológica tras el paso del frente frío</td></tr><tr><td>29 Sep 2026</td><td>Llegada real a Juan Lacaze 16:57 (etapa 2 cerrada en llegada), estado EN PUERTO y estadísticas actualizadas</td></tr></tbody></table>
+<hr>
+<div class="qt"><i>"Un barco en el puerto está seguro, pero no es para eso que se construyen los barcos."</i></div>
+<div class="qt"><b>¡Buen viento y buena mar, Capitán Adrian!</b> ⛵🌊</div></div>
+
+<!-- Ventana de datos (puntos de interés, historial) -->
+<div id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div id="modal-win">
+    <div id="modal-head"><span id="modal-title"></span><button onclick="closeModal()">&#10005;</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const CFG = {"key": "prueba", "boats": [{"key": "b0", "name": "Glory II", "nr": 46429, "active": true, "initial": {"pos": "S34°39.3' / O54°07.9' — navegando rumbo 193°", "lat": -34.655, "lon": -54.1317, "hdg": 193, "cog": 193, "sog": 0.0, "twd": null, "tws": null, "upd": null}}], "ports": [{"n": 1, "name": "Buenos Aires", "lat": -34.5833, "lon": -58.3667, "done": false, "dias": null, "fase": 0, "arr": "— (origen)", "sal": "29 Sep", "arrISO": null, "salISO": "2026-09-29", "mn": null, "te": null, "arrR": null, "salR": "29 Sep 10:41 (hora local, Club CNV)", "mnR": null}, {"n": 2, "name": "Juan Lacaze", "lat": -34.4333, "lon": -57.4333, "done": true, "dias": 1, "fase": 0, "arr": "29 Sep", "sal": "01 Oct", "arrISO": "2026-09-29", "salISO": "2026-10-01", "mn": "45", "te": "~7 h", "arrR": "29 Sep 16:57", "salR": "01 Oct 10:39 (log del capitán)", "mnR": "52"}, {"n": 3, "name": "Montevideo", "lat": -34.9, "lon": -56.2167, "done": true, "dias": 1, "fase": 0, "arr": "01 Oct", "sal": "03 Oct", "arrISO": "2026-10-01", "salISO": "2026-10-03", "mn": "67", "te": "~10 h", "arrR": "01 Oct, antes de las 22:11 (hora exacta a confirmar) — fondeado frente a Punta Carretas, a ~3 MN del puerto", "salR": "03 Oct 08:30 (zarpada rumbo a Piriápolis)", "mnR": "~62"}, {"n": 4, "name": "Piriápolis", "lat": -34.8667, "lon": -55.2667, "done": true, "dias": 1, "fase": 0, "arr": "03 Oct", "sal": "05 Oct", "arrISO": "2026-10-03", "salISO": "2026-10-05", "mn": "47", "te": "~7 h", "arrR": "03 Oct 16:29 (detectada por los datos en vivo)", "salR": "05 Oct 09:52 (detectada por los datos en vivo)", "mnR": "47"}, {"n": 5, "name": "La Paloma", "lat": -34.6667, "lon": -54.15, "done": true, "dias": 1, "fase": 0, "arr": "05 Oct", "sal": "07 Oct", "arrISO": "2026-10-05", "salISO": "2026-10-07", "mn": "69", "te": "~11 h", "arrR": "05 Oct 19:30", "salR": "07 Oct 10:30 (zarpada rumbo a Mar del Plata)", "mnR": "69"}, {"n": 6, "name": "Mar del Plata", "lat": -38.0333, "lon": -57.5333, "done": false, "dias": 2, "fase": 0, "arr": "09 Oct", "sal": "12 Oct", "arrISO": "2026-10-09", "salISO": "2026-10-12", "mn": "259", "te": "~40 h", "arrR": null, "salR": null, "mnR": null}, {"n": 7, "name": "Buenos Aires", "lat": -34.5833, "lon": -58.3667, "done": false, "dias": 2, "fase": 0, "arr": "14 Oct", "sal": null, "arrISO": "2026-10-14", "salISO": null, "mn": "293", "te": "~45 h", "arrR": null, "salR": null, "mnR": null}], "defaults": {"crew": 1, "water": 2.0, "food": 1.0, "margin": 100.0}, "activeEtapa": 6, "legs": {"2": {"dep": "2026-09-29T10:41", "h": 7, "path": [[-34.5583, -58.3167], [-34.525, -58.0], [-34.5083, -57.8333], [-34.4667, -57.6333], [-34.4467, -57.425]], "from": "Buenos Aires", "to": "Juan Lacaze", "paisFrom": "Argentina", "paisTo": "Uruguay"}, "3": {"dep": "2026-10-01T10:39", "h": 10, "path": [[-34.4467, -57.425], [-34.55, -57.25], [-34.75, -56.9167], [-34.875, -56.5], [-34.9333, -56.2167]], "from": "Juan Lacaze", "to": "Montevideo", "paisFrom": "Uruguay", "paisTo": "Uruguay"}, "4": {"dep": "2026-10-03T08:30", "h": 7, "path": [[-34.9333, -56.2167], [-34.9667, -56.0], [-34.9667, -55.5], [-34.8917, -55.275]], "from": "Montevideo", "to": "Piriápolis", "paisFrom": "Uruguay", "paisTo": "Uruguay"}, "5": {"dep": "2026-10-05T09:52", "h": 11, "path": [[-34.8917, -55.275], [-35.1333, -54.8333], [-35.0, -54.5], [-34.7083, -54.1417]], "from": "Piriápolis", "to": "La Paloma", "paisFrom": "Uruguay", "paisTo": "Uruguay"}, "6": {"dep": "2026-10-07T10:30", "h": 40, "path": [[-34.7083, -54.1417], [-36.3667, -55.8333], [-38.0833, -57.475]], "from": "La Paloma", "to": "Mar del Plata", "paisFrom": "Uruguay", "paisTo": "Argentina"}, "7": {"dep": "2026-10-12T09:00", "h": 45, "path": [[-38.0833, -57.475], [-37.5, -57.0833], [-36.5, -56.1667], [-35.75, -56.25], [-35.1667, -56.5], [-35.0, -57.1667], [-34.75, -57.8333], [-34.6333, -58.1667], [-34.5583, -58.3167]], "from": "Mar del Plata", "to": "Buenos Aires", "paisFrom": "Argentina", "paisTo": "Argentina"}}, "entradas": [{"id": "1790799362273", "bitacora": "prueba", "tipo": "nota", "fecha": "2026-09-30T20:16:02.273Z", "etapa": 3, "categoria": "navegacion", "texto": "Al ser navegacion en solitario, el chaleco auto inflable que sirve de arnes, es condicion para salir a cubierta el 100% del dia sea cual sea la condicion de olas y vientos. Cuando se considera navegacion riesgosa, ej 15kts de viento, olas importantes o navegacon nocturna, se agrega instalar la linea de vida y tener a mano el estrobo para el arnes"}, {"id": "1790861998801", "bitacora": "prueba", "tipo": "log", "fecha": "2026-10-01T13:39:58.801Z", "etapa": 2, "texto": "Salida desde Juan Lacaze rumbo a Montevideo", "detalles": "Salida de travez y en breve derivando casi a aleta", "ubicacion": "S34°26.63' W57°26.73'"}, {"id": "1790862098420", "bitacora": "prueba", "tipo": "log", "fecha": "2026-10-01T13:41:38.420Z", "etapa": 2, "texto": "Salida con Mayor y mesana a tope y J1", "ubicacion": "S34°26.72' W57°26.57'"}], "publico": true, "version": "20261008173756"};
+const K = CFG.key;
+const $ = (id) => document.getElementById(id);
+const POLL_MS = 30000;
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const BOATS = CFG.boats;
+const PORTS = CFG.ports;
+const ACTIVE = BOATS.find(b => b.active) || BOATS[0];
+function store(k, v) { try { if (v === undefined) return localStorage.getItem('bitacora_' + K + '_' + k); localStorage.setItem('bitacora_' + K + '_' + k, v); } catch(e) {} return null; }
+// Modo capitan (copia publica): con una clave de GitHub guardada en este dispositivo, la pagina publica
+// tambien edita (notas, eventos, fechas, millas, llegadas). Se carga una sola vez abriendo el link con #capitan.
+function ghToken() { try { return localStorage.getItem('gh_capitan') || ''; } catch(e) { return ''; } }
+if (CFG.publico && location.hash === '#capitan') {
+  const t = prompt('Modo capitán: pegá tu clave de GitHub (queda guardada solo en este dispositivo).\nDejalo vacío para salir del modo capitán.', ghToken());
+  if (t !== null) { try { if (t.trim()) localStorage.setItem('gh_capitan', t.trim()); else localStorage.removeItem('gh_capitan'); } catch(e) {} }
+  history.replaceState(null, '', location.pathname + location.search);
+}
+const CAPITAN = CFG.publico && !!ghToken();
+
+// ─── Parametros de consumo (por velero, editables) ───
+const PARAMS = {};
+BOATS.forEach(b => {
+  PARAMS[b.key] = Object.assign({}, CFG.defaults);
+  try { Object.assign(PARAMS[b.key], JSON.parse(store('params_' + b.key))); } catch(e) {}
+});
+// suministros a cargar para un tramo de `dias`: tripulantes x consumo x dias x (1 + margen)
+function need(bk, dias) {
+  const p = PARAMS[bk], f = 1 + p.margin / 100;
+  return { water: Math.ceil(dias * p.crew * p.water * f - 1e-9), food: Math.ceil(dias * p.crew * p.food * f - 1e-9) };
+}
+function perDay(bk) { const p = PARAMS[bk]; return { water: p.crew * p.water, food: p.crew * p.food }; }
+
+// ─── Ventana de Suministros: agua, comida, combustible y consumo de cada velero ───
+let SUM_BOAT = null;
+function proxTramo(bk) {   // proximo tramo del velero: dias y destino
+  const next = PORTS.find(p => p.n > 1 && !p.done);
+  return next && next.dias ? { dias: next.dias, to: next.name } : null;
+}
+function nivelSum(v, porDia, dias, margin) {
+  return v == null ? 'nd' : !dias ? '' : v >= dias * porDia * (1 + margin / 100) ? 'ok' : v >= dias * porDia ? 'warn' : 'crit';
+}
+function htmlSuministros(k) {
+  const b = BOATS.find(x => x.key === k), l = LIVE[k], p = PARAMS[k], pd = perDay(k), t = proxTramo(k), n = t ? need(k, t.dias) : null;
+  const c = (lbl, v, u, niv, sub) => '<div class="sm-c ' + niv + '"><div class="l">' + lbl + '</div><div class="v">' + (v ?? '—') + (v != null ? ' <small>' + u + '</small>' : '') +
+    '</div><div class="s">' + sub + '</div></div>';
+  return (BOATS.length > 1 ? '<div class="sm-boats">' + BOATS.map(x => '<button class="' + (x.key === k ? 'act' : '') + '" onclick="openSuministros(\'' + x.key + '\')">' +
+      (x.active ? '★ ' : '') + x.name + '</button>').join('') + '</div>' : '') +
+    '<div class="sm-grid">' +
+      c('💧 Agua', l.water, 'ltr', nivelSum(l.water, pd.water, t && t.dias, p.margin), n ? 'El tramo a ' + t.to + ' pide ' + n.water + ' ltr (+' + p.margin + '%)' : '') +
+      c('🍞 Comida', l.food, 'kg', nivelSum(l.food, pd.food, t && t.dias, p.margin), n ? 'El tramo a ' + t.to + ' pide ' + n.food + ' kg (+' + p.margin + '%)' : '') +
+      c('⛽ Combustible', l.fuel, 'ltr', l.fuel == null ? 'nd' : l.fuel < 20 ? 'crit' : l.fuel < 60 ? 'warn' : 'ok', l.fuel == null ? 'Sailaway no lo informa' : '') +
+    '</div>' +
+    '<div class="sm-par">' +
+      '<label>Tripulantes<input type="number" min="1" step="1" value="' + p.crew + '" oninput="setParam(\'' + k + '\',\'crew\',this.value)"></label>' +
+      '<label>Agua por tripulante (ltr/día)<input type="number" min="0" step="0.1" value="' + p.water + '" oninput="setParam(\'' + k + '\',\'water\',this.value)"></label>' +
+      '<label>Comida por tripulante (kg/día)<input type="number" min="0" step="0.1" value="' + p.food + '" oninput="setParam(\'' + k + '\',\'food\',this.value)"></label>' +
+      '<label>Margen de seguridad (%)<input type="number" min="0" step="5" value="' + p.margin + '" oninput="setParam(\'' + k + '\',\'margin\',this.value)"></label>' +
+      '<button class="mb-btn" style="margin:0" onclick="resetParams(\'' + k + '\')">Restablecer</button>' +
+    '</div><div class="sm-sum" id="sm-sum">' + resumenConsumo(k) + '</div>' +
+    '<div class="pt-nota" style="margin-top:8px">En puerto fondeado no se gasta. Cargar sólo hasta el margen: un velero pesado navega peor. Datos de ' + b.name + ': ' + fmtUpd(l.upd) + '.</div>';
+}
+function resumenConsumo(k) {
+  const p = PARAMS[k], d = perDay(k);
+  return 'Consumo por día: <b>' + +d.water.toFixed(2) + ' ltr</b> de agua + <b>' + +d.food.toFixed(2) + ' kg</b> de comida · se carga tramo × consumo × ' +
+    (1 + p.margin / 100).toFixed(2).replace(/\.?0+$/, '');
+}
+function openSuministros(k) {
+  SUM_BOAT = k;
+  openModal('🧺 Suministros — ' + BOATS.find(b => b.key === k).name, htmlSuministros(k));
+}
+function setParam(k, f, val) {
+  const v = parseFloat(val);
+  if (!isFinite(v) || v < 0 || (f === 'crew' && v < 1)) return;
+  PARAMS[k][f] = v;
+  store('params_' + k, JSON.stringify(PARAMS[k]));
+  if ($('sm-sum')) $('sm-sum').innerHTML = resumenConsumo(k);
+  renderAll();
+}
+function resetParams(k) {
+  PARAMS[k] = Object.assign({}, CFG.defaults);
+  store('params_' + k, JSON.stringify(PARAMS[k]));
+  openSuministros(k); renderAll();
+}
+function refrescarSuministros() {   // si la ventana esta abierta, con los datos nuevos
+  if (SUM_BOAT && $('modal-bg').classList.contains('show') && $('modal-title').textContent.startsWith('🧺')) {
+    const act = document.activeElement && document.activeElement.tagName === 'INPUT';
+    if (!act) $('modal-body').innerHTML = htmlSuministros(SUM_BOAT);
+  }
+}
+
+// ─── Datos en vivo de Sailaway ───
+// La pagina publica de cada barco en sailaway.world trae los instrumentos y los
+// suministros, y permite leerla desde cualquier pagina (CORS abierto), asi que
+// no hace falta usuario ni contraseña. Los MMSI salen del .md.
+const LIVE = {};
+BOATS.forEach(b => {
+  LIVE[b.key] = Object.assign({ pos: null, lat: null, lon: null, hdg: null, cog: null, sog: 0, twd: null, tws: null, awa: null, aws: null,
+                  water: null, food: null, fuel: null, miles: null, upd: null }, b.initial || {});
+  try { const s = JSON.parse(store('live_' + b.key)); if (s && b.nr != null && s.nr === b.nr) Object.assign(LIVE[b.key], s); } catch(e) {}
+});
+let FETCHED = null;
+try { FETCHED = parseInt(store('fetched')) || null; } catch(e) {}
+
+function parseBoatPage(html) {
+  const t = new DOMParser().parseFromString(html, 'text/html').body.textContent;
+  const f = (re) => t.match(re);
+  const n = (x) => x == null ? null : parseFloat(x);
+  const b = {};
+  let m;
+  if ((m = f(/Position\s+([NS][^\n]+)/))) b.pos = m[1].trim().replace(/°\s+/g, '°');
+  if ((m = html.match(/ShowWindy\(\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)/))) { b.lat = n(m[1]); b.lon = n(m[2]); }
+  if ((m = f(/Heading \(true\)\s+(\d+)°/))) b.hdg = n(m[1]);
+  if ((m = f(/GPS course\/speed over ground\s+(\d+)°,\s*(-?[\d.]+)\s*kn/))) { b.cog = n(m[1]); b.sog = Math.max(0, n(m[2])); }
+  if ((m = f(/True wind direction\/speed\s+(\d+)°,\s*([\d.]+)\s*kn/))) { b.twd = n(m[1]); b.tws = n(m[2]); }
+  if ((m = f(/Apparent wind angle\/speed\s+(-?\d+)°,\s*([\d.]+)\s*kn/))) { b.awa = n(m[1]); b.aws = n(m[2]); }
+  if ((m = f(/\bWater\s+(\d+)\s*ltr/))) b.water = n(m[1]);
+  if ((m = f(/\bFood\s+(\d+)\s*kg/))) b.food = n(m[1]);
+  m = f(/\b(?:Fuel|Diesel)\s+(\d+)\s*(?:ltr|l)\b/i);
+  b.fuel = m ? n(m[1]) : null;
+  if ((m = f(/Total miles sailed\s+(\d+)\s*nm/))) b.miles = n(m[1]);
+  if ((m = f(/Last position update:\s*(\d{4}-\d\d-\d\d \d\d:\d\d)/))) b.upd = m[1];
+  if (b.pos == null && b.lat == null) throw new Error('pagina sin datos del barco');
+  return b;
+}
+
+// Corta un pedido a Sailaway que no contesta en 20 s (en navegadores viejos sin AbortSignal.timeout,
+// con un temporizador; si tampoco hay AbortController, el pedido va sin limite)
+function limite20() {
+  try {
+    if (AbortSignal.timeout) return AbortSignal.timeout(20000);
+    const c = new AbortController(); setTimeout(() => c.abort(), 20000); return c.signal;
+  } catch(e) { return undefined; }
+}async function fetchBoat(nr) {
+  const r = await fetch('https://sailaway.world/cgi-bin/sailaway3/page.pl?p=boat&nr=' + nr + '&nr2=0', { cache: 'no-store', signal: limite20() });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return parseBoatPage(await r.text());
+}
+
+// Ruta cargada en el juego: boatmapdata.pl devuelve sus waypoints (type 1 = inicio, 9 = fin)
+let ROUTE = null;
+try { const r = JSON.parse(store('route')); if (r && r.nr === ACTIVE.nr) ROUTE = r; } catch(e) {}
+async function fetchRoute(nr) {
+  const r = await fetch('https://sailaway.world/cgi-bin/sailaway3/boatmapdata.pl?showboatlog=0&showracecourse=0&showwaypoints=1&ubtnr=0&botnr=' + nr, { cache: 'no-store', signal: limite20() });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const d = await r.json();
+  return { nr, wps: (d.waypoints || []).filter(w => w.lat != null && w.lon != null).map(w => ({ lat: +w.lat, lon: +w.lon, type: w.type })) };
+}
+
+// Proximo WP: el final del tramo de la ruta que queda mas cerca del barco
+function nextWaypoint(b, wps) {
+  if (!wps || wps.length < 2 || b.lat == null) return null;
+  const k = Math.cos(b.lat * Math.PI / 180);
+  const xy = (p) => [(p.lon - b.lon) * k, p.lat - b.lat];
+  let best = null;
+  for (let i = 0; i < wps.length - 1; i++) {
+    const [ax, ay] = xy(wps[i]), [bx, by] = xy(wps[i + 1]);
+    const dx = bx - ax, dy = by - ay, L = dx*dx + dy*dy;
+    const t = L ? Math.max(0, Math.min(1, -(ax*dx + ay*dy) / L)) : 0;
+    const d = Math.hypot(ax + t*dx, ay + t*dy);
+    if (!best || d < best.d - 1e-9) best = { d, i: i + 1, t };
+  }
+  // si ya esta encima del waypoint (menos de 0,5 MN), el proximo es el siguiente
+  let i = best.i;
+  while (i < wps.length - 1 && distNM(b, wps[i]) < 0.5) i++;
+  return { i, wp: wps[i], total: wps.length };
+}
+
+async function refreshLive() {
+  const con = BOATS.filter(b => b.nr != null);
+  if (!con.length) { setLiveBadge('nomsi'); renderAll(); return; }
+  const res = await Promise.allSettled(con.map(b => fetchBoat(b.nr)));
+  let ok = 0;
+  con.forEach((b, i) => {
+    if (res[i].status === 'fulfilled') {
+      Object.assign(LIVE[b.key], res[i].value); ok++;
+      store('live_' + b.key, JSON.stringify(Object.assign({ nr: b.nr }, LIVE[b.key])));
+    } else console.warn('Sailaway ' + b.name + ':', res[i].reason);
+  });
+  if (ACTIVE.nr != null) {
+    try { ROUTE = await fetchRoute(ACTIVE.nr); store('route', JSON.stringify(ROUTE)); const n0 = etapasObjetivo()[0]; if (n0 && FC[n0]) pintarTramo(n0); }
+    catch(e) { console.warn('Ruta de Sailaway:', e); }
+  }
+  if (ok) { FETCHED = Date.now(); store('fetched', String(FETCHED)); }
+  setLiveBadge(ok === con.length ? 'on' : 'off');
+  renderAll();
+  aplicarDeteccion();
+  refrescarMapa();
+}
+
+function hhmm(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+function fmtUpd(s) {
+  const m = s && s.match(/(\d{4})-(\d\d)-(\d\d) (\d\d:\d\d)/);
+  return m ? parseInt(m[3]) + ' ' + MESES[parseInt(m[2]) - 1] + ' ' + m[4] + ' UTC' : (s || '—');
+}
+function setLiveBadge(state) {
+  const el = $('dash-live');
+  el.className = state === 'nomsi' || state === 'carga' ? '' : state;
+  if (state === 'on') el.textContent = '● EN VIVO · ' + hhmm(FETCHED);
+  else if (state === 'nomsi') {
+    const hasInit = ACTIVE && ACTIVE.initial && ACTIVE.initial.lat != null;
+    el.textContent = hasInit ? '● NAVEGACIÓN SIMULADA' : '● FALTA EL MMSI DEL VELERO';
+  }
+  else if (state === 'carga') el.textContent = '● actualizando…' + (FETCHED ? ' · datos de las ' + hhmm(FETCHED) : '');
+  else el.textContent = '● SIN CONEXIÓN' + (FETCHED ? ' · datos de las ' + hhmm(FETCHED) : '');
+}
+
+// ─── Calculos de navegacion ───
+function distNM(a, b) {
+  const R = 3440.065, r = Math.PI/180;
+  const dLat = (b.lat-a.lat)*r, dLon = (b.lon-a.lon)*r;
+  const h = Math.sin(dLat/2)**2 + Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+function fmtTime(h) {
+  if (!isFinite(h) || h <= 0) return '—';
+  const d = Math.floor(h/24), hh = Math.floor(h%24), mm = Math.round((h%1)*60);
+  return d > 0 ? d + 'd ' + hh + 'h' : hh + 'h ' + String(mm).padStart(2,'0') + 'm';
+}
+// Hora UTC de llegada a esa velocidad; con fecha si no es dentro de las proximas 24 h
+function fmtEtaUTC(h) {
+  if (!isFinite(h) || h <= 0) return '';
+  const t = new Date(Date.now() + h * 3600e3), p = x => String(x).padStart(2, '0');
+  const hora = p(t.getUTCHours()) + ':' + p(t.getUTCMinutes());
+  return (h < 24 ? '' : p(t.getUTCDate()) + '/' + p(t.getUTCMonth() + 1) + ' ') + hora + ' UTC';
+}
+function setVal(id, v, cls) { $(id).textContent = v; $(id).className = 'dval ' + cls; }
+
+// ─── Render ───
+function renderAll() { renderDash(); renderConsumo(); fitSpacer(); }
+
+function renderDash() {
+  BOATS.forEach(b => {
+    const l = LIVE[b.key];
+    $('d-' + b.key + '-pos').textContent = l.pos || '—';
+    $('d-' + b.key + '-upd').textContent = fmtUpd(l.upd);
+  });
+
+  // Datos NMEA del velero activo
+  const e = LIVE[ACTIVE.key];
+  const next = PORTS.find(p => p.n > 1 && !p.done);
+  const dias = next && next.dias;
+  // boton Suministros: verde = hay lo que pide el proximo tramo con margen, amarillo = sin margen, rojo = no alcanza
+  const pa = PARAMS[ACTIVE.key], pd = perDay(ACTIVE.key);
+  const nv = [nivelSum(e.water, pd.water, dias, pa.margin), nivelSum(e.food, pd.food, dias, pa.margin)];
+  const peor = nv.includes('crit') ? 'crit' : nv.includes('warn') ? 'warn' : nv.includes('ok') ? 'ok' : '';
+  $('d-sum').className = 'dbox dbtn ' + peor;
+  $('d-sum-sub').textContent = peor === 'ok' ? 'alcanza' : peor === 'warn' ? 'sin margen' : peor === 'crit' ? 'no alcanza' : '';
+  refrescarSuministros();
+  if (e.hdg != null && $('d-rumbo')) $('d-rumbo').textContent = e.hdg + '°';
+  if (e.miles != null) $('d-millas').textContent = e.miles.toLocaleString('es-AR');
+  $('d-vel').textContent = (e.sog ?? 0).toFixed(1) + ' kts';
+  if (next && e.lat != null) {
+    const dist = distNM(e, next);
+    $('d-wpdist').textContent = Math.round(dist).toLocaleString('es-AR') + ' MN';
+    $('d-wpname').textContent = '→ ' + next.name;
+    $('d-wptime').textContent = e.sog > 0.1 ? fmtTime(dist / e.sog) : '—';
+    $('d-wpeta').textContent = e.sog > 0.1 ? fmtEtaUTC(dist / e.sog) : '';
+  }
+  // Proximo WP de la ruta cargada en el juego (no es el puerto de la etapa)
+  const nw = ROUTE && nextWaypoint(e, ROUTE.wps);
+  if (nw) {
+    const dist = distNM(e, nw.wp);
+    $('d-nwpdist').textContent = (dist < 10 ? dist.toFixed(1) : Math.round(dist).toLocaleString('es-AR')) + ' MN';
+    $('d-nwpname').textContent = nw.wp.type === 9 ? 'WP final de la ruta' : 'WP ' + nw.i + ' de ' + (nw.total - 1);
+    $('d-nwptime').textContent = e.sog > 0.1 ? fmtTime(dist / e.sog) : '—';
+  } else {
+    $('d-nwpdist').textContent = '—';
+    $('d-nwpname').textContent = ROUTE ? 'sin ruta cargada' : 'ruta del juego';
+    $('d-nwptime').textContent = '—';
+  }
+
+  const hdg = e.hdg ?? e.cog;
+  if (e.twd != null && hdg != null) {
+    const twa = Math.round(((e.twd - hdg + 540) % 360) - 180);
+    $('d-twa').textContent = Math.abs(twa) + '°' + (twa === 0 || Math.abs(twa) === 180 ? '' : twa > 0 ? ' Er' : ' Ba');
+  }
+  $('d-tws').textContent = e.tws != null ? e.tws.toFixed(1) + ' kts' : '—';
+}
+
+function renderConsumo() {}
+
+// Ajusta el espacio bajo el dashboard fijo a su altura real
+function fitSpacer() {
+  const h = $('dash').offsetHeight;
+  $('dash-spacer').style.height = (h + 8) + 'px';
+  document.documentElement.style.setProperty('--dashh', h + 'px');
+  document.documentElement.style.setProperty('--navh', $('et-nav').offsetHeight + 'px');
+}
+window.addEventListener('resize', fitSpacer);
+
+// ─── Secciones plegables del panel ───
+// Estadisticas, log y tramos: botones en una fila; se abre uno por vez y cada uno se minimiza tocandolo de nuevo
+const SECS = ['st', 'lg', 'rs'].filter(id => $(id + '-btn'));
+SECS.forEach(id => $('dash-tabs').appendChild($(id + '-btn')));
+function setSec(id, open) {
+  SECS.forEach(x => {
+    const on = open && x === id, b = $(x + '-btn');
+    $(x + '-body').style.display = on ? '' : 'none';
+    b.textContent = (on ? '▾ ' : '▸ ') + b.dataset.label;
+    b.classList.toggle('act', on);
+  });
+  $('dash-tabs').classList.toggle('abierto', !!open);
+  store('sec_open', open ? id : '');
+  fitSpacer();
+}
+function toggleSec(id) { setSec(id, $(id + '-body').style.display === 'none'); }
+
+// ─── Etapas: una pagina por etapa ───
+const PAGES = Array.from(document.querySelectorAll('.pg'));
+let ACTIVE_IDX = Math.max(0, PAGES.findIndex(pg => +pg.dataset.n === CFG.activeEtapa));
+let CUR = ACTIVE_IDX;
+function goEtapa(i, scroll) {
+  CUR = Math.min(PAGES.length - 1, Math.max(0, i));
+  PAGES.forEach((pg, j) => pg.classList.toggle('show', j === CUR));
+  const pg = PAGES[CUR];
+  $('et-label').textContent = 'Etapa ' + pg.dataset.n + ' de ' + PAGES.length + ' — ' + pg.dataset.name;
+  $('et-prev').disabled = CUR === 0;
+  $('et-next').disabled = CUR === PAGES.length - 1;
+  $('et-sel').value = String(CUR);
+  const act = $('et-act');
+  act.classList.toggle('here', CUR === ACTIVE_IDX);
+  act.innerHTML = CUR === ACTIVE_IDX ? '&#9733; Etapa activa (aquí)' : '&#9733; Etapa activa';
+  setTab(TAB);
+  if (scroll) $('etapas').scrollIntoView({ block: 'start' });
+}
+// ─── Ventana de datos: puntos de interes de cada puerto e historial ───
+function openModal(titulo, html, estilo, ancha) {
+  $('modal-win').classList.toggle('ancha', !!ancha);
+  $('modal-title').textContent = titulo;
+  $('modal-body').innerHTML = html;
+  if (estilo) $('modal-body').setAttribute('style', estilo); else $('modal-body').removeAttribute('style');
+  $('modal-bg').classList.add('show');
+}
+function closeModal() { $('modal-bg').classList.remove('show'); POI_LIST = null; if (RECARGAR) location.reload(); }
+function openPoi(btn) {
+  const pg = btn.closest('.pg'), src = pg.querySelector('.poi-src');
+  openModal('📍 ' + pg.dataset.port + ' — puntos de interés y datos del puerto', src.innerHTML, src.getAttribute('style'));
+}
+// Detalle de un punto de interes: fotos de Wikimedia Commons + resumen de Wikipedia
+let POI_LIST = null;
+function poiDetail(card) {
+  POI_LIST = $('modal-body').innerHTML;
+  const nombre = card.dataset.name, wiki = card.dataset.wiki, foto = card.dataset.foto;
+  const q = encodeURIComponent(card.dataset.map);
+  $('modal-body').innerHTML =
+    '<button class="pd-back" onclick="poiBack()">◀ Volver a los puntos</button>' +
+    '<div class="pd-name">' + nombre + '</div>' +
+    '<div class="pd-gal" id="pd-gal"><div class="cargando">Buscando fotos…</div></div>' +
+    '<div class="pd-txt">' + card.querySelector('div').innerHTML.replace(/^[^<]*<b>[^<]*<\/b>\s*—?\s*/, '<p>') + '</p>' +
+      card.querySelector('.poi-det').innerHTML + '</div>' +
+    '<div class="pd-wiki" id="pd-wiki" style="display:none"></div>' +
+    '<div class="pd-links" id="pd-links"><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + q + '">🗺 Ver en Google Maps</a>' +
+      '<a target="_blank" href="https://commons.wikimedia.org/w/index.php?search=' + encodeURIComponent(foto) + '&title=Special:MediaSearch&type=image">📷 Más fotos</a></div>' +
+    '<div class="pd-cred">Fotos: Wikimedia Commons (licencias libres, tocá una para ver autor y licencia). Texto: Wikipedia.</div>';
+  $('modal-body').scrollTop = 0;
+  cargarFotos(foto);
+  if (wiki) cargarWiki(wiki);
+}
+function poiBack() { if (POI_LIST != null) $('modal-body').innerHTML = POI_LIST; POI_LIST = null; }
+
+async function cargarFotos(q) {
+  const gal = $('pd-gal');
+  try {
+    const u = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&formatversion=2&origin=*&generator=search' +
+      '&gsrnamespace=6&gsrlimit=5&gsrsearch=' + encodeURIComponent('filetype:bitmap ' + q) +
+      '&prop=imageinfo&iiprop=url&iiurlwidth=700';
+    const d = await (await fetch(u)).json();
+    const fotos = ((d.query && d.query.pages) || []).sort((a, b) => a.index - b.index)
+      .map(p => p.imageinfo && p.imageinfo[0]).filter(Boolean).slice(0, 3);
+    if (!$('pd-gal') || $('pd-gal') !== gal) return;
+    gal.innerHTML = fotos.length ? fotos.map(f => '<a target="_blank" href="' + f.descriptionurl + '"><img loading="lazy" src="' + f.thumburl + '" alt=""></a>').join('')
+                                 : '<div class="cargando">No se encontraron fotos.</div>';
+  } catch(e) { gal.innerHTML = '<div class="cargando">No se pudieron cargar las fotos (¿sin internet?).</div>'; }
+}
+async function cargarWiki(w) {
+  const m = w.match(/^(\w{2}):(.+)$/), lang = m ? m[1] : 'es', t = m ? m[2] : w;
+  try {
+    const d = await (await fetch('https://' + lang + '.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(t.replace(/ /g, '_')))).json();
+    const el = $('pd-wiki'); if (!el || !d.extract) return;
+    el.innerHTML = '<b>Wikipedia' + (lang !== 'es' ? ' (' + lang + ')' : '') + ':</b> ' + d.extract;
+    el.style.display = '';
+    const url = d.content_urls && d.content_urls.desktop && d.content_urls.desktop.page;
+    if (url) $('pd-links').insertAdjacentHTML('beforeend', '<a target="_blank" href="' + url + '">📖 Artículo completo</a>');
+  } catch(e) {}
+}
+
+// ─── Estado detectado con los datos en vivo ───
+// La bitacora dice donde quedo el barco la ultima vez que se actualizo; los datos en vivo (Sailaway hoy,
+// NMEA del barco mañana) dicen si ya zarpo o si ya llego. Si no coinciden, manda lo que se ve en vivo.
+const RADIO_PUERTO = 2;   // MN: mas lejos que esto del puerto y navegando = zarpo; mas cerca y quieto = llego
+let DETECT = null;
+const DETECT_ENV = {};
+function detectarEstado() {
+  const b = LIVE[ACTIVE.key];
+  if (!b || b.lat == null || b.upd == null) return null;
+  const sog = b.sog ?? 0;
+  // en puerto segun la bitacora: el ultimo con llegada real sin salida real (o el origen sin zarpar)
+  const enPuerto = [...PORTS].reverse().find(p => p.arrR && !p.salR) || (!PORTS[0].salR ? PORTS[0] : null);
+  if (enPuerto) {
+    const hacia = PORTS.find(p => p.n === enPuerto.n + 1 && p.fase === enPuerto.fase);
+    if (hacia && sog >= 1.5 && distNM(b, enPuerto) > RADIO_PUERTO) return { tipo: 'zarpo', desde: enPuerto, hacia, dist: distNM(b, hacia) };
+    return null;
+  }
+  // navegando segun la bitacora: hacia el primer puerto sin llegada real
+  const destino = PORTS.find(p => p.n > 1 && !p.arrR);
+  if (destino && sog < 1 && distNM(b, destino) <= RADIO_PUERTO) return { tipo: 'llego', en: destino };
+  return null;
+}
+function aplicarDeteccion() {
+  const d = detectarEstado();
+  DETECT = d;
+  if (!d) return;
+  const activa = d.tipo === 'zarpo' ? d.hacia.n : d.en.n;
+  $('d-fase').textContent = d.tipo === 'zarpo' ? 'NAVEGANDO' : 'EN PUERTO';
+  const idx = PAGES.findIndex(pg => +pg.dataset.n === activa);
+  if (idx >= 0 && idx !== ACTIVE_IDX) {
+    const mirandoLaActiva = CUR === ACTIVE_IDX;
+    ACTIVE_IDX = idx;
+    goEtapa(mirandoLaActiva ? idx : CUR, false);
+  }
+  // con el servidor local, queda anotado en la bitacora (una sola vez; lo que ya anoto el capitan no se pisa)
+  const n = d.tipo === 'zarpo' ? d.desde.n : d.en.n, clave = d.tipo + n;
+  // en modo capitan (sin servidor) va como pedido a GitHub: solo si la bitacora no lo tiene y no se mando ya desde aca
+  const yaEnviado = () => { try { return (JSON.parse(store('detect')) || []).includes(clave); } catch(e) { return false; } };
+  const yaAnotado = d.tipo === 'zarpo' ? !!d.desde.salR : !!d.en.arrR;
+  if ((API || (CAPITAN && !yaAnotado && !yaEnviado())) && !DETECT_ENV[clave]) {
+    DETECT_ENV[clave] = true;
+    // La hora es la de la ultima posicion de Sailaway (UTC), no la de cuando se abrio la pagina. Para la zarpada
+    // se le resta lo que tardo en alejarse del puerto a la velocidad actual: queda cerca de la hora real.
+    const b = LIVE[ACTIVE.key];
+    let t = b && b.upd ? new Date(b.upd.replace(' ', 'T') + ':00Z') : new Date();
+    if (isNaN(t)) t = new Date();
+    if (d.tipo === 'zarpo' && b) t = new Date(t - distNM(b, d.desde) / Math.max(b.sog || 0, 1) * 3600e3);
+    const hora = String(t.getDate()).padStart(2, '0') + ' ' + MES_ABR[t.getMonth()] + ' ' + hm(t);
+    if (API) fetch(API + '/detectado', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bitacora: K, tipo: d.tipo, n, hora }) })
+      .catch(e => console.warn('No se pudo anotar la deteccion:', e));
+    else ghPedido({ op: 'detectado', bitacora: K, tipo: d.tipo, n, hora })
+      .then(() => { try { store('detect', JSON.stringify((JSON.parse(store('detect')) || []).concat([clave]))); } catch(e) {} avisar((d.tipo === 'zarpo' ? 'Zarpada' : 'Llegada') + ' detectada: queda anotada en la bitácora en 1 o 2 minutos.'); })
+      .catch(e => { DETECT_ENV[clave] = false; console.warn('No se pudo anotar la deteccion en GitHub:', e); });
+  }
+}
+
+// ─── Ventana de estado del viaje (boton Fase) ───
+function openEstado() {
+  const det = !DETECT ? '' : '<div class="pg-hito" style="margin-bottom:10px">🛰 Detectado con los datos en vivo: ' +
+    (DETECT.tipo === 'zarpo' ? 'zarpó de ' + DETECT.desde.name + ' y navega hacia ' + DETECT.hacia.name + ' (a ' + DETECT.dist.toFixed(1) + ' MN).'
+                             : 'llegó a ' + DETECT.en.name + '.') +
+    (API || CAPITAN ? ' Quedó anotado en la bitácora.' : ' La bitácora todavía no lo tiene cargado.') + '</div>';
+  openModal('📋 Estado del viaje', det + '<div class="est-box">' + $('src-estado').innerHTML + '</div>' +
+    '<button class="mb-btn" onclick="openHist()">📜 Historial de actualizaciones</button>');
+}
+
+// ─── Fechas del plan: editables; el tiempo en puerto se calcula ───
+const MES_ABR = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const isoAtxt = (iso) => { const m = iso.match(/(\d+)-(\d+)-(\d+)/); return m[3] + ' ' + MES_ABR[+m[2] - 1]; };
+const EDITABLE = !CFG.publico || CAPITAN;
+function enPuerto(p) {
+  if (!p.arrISO || !p.salISO) return null;
+  const d = Math.round((new Date(p.salISO) - new Date(p.arrISO)) / 86400e3);
+  return d < 0 ? null : d;
+}
+const txtDias = (d) => d == null ? '—' : d === 0 ? 'mismo día' : d + (d === 1 ? ' día' : ' días') + (d >= 2 ? ' · ' + (d - 1) + ' de descanso' : '');
+function txtNav(p) {
+  if (p.te) return p.te.replace(/^~?/, '~');
+  return p.dias ? p.dias + (p.dias === 1 ? ' día' : ' días') : '—';
+}
+// Llegada estimada a un puerto: salida del anterior (real o plan) + tiempo de navegacion de la etapa
+function llegadaEstimada(p) {
+  const lg = CFG.legs[p.n];
+  if (!lg || !lg.dep || !lg.h) return null;
+  const t = new Date(dparse(lg.dep).getTime() + lg.h * 3600e3), dd = String(t.getDate()).padStart(2, '0');
+  return { iso: t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + dd, txt: dd + ' ' + MES_ABR[t.getMonth()] + ' ' + hm(t) };
+}
+const sinOrigen = (s) => String(s).replace(/\s*\([^)]*\)\s*$/, '');   // "08 Oct 17:52 (detectada…)" -> "08 Oct 17:52"
+// Salida: se elige con el calendario (si todavia no se zarpo). Llegada: la real, con dia y hora de Sailaway,
+// si ya se llego; si no, se calcula sola (no se edita).
+function campoFecha(p, f) {
+  if (f === 'arr') {
+    if (p.arrR) return '<span class="f-real" title="Llegada real: ' + p.arrR + '">✓ ' + sinOrigen(p.arrR) + '</span>';
+    const est = llegadaEstimada(p);
+    return est ? '<span class="f-calc" title="Calculada: salida + tiempo de navegación de la etapa">≈ ' + est.txt + '</span>' : (p.arr || '—');
+  }
+  if (p.salR) return '<span class="f-real" title="Salida real: ' + p.salR + '">✓ ' + sinOrigen(p.salR) + '</span>';
+  const iso = p.salISO, txt = p.sal;
+  if (EDITABLE && (iso || (!txt || !/^—/.test(txt))))
+    return '<input type="date" value="' + (iso || '') + '" onchange="guardarEdicion(' + p.n + ',\'sal\',this.value)">';
+  return txt || '—';
+}
+const chipP = (lbl, v, cls) => '<div class="chp ' + (cls || '') + '"><span class="cl">' + lbl + '</span><span class="cv">' + v + '</span></div>';
+function pintarPlan() {
+  document.querySelectorAll('.pl-chips').forEach(box => {
+    const p = PORTS.find(x => x.n === +box.dataset.n); if (!p) return;
+    box.innerHTML =
+      (p.n > 1 ? chipP('🛬 Llegada', campoFecha(p, 'arr')) : '') +
+      (p.n < PORTS.length ? chipP('🛫 Salida', campoFecha(p, 'sal'), EDITABLE && !p.salR ? 'ed' : '') : '') +
+      (p.n > 1 ? chipP('⛵ Navegación', txtNav(p)) : '') +
+      (p.n > 1 && p.n < PORTS.length ? chipP('⚓ En puerto', txtDias(enPuerto(p))) : '') +
+      (p.n > 1 ? chipP('📏 Distancia', p.mn ? p.mn + ' MN' : '—') : '');
+  });
+}
+function openPuertos() {
+  const act = etapasObjetivo()[0];
+  let fase = -1;
+  const filas = PORTS.map(p => {
+    let h = '';
+    if (p.fase !== fase) { fase = p.fase; const pg = PAGES.find(x => +x.dataset.n === p.n); h = '<tr class="fase"><td colspan="9">' + (pg ? pg.querySelector('.pg-fase').textContent : '') + '</td></tr>'; }
+    const mn = EDITABLE && p.n > 1 ? '<input type="number" min="0" value="' + (p.mn || '').replace(/\./g, '') + '" onchange="guardarEdicion(' + p.n + ',\'mn\',this.value)">' : (p.mn || '—');
+    return h + '<tr class="' + (p.n === act ? 'act' : p.done ? 'done' : '') + '"><td>' + p.n + '</td><td><b>' + p.name + '</b></td>' +
+      '<td>' + (p.n > 1 ? campoFecha(p, 'arr') : '<i>origen</i>') + '</td><td>' + (p.n < PORTS.length ? campoFecha(p, 'sal') : '<i>destino</i>') + '</td>' +
+      '<td>' + (p.n > 1 && p.n < PORTS.length ? txtDias(enPuerto(p)) : '') + '</td><td>' + (p.n > 1 ? mn : '') + '</td><td>' + (p.n > 1 ? txtNav(p) : '') + '</td>' +
+      '<td>' + campoLlego(p) + '</td><td>' + (p.salR || '') + (p.mnR ? ' · ' + p.mnR + ' MN' : '') + '</td></tr>';
+  }).join('');
+  openModal('⚓ Puertos, millas y fechas',
+    '<p class="pt-nota">' + (EDITABLE ? 'La fecha de salida y las millas planificadas se pueden cambiar acá o arriba en cada etapa. La llegada se calcula sola (≈) hasta que se llega; después queda la real (✓), con el día y la hora de Sailaway. ' : '') +
+    'En verde los puertos ya visitados; en amarillo la etapa activa.' + (API || CAPITAN ? ' Tildá <b>Llegó</b> para avisar a mano que se llegó a un puerto.' : '') + '</p>' +
+    '<table class="pt"><tr><th>#</th><th>Puerto</th><th>Llegada</th><th>Salida</th><th>En puerto</th><th>MN</th><th>Navegación</th><th>Llegada real</th><th>Salida real</th></tr>' + filas + '</table>', null, true);
+}
+
+// Llegada a mano: con el servidor local se tilda/destilda en la lista de puertos y queda en el .md
+let RECARGAR = false;   // al cerrar la ventana se recarga la pagina, para que todo tome la llegada nueva
+function campoLlego(p) {
+  if (p.n === 1) return p.arrR || '';
+  if (!API && !CAPITAN) return p.arrR || '';
+  return '<label class="llego"><input type="checkbox"' + (p.arrR ? ' checked' : '') + ' onchange="marcarLlegada(' + p.n + ',this)"> Llegó</label>' +
+    (p.arrR ? ' <span>' + p.arrR + '</span>' : '');
+}
+async function marcarLlegada(n, chk) {
+  const p = PORTS.find(x => x.n === n); if (!p) return;
+  const llego = chk.checked;
+  if (!llego && !confirm('¿Quitar la llegada a ' + p.name + '? Vuelve a quedar navegando hacia ese puerto.')) { chk.checked = true; return; }
+  const t = new Date(), hora = String(t.getDate()).padStart(2, '0') + ' ' + MES_ABR[t.getMonth()] + ' ' + hm(t);
+  chk.disabled = true;
+  try {
+    if (API) {
+      const r = await fetch(API + '/llegada', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bitacora: K, n, llego, hora }) });
+      if (!r.ok) throw new Error((await r.json()).error || r.status);
+    } else { await ghPedido({ op: 'llegada', bitacora: K, n, llego, hora }); avisar(AVISO_CAPITAN); }
+  } catch(e) { chk.checked = !llego; chk.disabled = false; alert('No se pudo guardar la llegada en la bitácora: ' + e.message); return; }
+  p.arrR = llego ? hora + ' (marcada a mano)' : null;
+  p.done = llego;
+  DETECT_ENV['llego' + n] = true;   // que la deteccion en vivo no la vuelva a anotar
+  $('d-fase').textContent = llego ? 'EN PUERTO' : 'NAVEGANDO';
+  RECARGAR = true;
+  const sc = $('modal-body').scrollTop; openPuertos(); $('modal-body').scrollTop = sc;
+}
+
+// Guarda una edicion: con servidor va al .md; dentro de la app Dashboard Nautico, a la app; si no, a este navegador
+async function guardarEdicion(n, campo, valor) {
+  const p = PORTS.find(x => x.n === n); if (!p) return;
+  aplicarEdicion({ n, campo, valor });
+  const eds = [{ bitacora: K, n, campo, valor }];
+  // nueva salida: la llegada al puerto siguiente se recalcula y tambien queda en la bitacora (plan)
+  const sig = campo === 'sal' && PORTS.find(x => x.n === n + 1), est = sig && !sig.arrR && llegadaEstimada(sig);
+  if (est) { sig.arrISO = est.iso; sig.arr = isoAtxt(est.iso); eds.push({ bitacora: K, n: n + 1, campo: 'arr', valor: est.iso }); }
+  pintarPlan();
+  if ($('modal-title').textContent.startsWith('⚓')) { const sc = $('modal-body').scrollTop; openPuertos(); $('modal-body').scrollTop = sc; }
+  if (API) {
+    try {
+      for (const ed of eds) {
+        const r = await fetch(API + '/editar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ed) });
+        if (!r.ok) throw new Error((await r.json()).error || r.status);
+      }
+      return;
+    } catch(e) { alert('No se pudo guardar en la bitácora: ' + e.message); }
+  }
+  if (CAPITAN) {
+    try {
+      const marca = new Date().toISOString();
+      await ghCambiar(t => t.concat(eds.map((ed, i) => Object.assign({ id: Date.now() + '-' + i, fecha: marca, op: 'editar' }, ed))),
+        'Cambio desde la web: ' + campo + ' puerto ' + n, 'pedidos_web.json');
+      avisar(AVISO_CAPITAN); return;
+    } catch(e) { alert('No se pudo guardar en GitHub: ' + e.message); }
+  }
+  if (window.BitacoraApp && window.BitacoraApp.postMessage) { eds.forEach(ed => window.BitacoraApp.postMessage(JSON.stringify(Object.assign({ accion: 'editar' }, ed)))); return; }
+  const l = edicionesLocales().filter(x => !eds.some(ed => x.n === ed.n && x.campo === ed.campo)); store('ediciones', JSON.stringify(l.concat(eds)));
+}
+function edicionesLocales() { try { return JSON.parse(store('ediciones')) || []; } catch(e) { return []; } }
+function aplicarEdicion(e) {
+  const p = PORTS.find(x => x.n === +e.n); if (!p) return;
+  if (e.campo === 'arr' || e.campo === 'sal') {
+    p[e.campo + 'ISO'] = e.valor || null; p[e.campo] = e.valor ? isoAtxt(e.valor) : null;
+    if (e.campo === 'sal' && e.valor && !p.salR && CFG.legs[p.n + 1]) { CFG.legs[p.n + 1].dep = e.valor + 'T09:00'; delete FC[p.n + 1]; }
+    if (e.campo === 'arr' && e.valor) { const lg = CFG.legs[p.n]; if (lg) { const a = dparse(lg.dep); lg.h = Math.max(1, Math.round((new Date(e.valor + 'T' + String(a.getHours()).padStart(2, '0') + ':00') - a) / 3600e3) || lg.h); } }
+  } else if (e.campo === 'mn') p.mn = String(e.valor || '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+async function subirEdicionesLocales() {
+  if (!API) return;
+  for (const e of edicionesLocales()) {
+    try { await fetch(API + '/editar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(e) }); } catch(err) { return; }
+  }
+  store('ediciones', '[]');
+}
+
+// ─── Minimizar la barra de etapa + primera fila, y las pestañas ───
+function toggleCompacto(forzar) {
+  const on = forzar != null ? forzar : !$('etapas').classList.contains('compacto');
+  $('etapas').classList.toggle('compacto', on);
+  $('et-min').innerHTML = on ? '&#9660;' : '&#9650;';
+  store('compacto', on ? '1' : '0');
+  fitSpacer();
+}
+let TAB_MIN = true;   // por prolijidad, siempre arranca minimizado
+function tabClick(t) {
+  if (t === TAB && !TAB_MIN) TAB_MIN = true;      // tocar la pestaña abierta la minimiza
+  else TAB_MIN = false;
+  store('tabmin', TAB_MIN ? '1' : '0');
+  setTab(t);
+}
+
+// ─── Pestañas de la etapa ───
+let TAB = store('tab') || 'pron';
+function setTab(t) {
+  TAB = t; store('tab', t);
+  document.querySelectorAll('.pg-tabs').forEach(box => {
+    box.querySelectorAll('.tb-head button').forEach(b => b.classList.toggle('act', b.dataset.t === t));
+    box.querySelectorAll('.tb').forEach(x => x.classList.toggle('show', x.classList.contains('tb-' + t)));
+    box.classList.toggle('min', TAB_MIN);
+  });
+  const pg = PAGES[CUR]; if (pg && (t === 'pron' || t === 'cons')) loadForecast(pg.querySelector('.pr-live'));
+}
+
+// ─── Pronostico en vivo sobre la derrota (Open-Meteo, sin clave) + analisis automatico ───
+// Al abrir la pagina (y con ↻) se descarga el pronostico de la etapa activa y las dos siguientes,
+// y con esos datos se escriben solos el resumen del pronostico y los consejos de cada tramo.
+const FC = {};                       // n -> { t, slots, sun, err }
+const CARD = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+const card16 = (d) => CARD[Math.floor(((d + 11.25) % 360) / 22.5)];
+function rumbo(a, b) {
+  const r = Math.PI / 180, y = Math.sin((b[1]-a[1])*r) * Math.cos(b[0]*r);
+  const x = Math.cos(a[0]*r)*Math.sin(b[0]*r) - Math.sin(a[0]*r)*Math.cos(b[0]*r)*Math.cos((b[1]-a[1])*r);
+  return (Math.atan2(y, x) / r + 360) % 360;
+}
+// posicion y rumbo a una fraccion f de la derrota
+function enDerrota(path, f) {
+  const L = [0];
+  for (let i = 1; i < path.length; i++) L.push(L[i-1] + distNM({lat: path[i-1][0], lon: path[i-1][1]}, {lat: path[i][0], lon: path[i][1]}));
+  const d = f * L[L.length - 1];
+  for (let i = 1; i < path.length; i++) if (L[i] >= d || i === path.length - 1) {
+    const t = Math.min(1, (d - L[i-1]) / ((L[i] - L[i-1]) || 1));
+    return { lat: path[i-1][0] + t*(path[i][0]-path[i-1][0]), lon: path[i-1][1] + t*(path[i][1]-path[i-1][1]), crs: rumbo(path[i-1], path[i]) };
+  }
+}
+function rumboVela(twa) {
+  const a = Math.abs(twa);
+  return a < 40 ? 'proa' : a < 60 ? 'ceñida' : a < 80 ? 'descuartelar' : a < 110 ? 'través' : a < 150 ? 'largo' : a < 165 ? 'aleta' : 'popa';
+}
+function dparse(s) { const m = s.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/); return new Date(+m[1], m[2]-1, +m[3], +m[4], +m[5]); }
+const ymd = (t) => t.toISOString().slice(0, 10);
+const hm = (t) => String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0');
+const dhm = (t) => t.getDate() + ' ' + MESES[t.getMonth()] + ' ' + hm(t);
+const kn = (v) => Math.round(v) + ' kn';
+
+// Etapas a pronosticar: la primera que todavia no llego (la activa) y las dos siguientes
+function etapasObjetivo() {
+  const ns = PORTS.filter(p => p.n > 1 && !p.done && CFG.legs[p.n]).map(p => p.n);
+  return ns.slice(0, 3);
+}
+function estadoTramo(n) {
+  const leg = CFG.legs[n]; if (!leg) return { sin: true };
+  const dep = dparse(leg.dep), arr = new Date(dep.getTime() + leg.h * 3600e3), now = Date.now();
+  if (arr.getTime() < now - 3600e3) return { leg, dep, arr, pasado: true };
+  const desde = new Date(dep.getTime() - 15 * 86400e3);
+  if (desde.getTime() > now) return { leg, dep, arr, lejos: desde };
+  return { leg, dep, arr, ok: true };
+}
+
+async function fetchTramo(n) {
+  const e = estadoTramo(n);
+  if (!e.ok) return;
+  const { leg, dep, arr } = e, now = Date.now();
+  const N = Math.max(3, Math.min(10, Math.ceil(leg.h / 5) + 1));
+  const pts = Array.from({ length: N }, (_, i) => enDerrota(leg.path, i / (N - 1)));
+  // los modelos cubren ~16 dias: si el tramo termina despues, se pide hasta el limite
+  const limite = new Date(now + 15 * 86400e3);
+  const t0 = new Date(Math.max(dep.getTime(), now - 3600e3)), t1 = new Date(Math.min(arr.getTime(), limite.getTime()));
+  const base = 'latitude=' + pts.map(p => p.lat.toFixed(3)).join(',') + '&longitude=' + pts.map(p => p.lon.toFixed(3)).join(',') +
+    '&timezone=GMT&start_date=' + ymd(t0) + '&end_date=' + ymd(new Date(Math.min(arr.getTime() + 86400e3, limite.getTime())));
+  try {
+    const [w, m] = await Promise.all([
+      fetch('https://api.open-meteo.com/v1/forecast?' + base + '&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,temperature_2m&daily=sunrise,sunset&wind_speed_unit=kn').then(r => r.json()),
+      fetch('https://marine-api.open-meteo.com/v1/marine?' + base + '&hourly=wave_height').then(r => r.json()).catch(() => null)
+    ]);
+    const W = Array.isArray(w) ? w : [w], M = m ? (Array.isArray(m) ? m : [m]) : null;
+    if (!W[0] || !W[0].hourly) throw new Error((w && w.reason) || 'sin datos');
+    const paso = leg.h <= 12 ? 1 : 3, slots = [];
+    for (let t = new Date(Math.ceil(t0.getTime() / (paso * 3600e3)) * paso * 3600e3); t <= t1; t = new Date(t.getTime() + paso * 3600e3)) {
+      const f = (t - dep) / (arr - dep), i = Math.round(f * (N - 1)), pt = pts[i];
+      const key = t.toISOString().slice(0, 13) + ':00', h = W[i].hourly, k = h.time.indexOf(key);
+      if (k < 0) continue;
+      const wd = h.wind_direction_10m[k];
+      slots.push({ t, f, wd, ws: h.wind_speed_10m[k], wg: h.wind_gusts_10m[k], pr: h.precipitation ? h.precipitation[k] : 0, tp: h.temperature_2m ? h.temperature_2m[k] : null,
+                   wv: M && M[i] && M[i].hourly && M[i].hourly.wave_height ? M[i].hourly.wave_height[k] : null,
+                   twa: ((wd - pt.crs + 540) % 360) - 180, crs: pt.crs });
+    }
+    // sol en el puerto de llegada, el dia de la llegada
+    const dl = W[N - 1].daily, sun = {}, sol = {};
+    if (dl && dl.time) {
+      dl.time.forEach((d, k) => { sol[d] = { rise: new Date(dl.sunrise[k] + 'Z'), set: new Date(dl.sunset[k] + 'Z') }; });
+      const k = dl.time.indexOf(ymd(arr));
+      if (k >= 0) { sun.rise = sol[dl.time[k]].rise; sun.set = sol[dl.time[k]].set; }
+    }
+    FC[n] = { t: now, slots, sun, sol };
+  } catch(err) { FC[n] = { t: now, err: err.message, slots: [] }; }
+}
+
+// ─── Analisis: resumen del pronostico y consejos automaticos ───
+const VBARCO = 6.5;   // velocidad media supuesta del barco (kn) para el viento aparente
+function aparente(tws, twa) {
+  const a = Math.abs(twa) * Math.PI / 180;
+  const aws = Math.sqrt(tws*tws + VBARCO*VBARCO + 2*tws*VBARCO*Math.cos(a));
+  return { aws, awa: Math.acos(Math.max(-1, Math.min(1, (tws*Math.cos(a) + VBARCO) / (aws || 1)))) * 180 / Math.PI };
+}
+function esNoche(t, sol) {
+  const d = sol && sol[ymd(new Date(t.getTime()))];
+  if (!d) { const h = t.getHours(); return h < 7 || h >= 19; }
+  return t < d.rise || t > d.set;
+}
+// zona Rio de la Plata (nivel del agua segun el viento, bancos, canales de buques)
+const enRioPlata = (p) => p.lat > -35.6 && p.lat < -33.8 && p.lon > -58.8 && p.lon < -55.6;
+
+function analizar(n) {
+  const e = estadoTramo(n), fc = FC[n];
+  if (!fc || !fc.slots.length) return null;
+  const S = fc.slots, leg = e.leg;
+  const lead = (e.dep - Date.now()) / 86400e3;
+  const conf = lead < 2.5 ? 'alta' : lead < 5 ? 'media' : lead < 9 ? 'baja' : 'muy baja';
+  const faltan = lead < 0 ? 'en curso' : lead < 1 ? 'faltan ' + Math.round(lead * 24) + ' h' : 'faltan ' + Math.round(lead) + ' días';
+  if (S.length < 3) return {
+    res: ['<b>Todavía sin cobertura suficiente:</b> los modelos sólo alcanzan el ' + dhm(S[S.length - 1].t) + ' (' + Math.round(S[S.length - 1].f * 100) +
+          '% del tramo). El análisis completo aparece cuando el tramo entre en el rango de ~16 días.', '<b>Confianza:</b> ' + conf + ' (' + faltan + ').'],
+    tips: [{ g: 'Estrategia', t: '<b>Por ahora usá el pronóstico escrito</b> (tendencia de la temporada) de más abajo; este análisis se completa solo cada vez que abras la página.' }]
+  };
+  const max = S.reduce((a, s) => s.ws > a.ws ? s : a), gmax = S.reduce((a, s) => s.wg > a.wg ? s : a);
+  const olas = S.filter(s => s.wv != null), omax = olas.length ? Math.max(...olas.map(s => s.wv)) : null;
+  const lluvia = S.filter(s => s.pr >= 1);
+  const cat = {}; S.forEach(s => { const c = rumboVela(s.twa); cat[c] = (cat[c] || 0) + 1; });
+  const pct = (c) => Math.round(100 * (cat[c] || 0) / S.length);
+  const popa = pct('aleta') + pct('popa'), proa = pct('proa'), cenida = pct('ceñida');
+  const flojo = Math.round(100 * S.filter(s => s.ws < 6).length / S.length);
+  const media = S.reduce((a, s) => a + s.ws, 0) / S.length;
+  const pto = (s) => card16(s.wd) + ' ' + kn(s.ws) + ' (ráf. ' + Math.round(s.wg) + ')';
+  const primero = S[0], medio = S[Math.floor(S.length / 2)], ultimo = S[S.length - 1];
+  const parcial = e.arr - ultimo.t > 3 * 3600e3;
+  const noche = S.filter(s => esNoche(s.t, fc.sol));
+  const temps = S.filter(s => s.tp != null), tmin = temps.length ? temps.reduce((a, s) => s.tp < a.tp ? s : a) : null;
+  const ap = S.map(s => Object.assign(aparente(s.ws, s.twa), { s })), apMax = ap.reduce((a, x) => x.aws > a.aws ? x : a);
+  const apG = aparente(gmax.wg, gmax.twa).aws;
+  const rio = leg.path.some(p => enRioPlata({ lat: p[0], lon: p[1] }));
+
+  let rol = null;
+  for (let i = 1; i < S.length; i++) {
+    const d = Math.abs(((S[i].wd - S[0].wd + 540) % 360) - 180);
+    if (d >= 60 && (!rol || d > rol.d)) rol = { d, s: S[i] };
+  }
+  let frente = null;
+  for (let i = 0; i < S.length && !frente; i++) for (let j = i + 1; j < S.length; j++) {
+    if ((S[j].t - S[i].t) > 6 * 3600e3) break;
+    if (S[j].ws - S[i].ws >= 8 && S[j].wd >= 180 && S[j].wd <= 280) { frente = S[j]; break; }
+  }
+
+  const res = [
+    '<b>Salida (' + dhm(primero.t) + '):</b> ' + pto(primero) + ', ' + rumboVela(primero.twa) + '.',
+    '<b>Mitad (' + dhm(medio.t) + '):</b> ' + pto(medio) + ', ' + rumboVela(medio.twa) + '.',
+    '<b>' + (parcial ? 'Último dato' : 'Llegada') + ' (' + dhm(ultimo.t) + '):</b> ' + pto(ultimo) + ', ' + rumboVela(ultimo.twa) + '.',
+    parcial ? '<b>Cobertura parcial:</b> los modelos llegan hasta el ' + dhm(ultimo.t) + ' (' + Math.round(ultimo.f * 100) + '% del tramo).' : null,
+    '<b>Máximo:</b> ' + kn(max.ws) + ' de media (' + dhm(max.t) + ') y ráfagas de ' + kn(gmax.wg) + ' (' + dhm(gmax.t) + '). Media del tramo ' + kn(media) + '.',
+    '<b>Viento aparente estimado</b> (a ' + VBARCO + ' kn): hasta ~' + kn(apMax.aws) + ' (' + dhm(apMax.s.t) + '), ~' + kn(apG) + ' en la ráfaga máxima.',
+    '<b>Ángulo al viento:</b> ' + ['proa','ceñida','descuartelar','través','largo','aleta','popa'].filter(c => cat[c]).map(c => c + ' ' + pct(c) + '%').join(' · ') + '.',
+    omax != null ? '<b>Ola:</b> hasta ' + omax.toFixed(1) + ' m.' : null,
+    lluvia.length ? '<b>Lluvia:</b> chubascos hacia ' + dhm(lluvia[0].t) + '.' : null,
+    tmin ? '<b>Temperatura:</b> mínima ' + Math.round(tmin.tp) + ' °C (' + dhm(tmin.t) + ').' : null,
+    noche.length ? '<b>Navegación nocturna:</b> ' + Math.round(100 * noche.length / S.length) + '% del tramo de noche.' : null,
+    rol ? '<b>Rolada:</b> de ' + card16(S[0].wd) + ' a ' + card16(rol.s.wd) + ' hacia ' + dhm(rol.s.t) + '.' : null,
+    frente ? '<b>Posible frente:</b> sube a ' + kn(frente.ws) + ' del ' + card16(frente.wd) + ' hacia ' + dhm(frente.t) + '.' : null,
+    '<b>Confianza:</b> ' + conf + ' (' + faltan + ').'
+  ].filter(Boolean);
+
+  const T = [], add = (g, t) => T.push({ g, t });
+  // Viento y velas
+  if (gmax.wg >= 30) add('Viento y velas', '<b>Ráfagas de ' + kn(gmax.wg) + ':</b> salí con <b>dos rizos</b> o génova muy enrollado. Navegando solo, reducir antes es siempre más fácil que después.');
+  else if (gmax.wg >= 22) add('Viento y velas', '<b>Ráfagas de ' + kn(gmax.wg) + ' (' + dhm(gmax.t) + '):</b> llevá <b>un rizo</b> preparado y ponelo antes de esa hora.');
+  else if (flojo >= 40) add('Viento y velas', '<b>Viento flojo</b> (' + flojo + '% del tramo con menos de 6 kn): toda la vela y trimado fino (escotas sueltas, cunningham y contra flojos para dar bolsa). El tramo puede durar bastante más que las ' + leg.h + ' h estimadas.');
+  else add('Viento y velas', '<b>Viento manejable</b> (máx. ' + kn(max.ws) + ', ráfagas ' + kn(gmax.wg) + '): toda la vela.');
+  if (apMax.aws >= 18) add('Viento y velas', '<b>Rizá por el aparente, no por el real:</b> con ' + kn(apMax.s.ws) + ' reales en ' + rumboVela(apMax.s.twa) + ' vas a sentir ~' + kn(apMax.aws) +
+    ' en cubierta. Regla práctica para un crucero de ~40 pies: 1er rizo con 16–18 kn aparentes, 2do con 22–24.');
+  if (popa >= 25 && max.ws >= 15) add('Viento y velas', '<b>Popa con ' + kn(max.ws) + ':</b> el aparente baja y el barco "parece" tranquilo, pero si tenés que orzar de golpe (virar, maniobra de hombre al agua) el aparente sube de golpe. Reducí según el real.');
+  // Estrategia
+  if (proa >= 25) add('Estrategia', '<b>Viento de proa ' + proa + '% del tramo:</b> vas a tener que bordear (contá ~40% más de millas en esa parte). Bordes largos: cada virada cuesta velocidad. ' + (cenida ? 'Aprovechá las horas de ceñida para ganar barlovento.' : ''));
+  else if (cenida >= 30) add('Estrategia', '<b>Ceñida ' + cenida + '% del tramo:</b> escotas cerradas, pero 3–5° más abierto que la ceñida máxima: el barco gana velocidad y el VMG casi no cambia.');
+  if (popa >= 25) add('Estrategia', '<b>Popa/aleta ' + popa + '% del tramo:</b> riesgo de trasluchada. Piloto por ángulo de viento a ~150° o retenida de botavara; bordes de popa en vez de ir a 180°. Trasluchá controlado: cazar la mayor al centro antes de pasar la botavara.');
+  if (flojo < 40 && pct('través') + pct('largo') + pct('descuartelar') >= 60) add('Estrategia', '<b>Buen ángulo</b> (través/largo la mayor parte): tramo rápido; trimá para velocidad y vigilá la escora en las ráfagas (más de 20–25° de escora frena y carga el timón).');
+  if (rol) add('Estrategia', '<b>Rolada al ' + card16(rol.s.wd) + ' hacia ' + dhm(rol.s.t) + ':</b> preparate para cambiar de amura y re-trimar; si pasa a proa, ganá camino antes de esa hora. Regla: navegá hacia el lado de donde va a venir el viento.');
+  if (frente) add('Estrategia', '<b>Posible frente frío hacia ' + dhm(frente.t) + '</b> (sube a ' + kn(frente.ws) + ' del ' + card16(frente.wd) + '): rizá antes, asegurá todo en cubierta. Señales: barómetro cayendo rápido, nubes altas del SO, viento del N/NE que refresca. Si todavía no zarpaste, evaluá esperar a que pase.');
+  if (conf === 'baja' || conf === 'muy baja') add('Estrategia', '<b>Confianza ' + conf + ':</b> tomalo como tendencia; se va a ir afinando cada vez que abras la página. Decidí la zarpada con el pronóstico de 24–48 h antes.');
+  // Seguridad (tripulante solo)
+  // Regla del capitán (nota del 30 Sep): en solitario, chaleco autoinflable con arnés SIEMPRE para salir a cubierta;
+  // con navegación riesgosa (15 kn o más, olas importantes o de noche) además línea de vida instalada y estrobo a mano
+  const solo = PARAMS[ACTIVE.key] && PARAMS[ACTIVE.key].crew === 1;
+  add('Seguridad (solo a bordo)', '<b>Chaleco autoinflable con arnés puesto para salir a cubierta, el 100% del tiempo</b>' +
+    (solo ? ', sea cual sea el viento y la ola: navegando en solitario no hay quien te rescate.' : ', sea cual sea el viento y la ola.'));
+  const riesgo = [max.ws >= 15 ? 'viento de ' + kn(max.ws) + ' (' + dhm(max.t) + ')' : null, omax != null && omax >= 1.5 ? 'olas de ' + omax.toFixed(1) + ' m' : null,
+                  noche.length ? 'navegación nocturna (' + Math.round(100 * noche.length / S.length) + '% del tramo)' : null].filter(Boolean);
+  if (riesgo.length) add('Seguridad (solo a bordo)', '<b>Navegación riesgosa</b> (' + riesgo.join(', ') + '): <b>instalá la línea de vida</b> antes de zarpar y ' +
+    '<b>tené a mano el estrobo</b> para engancharte antes de salir del cockpit. Una mano para vos y otra para el barco.');
+  if (noche.length) add('Seguridad (solo a bordo)', '<b>Noche (' + Math.round(100 * noche.length / S.length) + '% del tramo):</b> luces de navegación encendidas desde el atardecer, linterna frontal con luz roja, rizos puestos antes de que oscurezca y plan de guardias.');
+  if (leg.h >= 12) add('Seguridad (solo a bordo)', '<b>Descanso en solitario (' + leg.h + ' h):</b> dormí en ciclos de 20–25 min con alarma, con AIS y alarma de proximidad activas, y sólo lejos de la costa y del tráfico. Comé y tomá agua a horario aunque no tengas hambre.');
+  if (tmin && tmin.tp < 12) add('Seguridad (solo a bordo)', '<b>Frío (' + Math.round(tmin.tp) + ' °C hacia ' + hm(tmin.t) + '):</b> capas térmicas y traje de agua; el viento de ' + kn(max.ws) + ' baja la sensación térmica varios grados.');
+  if (omax != null && omax >= 2.5) add('Seguridad (solo a bordo)', '<b>Ola de ' + omax.toFixed(1) + ' m:</b> incómodo para un tripulante solo; bajá vela para que el piloto no se vaya de rumbo y cerrá tambuchos.');
+  else if (omax != null && omax >= 1.5) add('Seguridad (solo a bordo)', '<b>Ola de ' + omax.toFixed(1) + ' m:</b> el barco va a cabecear/rolar; estibá todo abajo y revisá el piloto seguido.');
+  // Aguas, tráfico y comunicaciones
+  if (rio) {
+    const so = S.filter(s => s.wd >= 200 && s.wd <= 300).length / S.length, se = S.filter(s => s.wd >= 100 && s.wd <= 170).length / S.length;
+    if (so >= 0.4) add('Aguas y tráfico', '<b>Bajante probable:</b> el viento del SO/O empuja el agua fuera del Río de la Plata y baja el nivel. Puede haber bastante menos agua que en la carta: mirá la sonda, seguí los canales y entrá a puerto con cuidado.');
+    else if (se >= 0.4) add('Aguas y tráfico', '<b>Creciente (sudestada):</b> el viento del SE sube el nivel del río y arma una ola corta y empinada; más agua, pero mar incómodo.');
+    add('Aguas y tráfico', '<b>Tráfico de buques:</b> en el Río de la Plata los mercantes van por canales dragados (Punta Indio, Intermedio, acceso a Montevideo) y no pueden desviarse. Cruzalos perpendicular y rápido, nunca navegues dentro; vigilá el AIS.');
+  }
+  if (lluvia.length) add('Aguas y tráfico', '<b>Chubascos hacia ' + dhm(lluvia[0].t) + ':</b> visibilidad reducida y ráfagas bajo la nube; con radar/AIS vigilá el tráfico y reducí antes de que llegue el chubasco.');
+  add('Aguas y tráfico', '<b>Comunicaciones:</b> VHF en canal 16 siempre en escucha. Avisá zarpe y arribo a la autoridad marítima (' +
+    [leg.paisFrom, leg.paisTo].filter((v, i, a) => v && a.indexOf(v) === i).map(p => p === 'Argentina' ? 'Prefectura Naval Argentina' : p === 'Uruguay' ? 'Prefectura Nacional Naval (Uruguay)' : 'autoridad de ' + p).join(' / ') + ').');
+  // Llegada
+  if (fc.sun && fc.sun.set && !parcial && leg.h <= 20) {
+    const arr = e.arr, set = fc.sun.set, rise = fc.sun.rise;
+    if (arr > set) {
+      const antes = Math.ceil((arr - set) / 3600e3 + 0.5);
+      add('Llegada', '<b>Llegarías de noche</b> (' + hm(arr) + ', el sol se pone ' + hm(set) + '): salí <b>' + antes + ' h antes</b> (a las ' + hm(new Date(e.dep - antes * 3600e3)) + ') para entrar con luz.');
+    } else if (rise && arr < rise) add('Llegada', '<b>Llegarías antes del amanecer</b> (' + hm(arr) + ', sale el sol ' + hm(rise) + '): demorá la salida o reducí para entrar de día.');
+    else add('Llegada', '<b>Llegada con luz:</b> ' + hm(arr) + ', el sol se pone ' + hm(set) + ' (' + Math.round((set - arr) / 3600e3 * 10) / 10 + ' h de margen).');
+  } else if (fc.sun && fc.sun.set && !parcial) add('Llegada', '<b>Llegada estimada:</b> ' + dhm(e.arr) + ' (el sol se pone ' + hm(fc.sun.set) + '). Ajustá la velocidad en la última noche para entrar de día.');
+  add('Llegada', '<b>Antes de entrar a ' + leg.to + ':</b> 2–3 MN antes bajá vela o reducila, prepará defensas y cabos de amarre de ambas bandas, y repasá en la carta la entrada y los bajos.');
+  // En Sailaway
+  add('En Sailaway', '<b>El barco sigue navegando aunque cierres el juego:</b> antes de dejar la PC, dejá la vela reducida para la ráfaga máxima del período (' + kn(gmax.wg) + '), el piloto por ángulo de viento y las alarmas activadas.');
+  if (ROUTE && ROUTE.wps && ROUTE.wps.length > 1 && +n === etapasObjetivo()[0]) {
+    const dest = PORTS.find(p => p.n === +n);
+    const d = dest ? Math.min(...ROUTE.wps.map(w => distNM({ lat: w.lat, lon: w.lon }, dest))) : 0;
+    add('En Sailaway', d > 5 ? '<b>Revisá la ruta cargada en el juego:</b> ningún waypoint pasa por ' + leg.to + ' (el más cercano queda a ' + Math.round(d) + ' MN). Cargá la ruta de este tramo antes de zarpar.'
+                             : '<b>Ruta del juego OK:</b> la ruta cargada pasa por ' + leg.to + ' (' + ROUTE.wps.length + ' waypoints).');
+  }
+  add('En Sailaway', '<b>Usá el simulador como práctica real:</b> anotá a qué viento rizaste, cuánto tardó cada maniobra y la velocidad real contra la estimada (' + VBARCO + ' kn); esos datos sirven después para el Glory.');
+  // Para el Glory real
+  if (leg.paisFrom && leg.paisTo && leg.paisFrom !== leg.paisTo)
+    add('Para el Glory real', '<b>Cruce ' + leg.paisFrom + ' → ' + leg.paisTo + ':</b> despacho internacional de salida (Prefectura, Migraciones y Aduana) y entrada en el primer puerto habilitado del otro país. Llevá documentación del barco, del patrón y el rol de tripulación.');
+  add('Para el Glory real', '<b>Chequeo antes de zarpar:</b> motor (aceite, refrigeración, correa), combustible con reserva para ~' + Math.round(leg.h * 0.3 + 3) + ' h de motor, baterías y cargador, luces de navegación, bomba de achique, radio VHF y chalecos.');
+  add('Para el Glory real', '<b>Plan de navegación:</b> dejá a alguien en tierra la ruta, la hora de salida y la ETA (' + dhm(e.arr) + '), con la indicación de avisar a Prefectura si no reportás a una hora acordada.');
+  return { res, tips: T };
+}
+
+function tablaTramo(n) {
+  const S = FC[n].slots;
+  return '<table><tr><th>Hora (tu reloj)</th><th>Tramo</th><th>Viento</th><th>Media</th><th>Ráfaga</th><th>Ola</th><th>Ángulo al viento</th></tr>' +
+    S.map(s => '<tr><td>' + dhm(s.t).replace(/:\d\d$/, ':00') + '</td><td>' + Math.round(s.f * 100) + '%</td>' +
+      '<td><span class="arr" style="transform:rotate(' + (s.wd + 180) + 'deg)">↑</span> ' + card16(s.wd) + '</td>' +
+      '<td class="' + (s.ws >= 25 ? 'w2' : s.ws >= 18 ? 'w1' : '') + '">' + kn(s.ws) + '</td>' +
+      '<td class="' + (s.wg >= 30 ? 'w2' : s.wg >= 22 ? 'w1' : '') + '">' + Math.round(s.wg) + '</td>' +
+      '<td>' + (s.wv != null ? s.wv.toFixed(1) + ' m' : '—') + '</td>' +
+      '<td>' + Math.round(Math.abs(s.twa)) + '° ' + (s.twa > 0 ? 'Er' : 'Ba') + ' · ' + (rumboVela(s.twa) === 'proa' ? '⛔ proa (bordear)' : rumboVela(s.twa)) + '</td></tr>').join('') +
+    '</table>';
+}
+
+// Pinta pronostico automatico, tabla y consejos automaticos de una etapa
+function pintarTramo(n) {
+  const pg = PAGES.find(p => +p.dataset.n === +n); if (!pg) return;
+  const box = pg.querySelector('.pr-live'), auto = pg.querySelector('.pr-auto'), cons = pg.querySelector('.cn-auto');
+  const e = estadoTramo(n), fc = FC[n], leg = CFG.legs[n];
+  const btn = '<button onclick="actualizarPronosticos(true)" title="Actualizar pronóstico, análisis y consejos de la etapa activa y las dos siguientes">↻ Actualizar todo</button>';
+  const titulo = (t) => '<h4>' + t + btn + '</h4>';
+  if (e.sin) { box.innerHTML = ''; return; }
+  const objetivo = etapasObjetivo().includes(+n);
+  if (e.pasado) { box.innerHTML = titulo('🛰 ' + leg.from + ' → ' + leg.to) + '<div class="nota">Tramo ya navegado.</div>'; auto.innerHTML = cons.innerHTML = ''; return; }
+  if (e.lejos) {
+    box.innerHTML = titulo('🛰 En vivo sobre la derrota') + '<div class="nota">Los modelos llegan hasta ~16 días: el pronóstico de este tramo aparece desde el ' +
+      e.lejos.getDate() + ' ' + MESES[e.lejos.getMonth()] + ' y se analiza solo cuando sea la etapa activa o una de las dos siguientes.</div>';
+    auto.innerHTML = cons.innerHTML = ''; return;
+  }
+  if (!fc) {
+    box.innerHTML = titulo('🛰 En vivo sobre la derrota') + '<div class="nota">' + (objetivo ? 'Cargando pronóstico…' : 'Esta etapa no está entre la activa y las dos siguientes: tocá ↻ o abrí la pestaña para cargarla.') + '</div>';
+    auto.innerHTML = cons.innerHTML = ''; return;
+  }
+  if (fc.err) { box.innerHTML = titulo('🛰 En vivo sobre la derrota') + '<div class="nota">No se pudo cargar el pronóstico (' + fc.err + ').</div>'; return; }
+  const a = analizar(n), cuando = 'actualizado ' + hm(new Date(fc.t)) + ' · Open-Meteo sobre la derrota';
+  auto.innerHTML = a ? '<div class="auto-h">🤖 Análisis automático · ' + cuando + '</div><ul class="pg-list">' + a.res.map(x => '<li>' + x + '</li>').join('') + '</ul>' : '';
+  const grupos = a ? [...new Set(a.tips.map(x => x.g))] : [];
+  cons.innerHTML = a ? '<div class="auto-h">🤖 Consejos automáticos para ' + leg.from + ' → ' + leg.to + ' · ' + cuando + '</div>' +
+    grupos.map(g => '<div class="cn-g">' + g + '</div><ul class="pg-list">' + a.tips.filter(x => x.g === g).map(x => '<li>' + x.t + '</li>').join('') + '</ul>').join('') : '';
+  box.innerHTML = titulo('🛰 Hora por hora sobre la derrota · ' + leg.from + ' → ' + leg.to) + (fc.slots.length ? tablaTramo(n) +
+    '<div class="nota">Modelo Open-Meteo (mejor combinación GFS/ECMWF/ICON) en el punto de la derrota según la hora estimada de paso; el ángulo supone que seguís la derrota planificada. Sailaway usa viento real, así que debería parecerse.</div>'
+    : '<div class="nota">Sin datos para las horas del tramo.</div>');
+}
+
+// Descarga y analiza la etapa activa y las dos siguientes (y la que estes mirando)
+let FC_RUN = null;
+async function actualizarPronosticos(forzar) {
+  if (FC_RUN) return FC_RUN;
+  const ns = etapasObjetivo(), vista = PAGES[CUR] && +PAGES[CUR].dataset.n;
+  if (vista && !ns.includes(vista)) ns.push(vista);
+  FC_RUN = (async () => {
+    for (const n of ns) {
+      if (!forzar && FC[n] && Date.now() - FC[n].t < 30 * 60e3) { pintarTramo(n); continue; }
+      if (estadoTramo(n).ok) { pintarTramo(n); await fetchTramo(n); }
+      pintarTramo(n);
+    }
+  })();
+  try { await FC_RUN; } finally { FC_RUN = null; }
+}
+function loadForecast(box) {   // al mirar una etapa: si no esta cargada, la trae
+  if (!box) return;
+  const n = +box.dataset.n;
+  if (FC[n] || !estadoTramo(n).ok) pintarTramo(n);
+  else fetchTramo(n).then(() => pintarTramo(n));
+}
+
+// ─── Notas del capitan y eventos del log (se guardan en entradas_capitan.json via servidor.py) ───
+if (CFG.publico) document.body.classList.add('publico');
+// Copia publica: GitHub Pages deja que el navegador guarde la pagina ~10 min; si hay una version mas nueva publicada, se recarga sola
+async function versionNueva() {
+  if (!CFG.publico || !CFG.version) return;
+  try {
+    const v = (await (await fetch('version.json?t=' + Date.now(), { cache: 'no-store' })).json()).v;
+    if (v && v !== CFG.version) location.replace(location.pathname + '?v=' + v + location.hash);
+  } catch(e) {}
+}
+versionNueva();
+if (CFG.publico) setInterval(versionNueva, 60e3);
+const API = !CFG.publico && location.protocol.startsWith('http') ? '/api' : null;
+let ENTRADAS = CFG.entradas || [];
+
+// ─── Modo capitan en la copia publica: notas y eventos directo al repo, sin ninguna computadora ───
+// Se activa una sola vez por dispositivo abriendo el link con #capitan al final: pide una clave de GitHub
+// (fine-grained, con permiso de escritura en los repos) que queda guardada SOLO en este navegador.
+// La nota se agrega a entradas_capitan.json en GitHub y una GitHub Action vuelve a publicar las bitacoras.
+// (CAPITAN y ghToken estan al principio del script: las fechas editables los usan antes)
+const GH_REPO = 'adrianfonq/SA-Viaje', GH_ARCHIVO = 'entradas_capitan.json';
+if (CAPITAN) document.body.classList.add('capitan');
+const b64aTexto = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, '')), c => c.charCodeAt(0)));
+function textoAb64(t) {
+  const u = new TextEncoder().encode(t);
+  let s = '';
+  for (let i = 0; i < u.length; i += 8192) s += String.fromCharCode.apply(null, u.subarray(i, i + 8192));
+  return btoa(s);
+}
+// Lee un archivo JSON (lista) de GitHub, le aplica el cambio y lo sube; si alguien lo cambio justo antes, reintenta
+async function ghCambiar(cambio, mensaje, archivo) {
+  const url = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + (archivo || GH_ARCHIVO);
+  const h = { Authorization: 'Bearer ' + ghToken(), Accept: 'application/vnd.github+json' };
+  for (let intento = 0; intento < 3; intento++) {
+    const r = await fetch(url + '?ref=main&t=' + Date.now(), { headers: h, cache: 'no-store' });
+    if (r.status === 401 || r.status === 403 || r.status === 404) throw new Error('GitHub no acepta la clave (' + r.status + '). Volvé a abrir el link con #capitan al final y pegala de nuevo.');
+    if (!r.ok) throw new Error('GitHub respondió ' + r.status);
+    const f = await r.json();
+    const todas = cambio(JSON.parse(b64aTexto(f.content)));
+    const p = await fetch(url, { method: 'PUT', headers: h, body: JSON.stringify({ message: mensaje, content: textoAb64(JSON.stringify(todas, null, 1)), sha: f.sha, branch: 'main' }) });
+    if (p.ok) return todas;
+    if (p.status !== 409 && p.status !== 422) throw new Error('GitHub respondió ' + p.status + ' al guardar');
+  }
+  throw new Error('el archivo cambió varias veces seguidas en GitHub; probá de nuevo');
+}
+const AVISO_CAPITAN = 'Guardado en GitHub. La página se actualiza sola en 1 o 2 minutos.';
+// Fechas, millas y llegadas: se deja el pedido en pedidos_web.json y la GitHub Action lo aplica al .md
+async function ghPedido(p) {
+  const x = Object.assign({ id: Date.now() + '-' + Math.random().toString(36).slice(2, 6), fecha: new Date().toISOString() }, p);
+  await ghCambiar(t => t.concat([x]), 'Cambio desde la web: ' + p.op + ' ' + (p.campo || p.tipo || '') + ' puerto ' + (p.n || ''), 'pedidos_web.json');
+}
+// Aviso corto abajo de la pantalla (sin frenar la pagina)
+function avisar(msg) {
+  let el = $('aviso-flot');
+  if (!el) { el = document.createElement('div'); el.id = 'aviso-flot'; document.body.appendChild(el); }
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(avisar.t); avisar.t = setTimeout(() => el.classList.remove('on'), 5000);
+}
+const CATS = { navegacion: '⛵', mejora: '💡', otro: '📝' };
+const escH = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function pendientes() { try { return JSON.parse(store('pend')) || []; } catch(e) { return []; } }
+function fechaCorta(iso) { const d = new Date(iso); return isNaN(d) ? iso : d.getDate() + ' ' + MESES[d.getMonth()] + ' ' + d.getFullYear() + ' ' + hm(d); }
+
+async function enviar(ruta, cuerpo) {
+  const r = await fetch(API + ruta, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo) });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+async function cargarEntradas() {
+  if (CAPITAN && pendientes().length) {   // lo que no se pudo subir antes (sin internet), se sube ahora
+    const pend = pendientes();
+    try {
+      const todas = await ghCambiar(t => t.concat(pend.filter(p => !t.some(e => e.id === p.id))), 'Notas y eventos desde la web (pendientes)');
+      store('pend', '[]');
+      ENTRADAS = todas.filter(e => e.bitacora === K);
+    } catch(e) { console.warn('GitHub (pendientes):', e); }
+  }
+  if (CFG.publico) {
+    const pend = pendientes();
+    ENTRADAS = ENTRADAS.concat(pend.filter(p => !ENTRADAS.some(e => e.id === p.id)));
+    pintarEntradas(); return;
+  }
+  if (API) {
+    try {
+      for (const e of pendientes()) ENTRADAS = await enviar('/entrada', e);   // sube lo guardado sin servidor
+      store('pend', '[]');
+      const r = await fetch(API + '/entradas?b=' + K, { cache: 'no-store' });
+      if (r.ok) ENTRADAS = await r.json();
+    } catch(e) { console.warn('Servidor de notas:', e); }
+  }
+  const pend = pendientes();
+  ENTRADAS = ENTRADAS.concat(pend.filter(p => !ENTRADAS.some(e => e.id === p.id)));
+  pintarEntradas();
+}
+async function guardarEntrada(e) {
+  Object.assign(e, { id: String(Date.now()), bitacora: K, fecha: new Date().toISOString() });
+  if (API) {
+    try { ENTRADAS = await enviar('/entrada', e); pintarEntradas(); return true; } catch(err) { console.warn(err); }
+  }
+  if (CAPITAN) {
+    try {
+      const todas = await ghCambiar(t => t.concat([e]), (e.tipo === 'log' ? 'Evento' : 'Nota') + ' desde la web: ' + e.texto.slice(0, 60));
+      ENTRADAS = todas.filter(x => x.bitacora === K); pintarEntradas(); avisar(AVISO_CAPITAN); return true;
+    } catch(err) { alert('No se pudo guardar en GitHub: ' + err.message + '\nQueda guardada en este dispositivo y se sube la próxima vez que abras la página.'); }
+  }
+  const p = pendientes(); p.push(e); store('pend', JSON.stringify(p));
+  ENTRADAS = ENTRADAS.concat([e]); pintarEntradas(); return false;
+}
+async function borrarEntrada(id) {
+  if (!confirm('¿Borrar esta entrada?')) return;
+  const soloLocal = esPend(id);   // pendiente de subir: alcanza con borrarla de este dispositivo
+  store('pend', JSON.stringify(pendientes().filter(p => p.id !== id)));
+  if (API) { try { ENTRADAS = await enviar('/borrar', { id, bitacora: K }); } catch(e) { alert('No se pudo borrar: ' + e.message); return; } }
+  else if (CAPITAN && !soloLocal) {
+    try { ENTRADAS = (await ghCambiar(t => t.filter(e => e.id !== id), 'Borrar entrada desde la web')).filter(e => e.bitacora === K); }
+    catch(e) { alert('No se pudo borrar en GitHub: ' + e.message); return; }
+  }
+  else ENTRADAS = ENTRADAS.filter(e => e.id !== id);
+  pintarEntradas();
+}
+const esPend = (id) => pendientes().some(p => p.id === id);
+const AVISO = API || CFG.publico ? '' : 'Sin servidor: se guarda sólo en este navegador. Abrí la bitácora con abrir_bitacoras.command (Mac) o abrir_bitacoras.bat (Windows) para que se guarde en el proyecto y Claude la pueda leer.';
+
+function pintarEntradas() {
+  const orden = (a, b) => (b.fecha || '').localeCompare(a.fecha || '');
+  document.querySelectorAll('.cap-list').forEach(box => {
+    const n = +box.dataset.n;
+    const notas = ENTRADAS.filter(e => e.tipo === 'nota' && e.etapa === n);
+    const tab = box.closest('.pg-tabs') && box.closest('.pg-tabs').querySelector('.tb-head button[data-t="notas"]');
+    if (tab) tab.innerHTML = '📝 Notas' + (notas.length ? ' <i class="tb-dot"></i><small>' + notas.length + '</small>' : '');
+    box.innerHTML = notas.sort(orden).map(e =>
+      '<div class="cap-n"><span>' + (CATS[e.categoria] || '📝') + '</span><div class="ct">' + escH(e.texto) +
+      '<small>' + fechaCorta(e.fecha) + (esPend(e.id) ? ' · pendiente de subir' : '') + '</small></div>' +
+      '<button title="Borrar" onclick="borrarEntrada(\'' + e.id + '\')">✕</button></div>').join('');
+  });
+  document.querySelectorAll('.cap-aviso').forEach(el => el.textContent = AVISO);
+  const tabla = document.querySelector('table.lg');
+  if (tabla) {
+    tabla.querySelectorAll('tr.cap').forEach(r => r.remove());
+    const cab = tabla.querySelector('tr');
+    const ev = ENTRADAS.filter(e => e.tipo === 'log').sort(orden);
+    cab.insertAdjacentHTML('afterend', ev.map(e => '<tr class="cap"><td>' + fechaCorta(e.fecha) + '</td><td>' + escH(e.ubicacion || '—') + '</td><td>' +
+      escH(e.texto) + '</td><td>' + escH(e.detalles || '') + (esPend(e.id) ? ' (pendiente)' : '') +
+      ' <button class="lg-x" title="Borrar" onclick="borrarEntrada(\'' + e.id + '\')">✕</button></td></tr>').join(''));
+    const b = $('lg-btn'), tot = +b.dataset.base + ev.length;
+    b.dataset.label = 'Log de eventos (' + tot + ')';
+    b.textContent = (b.classList.contains('act') ? '▾ ' : '▸ ') + b.dataset.label;
+  }
+}
+async function guardarNota(btn, n) {
+  const f = btn.closest('.cap-form'), txt = f.querySelector('.cap-txt');
+  if (!txt.value.trim()) { txt.focus(); return; }
+  btn.disabled = true;
+  await guardarEntrada({ tipo: 'nota', etapa: n, categoria: f.querySelector('.cap-cat').value, texto: txt.value.trim() });
+  txt.value = ''; btn.disabled = false;
+}
+async function guardarEvento() {
+  const ev = $('lg-ev'), det = $('lg-det'), ubi = $('lg-ubi');
+  if (!ev.value.trim()) { ev.focus(); return; }
+  const l = LIVE[ACTIVE.key];
+  await guardarEntrada({ tipo: 'log', etapa: CFG.activeEtapa, texto: ev.value.trim(), detalles: det.value.trim(),
+                         ubicacion: ubi.value.trim() || l.pos || '—' });
+  ev.value = det.value = ubi.value = '';
+}
+
+// ─── Compartir en la web (GitHub Pages, via servidor.py + compartir.py) ───
+let SHARE = null;
+async function estadoCompartir() {
+  if (!API) return null;
+  try { SHARE = await (await fetch(API + '/compartir?b=' + K, { cache: 'no-store' })).json(); } catch(e) { SHARE = null; }
+  $('sh-btn').classList.toggle('on', !!(SHARE && SHARE.activo));
+  $('sh-btn').innerHTML = SHARE && SHARE.activo ? '&#128279; Compartida' : '&#128279; Compartir';
+  return SHARE;
+}
+function htmlCompartir(msg) {
+  const on = SHARE && SHARE.activo;
+  return '<div class="sh-box"><label class="sh-sw"><input type="checkbox" id="sh-on" ' + (on ? 'checked' : '') + ' onchange="cambiarCompartir(this.checked)"> ' +
+    (on ? 'Compartida en la web' : 'No se comparte — activalo para obtener el link de la bitácora (posición en vivo)') + '</label>' +
+    (on && SHARE.url ? '<div class="sh-link"><input id="sh-url" readonly value="' + SHARE.url + '" onclick="this.select()">' +
+      '<button onclick="copiarLink(this)">Copiar</button><a href="' + SHARE.url + '" target="_blank">Abrir</a></div>' : '') +
+    (SHARE && SHARE.calendarios && SHARE.calendarios.length ? '<div class="sh-cal"><b>📅 Calendario para Google Calendar</b>' +
+      SHARE.calendarios.map((c, i) => '<div class="sh-link"><input id="sh-cal' + i + '" readonly value="' + c.url + '" onclick="this.select()" title="' + c.nombre + '">' +
+        '<button onclick="copiarLink(this,\'sh-cal' + i + '\')">Copiar</button></div>').join('') +
+      '<div class="sh-nota">En Google Calendar (en la computadora): <b>Otros calendarios → + → Desde URL</b>, pegá la dirección y tocá <b>Agregar calendario</b>. ' +
+      'Queda suscripto: Google lo actualiza solo (cada 8 a 24 h) con las fechas de las etapas.</div></div>' : '') +
+    '<div class="sh-est">' + (msg || (SHARE && SHARE.publicado ? 'Última publicación: ' + SHARE.publicado : '')) + '</div>' +
+    '<div class="sh-nota">Quien tenga el link ve la bitácora completa y en vivo (posición, instrumentos, pronóstico, notas y log), sin poder modificar nada. ' +
+    'La copia se actualiza sola cuando cargás notas o eventos y cada vez que Claude sube cambios. Al desactivar, la página deja de estar en la web ' +
+    '(puede tardar 1–2 minutos). La primera publicación también tarda 1–2 minutos en estar disponible.</div></div>';
+}
+async function abrirCompartir() {
+  if (!API) {
+    const archivo = location.pathname.split('/').pop();
+    openModal('🔗 Compartir', '<div class="sh-box">Esta bitácora está abierta como archivo (doble clic), y para compartirla hace falta el servidor local.<br><br>' +
+      '1. Abrí <b>abrir_bitacoras.command</b> (Mac) o <b>abrir_bitacoras.bat</b> (Windows).<br>2. Tocá el botón de abajo: abre esta misma bitácora con el servidor.<br>' +
+      '<a class="mb-btn" style="display:inline-block;text-decoration:none" href="http://localhost:8765/' + archivo + '">Abrir con el servidor</a>' +
+      '<div class="sh-nota">Así también se guardan en el proyecto las notas, los eventos y los cambios de fechas.</div></div>');
+    return;
+  }
+  openModal('🔗 Compartir esta bitácora', '<div class="sh-box">Consultando…</div>');
+  await estadoCompartir();
+  $('modal-body').innerHTML = htmlCompartir();
+}
+async function cambiarCompartir(on) {
+  $('modal-body').innerHTML = htmlCompartir(on ? 'Publicando… (puede tardar unos segundos)' : 'Quitando de la web…');
+  $('sh-on').disabled = true;
+  try {
+    const r = await fetch(API + '/compartir', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bitacora: K, activo: on }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+  } catch(e) { await estadoCompartir(); $('modal-body').innerHTML = htmlCompartir('⚠️ No se pudo: ' + e.message); return; }
+  await estadoCompartir();
+  $('modal-body').innerHTML = htmlCompartir(on ? '✅ Publicada. Copiá el link y compartilo.' : 'Ya no se comparte.');
+}
+function copiarLink(btn, id) {
+  const u = $(id || 'sh-url'); u.select();
+  (navigator.clipboard ? navigator.clipboard.writeText(u.value) : Promise.reject()).catch(() => document.execCommand('copy'));
+  btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = 'Copiar', 1500);
+}
+
+function openHist() { openModal('📜 Historial de actualizaciones', $('src-historial').innerHTML); }
+
+function stepEtapa(d) { goEtapa(CUR + d, true); }
+function goActive() { goEtapa(ACTIVE_IDX, true); }
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape') { closeMap(); closeModal(); }
+  const t = ev.target.tagName;
+  if (t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA' || $('map-bg').classList.contains('show') || $('modal-bg').classList.contains('show')) return;
+  if (ev.key === 'ArrowLeft') stepEtapa(-1);
+  if (ev.key === 'ArrowRight') stepEtapa(1);
+});
+
+// ─── Mapa del barco: track, ruta del juego, posicion y viento (Windy) ───
+// Tres modos de encuadre, para el track y para Windy:
+//   libre   -> no se mueve solo
+//   centrar -> sigue al barco
+//   wp      -> barco + proximo waypoint de la ruta del juego (o proximo puerto)
+let MAP = null, MAP_LAYER = null, MAP_BOAT = null, MAP_TAB = 'track';
+let MAP_MODO = store('mapmodo') || 'centrar';
+let MAP_FONDOS = null, MAP_FONDO = store('mapfondo') === 'sat' ? 'sat' : 'osm';   // fondo de la carta: satelite u OpenSeaMap
+let TRACK = null, TRACK_T = 0;       // ultimo track leido de Sailaway
+let WINDY_VISTA = null;              // centro y zoom con que se cargo Windy
+
+function boatSvg(hdg, size) {
+  return '<svg width="' + size + '" height="' + size + '" viewBox="-14 -14 28 28" style="transform:rotate(' + (hdg || 0) + 'deg)">' +
+         '<path d="M0,-12 L7,9 L0,5 L-7,9 Z" fill="#facc15" stroke="#0f172a" stroke-width="1.5"/></svg>';
+}
+function boatIcon(hdg) {
+  return L.divIcon({ className: 'boat-ico', iconSize: [28, 28], iconAnchor: [14, 14], html: boatSvg(hdg, 28) });
+}
+
+// Hacia donde mira "Centrado + WP": el proximo WP de la ruta del juego o, si no hay, el proximo puerto
+function objetivoWP(k) {
+  const boat = BOATS.find(b => b.key === k), b = LIVE[k];
+  if (!boat || !boat.active || b.lat == null) return null;
+  const nw = ROUTE && ROUTE.wps && nextWaypoint(b, ROUTE.wps);
+  if (nw) return { lat: nw.wp.lat, lon: nw.wp.lon, name: nw.wp.type === 9 ? 'WP final' : 'WP ' + nw.i };
+  const next = PORTS.find(p => p.n > 1 && !p.done);
+  return next ? { lat: next.lat, lon: next.lon, name: next.name } : null;
+}
+
+async function openMap(k) {
+  const otro = MAP_BOAT !== k;
+  MAP_BOAT = k;
+  const boat = BOATS.find(b => b.key === k);
+  $('map-title').textContent = boat.name;
+  // con mas de un velero, botones para pasar de uno a otro
+  $('map-boats').innerHTML = BOATS.length > 1 ? BOATS.map(x => '<button class="' + (x.key === k ? 'act' : '') + '" onclick="openMap(\'' + x.key + '\')">' + x.name + '</button>').join('') : '';
+  $('map-bg').classList.add('show');
+  pintarModos();
+  if (otro) { TRACK = null; WINDY_VISTA = null; const iw = $('map-windy'); if (iw) iw.src = ''; }
+  showMapTab(MAP_TAB, true);
+  if (typeof L === 'undefined') { $('map-leaf').textContent = 'No se pudo cargar el mapa (sin internet).'; return; }
+  dibujarMapa(true);
+  await leerTrack(k);
+  if (MAP_BOAT === k) dibujarMapa(false);
+}
+
+async function leerTrack(k) {
+  const boat = BOATS.find(b => b.key === k);
+  if (!boat || boat.nr == null) return;
+  try {
+    const r = await fetch('https://sailaway.world/cgi-bin/sailaway3/boatmapdata.pl?showboatlog=1&showracecourse=0&showwaypoints=0&ubtnr=0&botnr=' + boat.nr, { cache: 'no-store', signal: limite20() });
+    const bd = ((await r.json()).boats || [])[0];
+    if (bd) { TRACK = (bd.track || []).filter(p => Array.isArray(p) && p.length >= 2); TRACK_T = Date.now(); }
+  } catch(e) { console.warn('Track de Sailaway:', e); }
+}
+
+// Dibuja todo con los datos actuales; forzar = encuadrar aunque el modo sea libre (al abrir)
+function dibujarMapa(forzar) {
+  const k = MAP_BOAT; if (!k) return;
+  const boat = BOATS.find(b => b.key === k), b = LIVE[k];
+  const o = objetivoWP(k);
+  $('map-info').textContent = b.lat == null ? 'Sin posicion todavia' + (boat.nr == null ? ': falta el MMSI del velero en la bitacora.' : '.') :
+    (b.pos || '') + ' · ' + (b.sog ?? 0).toFixed(1) + ' kts · viento ' + (b.twd ?? '—') + '° / ' + (b.tws != null ? b.tws.toFixed(1) : '—') + ' kts' +
+    (o ? ' · ' + o.name + ' a ' + distNM(b, o).toFixed(1) + ' MN' : '') + ' · ' + fmtUpd(b.upd);
+  pintarNMEA();
+  if (typeof L === 'undefined') return;
+  if (!MAP) {
+    MAP = L.map('map-leaf', { worldCopyJump: true, maxZoom: 18, zoomSnap: 0.1 });
+    // Fondos: imagen satelital de Esri, o carta de OpenStreetMap con balizas y faros de OpenSeaMap
+    MAP_FONDOS = {
+      sat: L.layerGroup([
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, maxNativeZoom: 17, attribution: 'Esri, Maxar, Earthstar Geographics' }),
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, maxNativeZoom: 17 })
+      ]),
+      osm: L.layerGroup([
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }),
+        L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', { maxZoom: 18, attribution: 'OpenSeaMap' })
+      ])
+    };
+    MAP_FONDOS[MAP_FONDO].addTo(MAP);
+  }
+  if (MAP_LAYER) MAP_LAYER.remove();
+  MAP_LAYER = L.layerGroup().addTo(MAP);
+
+  // Con pocos puertos (viaje corto) se dibujan todos
+  if (PORTS.length <= 20) PORTS.forEach(p => {
+    L.circleMarker([p.lat, p.lon], { radius: 5, color: '#0f172a', weight: 2, fillColor: p.done ? '#4ade80' : '#94a3b8', fillOpacity: 1 })
+      .bindTooltip('P' + String(p.n).padStart(2, '0') + ' ' + p.name).addTo(MAP_LAYER);
+  });
+  if (b.lat == null) {
+    if (!MAP._loaded || forzar) {
+      if (PORTS.length <= 20) MAP.fitBounds(L.latLngBounds(PORTS.map(p => [p.lat, p.lon])), { padding: [40, 40] });
+      else MAP.setView([0, -30], 3);
+    }
+    return;
+  }
+
+  // Track desde Sailaway (partido donde cruza el antimeridiano) hasta la posicion actual
+  if (TRACK && TRACK.length) {
+    const pts = TRACK.concat([[b.lat, b.lon]]), segs = [[]];
+    pts.forEach((p, i) => { if (i && Math.abs(p[1] - pts[i-1][1]) > 180) segs.push([]); segs[segs.length - 1].push(p); });
+    L.polyline(segs, { color: '#f97316', weight: 2.5, opacity: 0.9 }).addTo(MAP_LAYER);
+  }
+  // Ruta cargada en el juego (velero activo)
+  if (boat.active && ROUTE && ROUTE.wps && ROUTE.wps.length > 1) {
+    L.polyline(ROUTE.wps.map(w => [w.lat, w.lon]), { color: '#a78bfa', weight: 2, opacity: 0.9 }).addTo(MAP_LAYER);
+    const nw = nextWaypoint(b, ROUTE.wps);
+    ROUTE.wps.forEach((w, i) => L.circleMarker([w.lat, w.lon], { radius: nw && nw.i === i ? 6 : 3, color: '#4c1d95', weight: 1.5,
+      fillColor: nw && nw.i === i ? '#facc15' : '#a78bfa', fillOpacity: 1 })
+      .bindTooltip((nw && nw.i === i ? 'Próximo WP · ' : '') + 'WP ' + i + (i ? ' · ' + distNM(b, w).toFixed(1) + ' MN' : ' (inicio)')).addTo(MAP_LAYER));
+  }
+  // Hacia el objetivo del encuadre (proximo WP o puerto)
+  if (o) {
+    L.polyline([[b.lat, b.lon], [o.lat, o.lon]], { color: '#38bdf8', weight: 2, dashArray: '6 6' }).addTo(MAP_LAYER);
+    if (!(ROUTE && ROUTE.wps && ROUTE.wps.length > 1)) L.circleMarker([o.lat, o.lon], { radius: 6, color: '#0f172a', weight: 2, fillColor: '#38bdf8', fillOpacity: 1 })
+      .bindTooltip('Próximo: ' + o.name + ' · ' + distNM(b, o).toFixed(1) + ' MN').addTo(MAP_LAYER);
+  }
+  // Laylines del WP (solo con el mapa maximizado y Datos prendido)
+  juegosLaylines().filter(j => j.ll && j.ll.lineas.length).forEach(j => j.ll.lineas.forEach(l =>
+    L.polyline([[j.ll.wp.lat, j.ll.wp.lon], [l.fin.lat, l.fin.lon]], { color: COLOR_AMURA[l.amura], weight: j.ancho, dashArray: j.dash, lineCap: 'round', opacity: 0.9 })
+      .bindTooltip('Layline amura ' + l.amura + ' (' + j.fuente + ')').addTo(MAP_LAYER)));
+  // Linea punteada hasta donde el rumbo actual toca tierra (mismas condiciones)
+  const ts = tierraSel();
+  if (ts) {
+    L.polyline([[ts.b.lat, ts.b.lon], [ts.r.lat, ts.r.lon]], { color: COLOR_TIERRA, weight: 2.5, dashArray: '2 5', lineCap: 'round' }).bindTooltip('Tierra en ' + fmtTime(ts.r.t)).addTo(MAP_LAYER);
+    L.circleMarker([ts.r.lat, ts.r.lon], { radius: 5, color: '#0f172a', weight: 1.5, fillColor: COLOR_TIERRA, fillOpacity: 1 }).addTo(MAP_LAYER);
+  }
+  L.marker([b.lat, b.lon], { icon: boatIcon(b.hdg ?? b.cog), zIndexOffset: 1000 })
+    .bindPopup('<b>' + boat.name + '</b><br>' + (b.pos || '') + '<br>Rumbo ' + (b.hdg ?? b.cog ?? '—') + '° · ' + (b.sog ?? 0).toFixed(1) + ' kts').addTo(MAP_LAYER);
+  encuadrar(forzar);
+}
+
+function setMapModo(m) { MAP_MODO = m; store('mapmodo', m); pintarModos(); encuadrar(true); }
+function pintarModos() { ['libre', 'centrar', 'wp'].forEach(m => $('map-m-' + m).classList.toggle('act', m === MAP_MODO)); }
+
+// Encuadre segun el modo; forzar = al abrir o al cambiar de modo
+function encuadrar(forzar) {
+  if (!MAP_BOAT) return;
+  if (MAP_TAB === 'windy') { cargarWindy(forzar); return; }
+  const b = LIVE[MAP_BOAT];
+  if (!MAP || b.lat == null) return;
+  const cargado = MAP._loaded;
+  if (MAP_MODO === 'centrar') MAP.setView([b.lat, b.lon], cargado && !forzar ? MAP.getZoom() : Math.max(cargado ? MAP.getZoom() : 0, 10));
+  else if (MAP_MODO === 'wp') {
+    const o = objetivoWP(MAP_BOAT);
+    // velero y WP con un 10% de margen a cada lado (el zoom va de a decimos para no dejar de mas)
+    const sz = MAP.getSize();
+    if (o) MAP.fitBounds(L.latLngBounds([[b.lat, b.lon], [o.lat, o.lon]]), { padding: L.point(sz.x * 0.1, sz.y * 0.1), maxZoom: 15 });
+    else MAP.setView([b.lat, b.lon], cargado ? MAP.getZoom() : 10);
+  } else if (!cargado) MAP.setView([b.lat, b.lon], 9);
+}
+
+// ─── Windy: mismo encuadre, con el velero dibujado encima ───
+const mercX = (lon, z) => (lon + 180) / 360 * 256 * Math.pow(2, z);
+const mercY = (lat, z) => { const s = Math.sin(lat * Math.PI / 180); return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * 256 * Math.pow(2, z); };
+const mercLat = (y, z) => { const n = Math.PI - 2 * Math.PI * y / (256 * Math.pow(2, z)); return 180 / Math.PI * Math.atan(Math.sinh(n)); };
+function vistaWindy() {
+  const b = LIVE[MAP_BOAT], box = $('map-body'), w = box.clientWidth || 800, h = box.clientHeight || 500;
+  if (b.lat == null) return { lat: PORTS[0].lat, lon: PORTS[0].lon, zoom: 6 };
+  const zAct = WINDY_VISTA ? WINDY_VISTA.zoom : (MAP && MAP._loaded ? Math.min(8, MAP.getZoom()) : 6);
+  if (MAP_MODO === 'wp') {
+    const o = objetivoWP(MAP_BOAT);
+    if (o) {
+      // 10% de margen a cada lado, sin contar la franja de abajo de Windy (linea de tiempo)
+      let z = 11;
+      for (; z > 3; z--) {
+        const dx = Math.abs(mercX(b.lon, z) - mercX(o.lon, z)), dy = Math.abs(mercY(b.lat, z) - mercY(o.lat, z));
+        if (dx <= w * 0.8 && dy <= (h - 180) * 0.8) break;
+      }
+      const cy = (mercY(b.lat, z) + mercY(o.lat, z)) / 2;
+      return { lat: mercLat(cy, z), lon: (b.lon + o.lon) / 2, zoom: z };
+    }
+  }
+  return { lat: b.lat, lon: b.lon, zoom: zAct };
+}
+function cargarWindy(forzar) {
+  const b = LIVE[MAP_BOAT], has = b && b.lat != null, box = $('map-body');
+  const ifr = $('map-windy');
+  // Si ya está cargado y no se fuerza una recarga (por cambio de velero o clic en centrar),
+  // no tocar el iframe para que el usuario pueda interactuar con la barra de tiempo y pronóstico sin interrupciones.
+  if (!forzar && ifr.src && WINDY_VISTA) { ovBarco(); return; }
+
+  const v = MAP_MODO === 'libre' && WINDY_VISTA ? WINDY_VISTA : vistaWindy();
+  WINDY_VISTA = v;
+  const src = 'https://embed.windy.com/embed.html?type=map&location=coordinates&metricWind=kt&metricTemp=%C2%B0C&overlay=wind&product=ecmwf&level=surface' +
+    '&zoom=' + v.zoom + '&lat=' + v.lat.toFixed(4) + '&lon=' + v.lon.toFixed(4) +
+    (has ? '&detail=true&detailLat=' + b.lat.toFixed(4) + '&detailLon=' + b.lon.toFixed(4) + '&marker=true' : '');
+  if (ifr.src !== src) ifr.src = src;
+  ovBarco();
+}
+// El velero encima de Windy, en su lugar de la carta (en libre no se sabe hacia donde moviste Windy)
+function ovBarco() {
+  const ov = $('map-boat-ov'), b = MAP_BOAT && LIVE[MAP_BOAT], v = WINDY_VISTA, box = $('map-body');
+  $('map-lay-ov').innerHTML = '';
+  if (MAP_TAB !== 'windy' || MAP_MODO === 'libre' || !b || b.lat == null || !v) { ov.style.display = 'none'; return; }
+  const px = (p) => [box.clientWidth / 2 + mercX(p.lon, v.zoom) - mercX(v.lon, v.zoom), (box.clientHeight - 180) / 2 + mercY(p.lat, v.zoom) - mercY(v.lat, v.zoom)];
+  // laylines del WP sobre Windy (solo con el mapa maximizado y Datos prendido)
+  $('map-lay-ov').innerHTML = juegosLaylines().filter(j => j.ll && j.ll.lineas.length).map(j => {
+    const [wx, wy] = px(j.ll.wp);
+    return j.ll.lineas.map(l => { const [lx, ly] = px(l.fin); return '<line x1="' + wx + '" y1="' + wy + '" x2="' + lx + '" y2="' + ly + '" stroke="' + COLOR_AMURA[l.amura] + '" stroke-width="' + j.ancho + '" stroke-dasharray="' + j.dash + '" stroke-linecap="round" opacity=".9"/>'; }).join('');
+  }).join('') + ((ts) => {   // linea punteada hasta donde el rumbo actual toca tierra
+    if (!ts) return '';
+    const [bx, by] = px(ts.b), [tx, ty] = px(ts.r);
+    return '<line x1="' + bx + '" y1="' + by + '" x2="' + tx + '" y2="' + ty + '" stroke="' + COLOR_TIERRA + '" stroke-width="2.5" stroke-dasharray="2 5" stroke-linecap="round"/><circle cx="' + tx + '" cy="' + ty + '" r="5" fill="' + COLOR_TIERRA + '" stroke="#0f172a" stroke-width="1.5"/>';
+  })(tierraSel());
+  const [x, y] = px(b);
+  ov.innerHTML = boatSvg(b.hdg ?? b.cog, 34);
+  ov.style.left = (x - 17) + 'px'; ov.style.top = (y - 17) + 'px'; ov.style.display = 'block';
+}
+
+function showMapTab(tab, sinEncuadre) {
+  MAP_TAB = tab;
+  const w = tab === 'windy';
+  $('map-leaf').style.display = w ? 'none' : 'block';
+  $('map-windy').style.display = w ? 'block' : 'none';
+  const c = CARTAS[w ? 'windy' : MAP_FONDO];
+  $('map-carta').innerHTML = c.txt + ' &#9656;';
+  $('map-carta').title = c.tip + ' · tocá para pasar a ' + CARTAS[c.sig].txt;
+  const btnW = $('map-link-windy');
+  if (btnW) {
+    const b = MAP_BOAT && LIVE[MAP_BOAT];
+    if (w && b && b.lat != null) {
+      btnW.href = 'https://www.windy.com/?' + b.lat.toFixed(3) + ',' + b.lon.toFixed(3) + ',6,m:ecmwf';
+      btnW.style.display = 'inline-flex';
+    } else {
+      btnW.style.display = 'none';
+    }
+  }
+  if (w) { if (!sinEncuadre || !$('map-windy').src) cargarWindy(!WINDY_VISTA); }
+  else if (MAP) setTimeout(() => MAP.invalidateSize(), 50);
+  ovBarco();
+}
+// Tres cartas en un solo boton, que pasa de una a la otra: Windy → satelite → OpenSeaMap
+// (satelite y OpenSeaMap son el fondo de la carta con el track)
+const CARTAS = {
+  windy: { txt: '🌬️ Windy', tip: 'Viento y pronóstico de Windy', sig: 'sat' },
+  sat:   { txt: '🛰️ Satélite', tip: 'Imagen satelital (Esri)', sig: 'osm' },
+  osm:   { txt: '⚓ OpenSeaMap', tip: 'Carta náutica de OpenSeaMap: balizas, faros y boyas (se ven desde zoom ~9)', sig: 'windy' }
+};
+function sigCarta() { setCarta(CARTAS[MAP_TAB === 'windy' ? 'windy' : MAP_FONDO].sig); }
+function setCarta(c) {
+  if (c === 'windy') { showMapTab('windy'); return; }
+  MAP_FONDO = c; store('mapfondo', c);
+  if (MAP && MAP_FONDOS) { Object.values(MAP_FONDOS).forEach(f => MAP.removeLayer(f)); MAP_FONDOS[c].addTo(MAP); }
+  showMapTab('track');
+}
+// ─── Datos NMEA del velero del mapa, sobre el mapa en pantalla completa ───
+let NMEA_ON = store('nmea') !== '0';
+function toggleNMEA() { NMEA_ON = !NMEA_ON; store('nmea', NMEA_ON ? '1' : '0'); pintarNMEA(); if (MAP_BOAT) dibujarMapa(false); }
+
+// ─── Laylines al proximo WP (o al puerto): solo con el mapa maximizado y Datos prendido ───
+// WP a barlovento (ceñida) o a sotavento (popa): dos lineas que llegan al WP con el rumbo de cada amura.
+// El angulo es el TWA actual si va ciñendo o empopado; si no, 45° de ceñida y 150° de popa.
+const difAng = (a, b) => ((a - b + 540) % 360) - 180;
+const COLOR_AMURA = { Ba: '#f87171', Er: '#4ade80' };
+// twdOtro: otra direccion del viento (la de Windy en el WP); sin ella, el viento real del velero (NMEA)
+function laylinesDe(b, wp, twdOtro) {
+  const twd = twdOtro != null ? twdOtro : b.twd;
+  if (!wp || twd == null || b.lat == null) return null;
+  const hdg = b.hdg ?? b.cog, v = b.sog || 0;
+  const aWp = Math.abs(difAng(rumbo([b.lat, b.lon], [wp.lat, wp.lon]), twd));
+  const twaAct = hdg != null && b.twd != null ? Math.abs(difAng(b.twd, hdg)) : null;
+  const cen = twaAct >= 30 && twaAct <= 60 ? twaAct : 45, popa = twaAct >= 135 && twaAct <= 175 ? twaAct : 150;
+  const ang = aWp < cen ? cen : aWp > popa ? popa : null;
+  if (ang == null) return { wp, tipo: 'directo', lineas: [] };
+  const k = Math.cos(wp.lat * Math.PI / 180);
+  let dl = b.lon - wp.lon; if (dl > 180) dl -= 360; else if (dl < -180) dl += 360;
+  const P = [dl * k * 60, (b.lat - wp.lat) * 60];   // velero en MN, con el WP en el origen
+  const u = (h) => [Math.sin(h * Math.PI / 180), Math.cos(h * Math.PI / 180)];
+  const cr = (a, c) => a[0] * c[1] - a[1] * c[0];
+  const hb = hdg != null ? u(hdg) : null, L = Math.max(distNM(b, wp) * 1.4, 5);
+  // rumbo twd + ang = viento por babor (amura Ba); twd - ang = amura Er
+  const lineas = [['Ba', twd + ang], ['Er', twd - ang]].map(([amura, h]) => {
+    const d = u(h);
+    let t = null;   // con su rumbo y velocidad, cuando cruza la layline (antes del WP)
+    if (hb && v > 0.1 && Math.abs(cr(hb, d)) > 1e-6) {
+      const s = cr(d, P) / cr(hb, d), kk = (P[0] + s * hb[0]) * d[0] + (P[1] + s * hb[1]) * d[1];
+      if (s > 0 && kk <= 0) t = s / v;
+    }
+    return { amura, t, fin: { lat: wp.lat - L * d[1] / 60, lon: wp.lon - L * d[0] / (60 * k) } };
+  });
+  return { wp, tipo: ang === cen ? 'ceñida' : 'popa', lineas };
+}
+// Viento de Windy en el WP: Windy no deja leer su carta, asi que se pide el mismo modelo (ECMWF)
+// a Open-Meteo para la hora actual. Se renueva cada 30 min o al cambiar de WP.
+let VIENTO_WP = null;
+function vientoWindy(wp) {
+  const clave = wp.lat.toFixed(3) + ',' + wp.lon.toFixed(3);
+  if (VIENTO_WP && VIENTO_WP.clave === clave && (VIENTO_WP.pidiendo || Date.now() - VIENTO_WP.t < 30 * 60e3)) return VIENTO_WP.twd;
+  VIENTO_WP = { clave, pidiendo: true, twd: VIENTO_WP && VIENTO_WP.clave === clave ? VIENTO_WP.twd : null, t: Date.now() };
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=' + wp.lat.toFixed(3) + '&longitude=' + wp.lon.toFixed(3) + '&current=wind_direction_10m,wind_speed_10m&wind_speed_unit=kn&models=ecmwf_ifs025')
+    .then(r => r.json()).then(d => {
+      if (VIENTO_WP.clave !== clave) return;
+      VIENTO_WP = { clave, twd: d.current.wind_direction_10m, tws: d.current.wind_speed_10m, t: Date.now() };
+      if (MAP_BOAT) { pintarNMEA(); dibujarMapa(false); }
+    }).catch(e => { console.warn('Viento Windy en el WP:', e); if (VIENTO_WP.clave === clave) VIENTO_WP.pidiendo = false; });
+  return VIENTO_WP.twd;
+}
+// Los dos juegos: segun el viento del velero (NMEA) y segun Windy (ECMWF) en el WP
+function juegosLaylines() {
+  if (!NMEA_ON || !MAP_BOAT || !mapEnFS()) return [];
+  const b = LIVE[MAP_BOAT], wp = objetivoWP(MAP_BOAT);
+  if (!wp || b.lat == null) return [];
+  const twdW = vientoWindy(wp);
+  return [
+    { fuente: 'NMEA', ll: laylinesDe(b, wp), dash: '8 6', ancho: 2.5 },
+    { fuente: 'Windy', ll: twdW != null ? laylinesDe(b, wp, twdW) : null, dash: '2 5', ancho: 2 }
+  ];
+}
+// ─── Tierra en el rumbo actual (solo con la carta maximizada y Datos prendido) ───
+// Costas de Natural Earth 1:10 millones (world-atlas, ~800 KB): continentes e islas chicas, se bajan una sola vez.
+// Se sigue el rumbo actual en linea recta (loxodromica) hasta 48 h de navegacion a la velocidad actual.
+let TIERRA = null, TIERRA_PIDIENDO = false, TIERRA_CACHE = null;
+function cargarTierra(listo) {
+  if (TIERRA || TIERRA_PIDIENDO) return;
+  TIERRA_PIDIENDO = true;
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-10m.json').then(r => r.json()).then(topo => {
+    // TopoJSON: arcos con coordenadas cuantizadas y en deltas
+    const [sx, sy] = topo.transform.scale, [tx, ty] = topo.transform.translate;
+    const arcs = topo.arcs.map(a => { let x = 0, y = 0; return a.map(([dx, dy]) => [(x += dx) * sx + tx, (y += dy) * sy + ty]); });
+    const arco = (i) => i >= 0 ? arcs[i] : arcs[~i].slice().reverse();
+    const anillo = (ids) => ids.flatMap((i, k) => k ? arco(i).slice(1) : arco(i));
+    // Cada borde de costa se guarda en las franjas de latitud (de 0,1°) que atraviesa: para saber si un
+    // punto es tierra solo se miran los bordes de su franja
+    const bandas = Array.from({ length: TIERRA_NB }, () => []);
+    (topo.objects.land.geometries || [topo.objects.land]).forEach(g =>
+      (g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : []).forEach(p => {
+        const rings = p.map(anillo);
+        // islas que cruzan el meridiano 180 (Fiji…): se unen del otro lado para que no formen
+        // una franja alrededor del mundo (la Antartida, que llega al polo, queda como esta)
+        if (rings[0].every(q => q[1] > -85)) rings.forEach(r => { for (let i = 1; i < r.length; i++) { while (r[i][0] - r[i - 1][0] > 180) r[i] = [r[i][0] - 360, r[i][1]]; while (r[i][0] - r[i - 1][0] < -180) r[i] = [r[i][0] + 360, r[i][1]]; } });
+        rings.forEach(r => { for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+          const yi = r[i][1], yj = r[j][1];
+          if (yi === yj) continue;   // los bordes horizontales no cruzan
+          const b0 = banda(Math.min(yi, yj)), b1 = banda(Math.max(yi, yj));
+          for (let k = b0; k <= b1; k++) bandas[k].push(r[i][0], yi, r[j][0], yj);
+        } });
+      }));
+    TIERRA = bandas.map(e => Float64Array.from(e));
+    listo();
+  }).catch(e => console.warn('Costas (tierra en el rumbo):', e)).finally(() => { TIERRA_PIDIENDO = false; });
+}
+const TIERRA_NB = 1800, banda = (lat) => Math.max(0, Math.min(TIERRA_NB - 1, Math.floor((lat + 90) * 10)));
+// Par-impar: cuantos bordes cruza una linea desde el punto hacia el este (impar = tierra; los lagos quedan
+// como agua). Tambien se prueba corrido 360° por las islas unidas del otro lado del 180.
+function enTierra(lon, lat) {
+  const E = TIERRA[banda(lat)];
+  let c0 = 0, c1 = 0, c2 = 0;
+  for (let i = 0; i < E.length; i += 4) {
+    const yi = E[i + 1], yj = E[i + 3];
+    if ((yi > lat) === (yj > lat)) continue;
+    const x = (E[i + 2] - E[i]) * (lat - yi) / (yj - yi) + E[i];
+    if (lon < x) c0 ^= 1;
+    if (lon + 360 < x) c1 ^= 1;
+    if (lon - 360 < x) c2 ^= 1;
+  }
+  return !!(c0 | c1 | c2);
+}
+// Donde toca tierra el rumbo actual: { d (MN), t (h), lat, lon } o null
+function tierraEnRumbo(lat, lon, rumboG, v) {
+  if (!TIERRA || lat == null || rumboG == null || isNaN(rumboG) || !(v >= 0.5)) return null;
+  const clave = [lat.toFixed(3), lon.toFixed(3), Math.round(rumboG), v.toFixed(1)].join();
+  if (TIERRA_CACHE && TIERRA_CACHE.clave === clave) return TIERRA_CACHE.res;
+  const h = rumboG * Math.PI / 180, maxD = Math.min(Math.max(v * 48, 5), 1000), paso = Math.max(0.25, maxD / 500);
+  const punto = (d) => {
+    const la = lat + d * Math.cos(h) / 60;
+    const lo = lon + d * Math.sin(h) / (60 * Math.cos((lat + la) / 2 * Math.PI / 180));
+    return [la, ((lo + 540) % 360) - 180];
+  };
+  // si arranca "en tierra" (en puerto o por lo grueso de la costa), cuenta desde que sale al agua
+  let res = null, agua = enTierra(lon, lat) ? null : 0;
+  for (let d = paso; d <= maxD; d += paso) {
+    const [la, lo] = punto(d);
+    if (Math.abs(la) > 85) break;
+    if (!enTierra(lo, la)) { agua = d; continue; }
+    if (agua == null) continue;
+    let a = agua, z = d;   // afinar entre el ultimo punto en el agua y el primero en tierra
+    for (let i = 0; i < 12; i++) { const m = (a + z) / 2, [ml, mo] = punto(m); if (enTierra(mo, ml)) z = m; else a = m; }
+    const [pl, po] = punto(z);
+    res = { d: z, t: z / v, lat: pl, lon: po };
+    break;
+  }
+  TIERRA_CACHE = { clave, res };
+  return res;
+}
+const COLOR_TIERRA = '#fb923c';
+function tierraSel() {
+  if (!NMEA_ON || !MAP_BOAT || !mapEnFS()) return null;
+  const b = LIVE[MAP_BOAT];
+  if (b.lat == null) return null;
+  if (!TIERRA) { cargarTierra(() => { if (MAP_BOAT) { pintarNMEA(); dibujarMapa(false); } }); return null; }
+  const r = tierraEnRumbo(b.lat, b.lon, b.cog ?? b.hdg, b.sog);   // rumbo actual: sobre el fondo si lo hay
+  return r && { b, r };
+}function celdasLaylines() {
+  const js = juegosLaylines();
+  if (!js.length) return '';
+  const celdas = js.map(({ fuente, ll }) =>
+    !ll || ll.tipo === 'directo' ? ''   // sin laylines (va directo al WP): no ocupa lugar
+    : ll.lineas.map(l => '<div><span style="color:' + COLOR_AMURA[l.amura] + '">' + l.amura + ' · ' + fuente + '</span><b>' + (l.t != null ? fmtTime(l.t) : '—') + '</b></div>').join('')).join('') +
+    // a la derecha: cuanto falta para tocar tierra con el rumbo actual (solo si pasa)
+    ((ts) => ts ? '<div><span style="color:' + COLOR_TIERRA + '">Tierra</span><b>' + fmtTime(ts.r.t) + '</b></div>' : '')(tierraSel());
+  return celdas ? '<div class="lay">' + celdas + '</div>' : '';
+}
+// d: spd, vmg, twa y awa (con signo: + estribor, - babor), tws, aws, dWp, tWp, dDest, tDest
+function hudNMEA(nombre, d, fmtT) {
+  const ok = (v) => v != null && !isNaN(v);
+  const kn = (v) => ok(v) ? v.toFixed(1) + ' kn' : '—';
+  const ang = (v) => ok(v) ? Math.abs(Math.round(v)) + '°' + (Math.round(v) % 180 ? (v > 0 ? ' Er' : ' Ba') : '') : '—';
+  const mn = (v) => ok(v) ? (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString('es-AR')) + ' MN' : '—';
+  const c = (l, v) => '<div><span>' + l + '</span><b>' + v + '</b></div>';
+  return '<div class="t">' + nombre + '</div>' +
+    c('Velocidad', kn(d.spd)) + c('VMG', kn(d.vmg)) + c('TWA', ang(d.twa)) + c('AWA', ang(d.awa)) + c('TWS', kn(d.tws)) + c('AWS', kn(d.aws)) +
+    c('Dist. próx. WP', mn(d.dWp)) + c('Tiempo próx. WP', ok(d.tWp) ? fmtT(d.tWp) : '—') + c('Dist. destino', mn(d.dDest)) + c('Tiempo destino', ok(d.tDest) ? fmtT(d.tDest) : '—');
+}
+function pintarNMEA() {
+  const hud = $('nmea-hud');
+  hud.classList.toggle('on', NMEA_ON);
+  $('map-nmea').className = 'nmea-btn' + (NMEA_ON ? ' act' : '');
+  if (!NMEA_ON || !MAP_BOAT) return;
+  const boat = BOATS.find(x => x.key === MAP_BOAT), b = LIVE[MAP_BOAT];
+  if (b.lat == null) { hud.innerHTML = '<div class="t">' + boat.name + ': sin posición todavía</div>'; return; }
+  const v = b.sog || 0, hdg = b.hdg ?? b.cog;
+  const nw = boat.active && ROUTE ? nextWaypoint(b, ROUTE.wps) : null;
+  const port = PORTS.find(p => p.n > 1 && !p.done);
+  const dWp = nw ? distNM(b, nw.wp) : null, dDest = port ? distNM(b, port) : null;
+  const horas = (d) => d != null && v > 0.1 ? d / v : null;
+  const twa = b.twd != null && hdg != null ? ((b.twd - hdg + 540) % 360) - 180 : null;
+  hud.innerHTML = hudNMEA(boat.name, {
+    spd: v, vmg: twa != null ? Math.abs(v * Math.cos(twa * Math.PI / 180)) : null,   // VMG al viento (ceñida o popa)
+    twa, awa: b.awa, tws: b.tws, aws: b.aws,
+    dWp, tWp: horas(dWp), dDest, tDest: horas(dDest)
+  }, fmtTime) + celdasLaylines();   // a la derecha, el tiempo a cada layline
+}
+// Pantalla completa solo de la ventana del mapa
+function mapEnFS() { const d = document; return (d.fullscreenElement || d.webkitFullscreenElement) === $('map-win'); }
+function toggleMapFS() {
+  const d = document, el = $('map-win');
+  if (mapEnFS()) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  else (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+}
+function mapFSLabel() {
+  const on = mapEnFS();
+  $('map-fs').innerHTML = on ? '&#x2715; Salir' : '&#x26F6;';
+  $('map-fs').title = on ? 'Salir de pantalla completa' : 'Mapa en pantalla completa';
+  // con otro tamaño, se vuelve a encuadrar (salvo en libre)
+  setTimeout(() => { if (MAP) MAP.invalidateSize(); if (MAP_BOAT) { pintarNMEA(); dibujarMapa(false); if (MAP_MODO !== 'libre') encuadrar(true); } ovBarco(); }, 150);
+}
+document.addEventListener('fullscreenchange', mapFSLabel);
+document.addEventListener('webkitfullscreenchange', mapFSLabel);
+if (!($('map-win').requestFullscreen || $('map-win').webkitRequestFullscreen)) $('map-fs').style.display = 'none';
+function closeMap() {
+  if (mapEnFS()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  $('map-bg').classList.remove('show'); MAP_BOAT = null; $('map-boat-ov').style.display = 'none'; }
+// Con cada lectura de Sailaway: si el mapa esta abierto, se actualiza (y cada 5 min, el track)
+async function refrescarMapa() {
+  if (!MAP_BOAT || !$('map-bg').classList.contains('show')) return;
+  if (Date.now() - TRACK_T > 5 * 60e3) await leerTrack(MAP_BOAT);
+  if (MAP_BOAT) {
+    if (MAP_TAB === 'windy') {
+      const b = LIVE[MAP_BOAT], o = objetivoWP(MAP_BOAT);
+      $('map-info').textContent = b.lat == null ? 'Sin posicion todavia' + (BOATS.find(x => x.key === MAP_BOAT)?.nr == null ? ': falta el MMSI del velero en la bitacora.' : '.') :
+        (b.pos || '') + ' · ' + (b.sog ?? 0).toFixed(1) + ' kts · viento ' + (b.twd ?? '—') + '° / ' + (b.tws != null ? b.tws.toFixed(1) : '—') + ' kts' +
+        (o ? ' · ' + o.name + ' a ' + distNM(b, o).toFixed(1) + ' MN' : '') + ' · ' + fmtUpd(b.upd);
+      pintarNMEA();
+      ovBarco();
+      return;
+    }
+    dibujarMapa(false);
+  }
+}
+window.addEventListener('resize', () => { if (MAP_TAB === 'windy') ovBarco(); });
+
+
+// ─── Pantalla completa ───
+function toggleFS() {
+  const d = document, el = d.documentElement;
+  if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  else (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+}
+function fsLabel() {
+  const on = (document.fullscreenElement || document.webkitFullscreenElement) === document.documentElement;
+  $('fs-btn').innerHTML = on ? '&#x2715; Salir de pantalla completa' : '&#x26F6; Pantalla completa';
+  setTimeout(fitSpacer, 150);
+}
+document.addEventListener('fullscreenchange', fsLabel);
+document.addEventListener('webkitfullscreenchange', fsLabel);
+if (!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen)) $('fs-btn').style.display = 'none';
+
+// Arranque
+document.querySelectorAll('.tb-head button').forEach(b => b.onclick = () => tabClick(b.dataset.t));
+$('et-label').onclick = () => { if ($('etapas').classList.contains('compacto')) toggleCompacto(false); };
+toggleCompacto(true);
+// ediciones que trae la app (window.EDICIONES) o que quedaron en este navegador sin servidor
+(window.EDICIONES || []).forEach(aplicarEdicion);
+if (!API) edicionesLocales().forEach(aplicarEdicion);
+pintarPlan();
+subirEdicionesLocales();
+setSec(SECS[0], false);
+goEtapa(ACTIVE_IDX, false);
+renderAll();
+setLiveBadge('carga');
+refreshLive();
+setInterval(refreshLive, POLL_MS);
+cargarEntradas();
+estadoCompartir();
+actualizarPronosticos();                              // pronostico + analisis de la etapa activa y las dos siguientes
+setInterval(() => actualizarPronosticos(true), 30 * 60e3);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { refreshLive(); actualizarPronosticos(); } });
+</script>
+</body>
+</html>
