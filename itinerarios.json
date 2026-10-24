@@ -1,0 +1,2424 @@
+{
+ "generado": "2026-10-24T08:55",
+ "bitacoras": [
+  {
+   "clave": "vuelta_al_mundo",
+   "lista": "Vuelta al mundo en velero",
+   "tareas": [
+    {
+     "id": "zarpe-1-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Mar del Plata → Ilha Grande",
+     "notas": "Zarpada real: 20/10 21:16\nLlegada estimada: 27/10 20:00\n1.200 MN",
+     "vence": "2026-10-20",
+     "hecha": true
+    },
+    {
+     "id": "llegada-2-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Ilha Grande",
+     "notas": "Llegada estimada: 27/10 20:00",
+     "vence": "2026-10-27",
+     "hecha": false
+    },
+    {
+     "id": "estadia-2-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Ilha Grande · escala",
+     "notas": "Del 27/10 20:00 al 28/10 09:00",
+     "vence": "2026-10-27",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-2-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Ilha Grande → Salvador de Bahía",
+     "notas": "Zarpada planificada: 28/10 09:00\nLlegada estimada: 02/11 18:00\n700 MN",
+     "vence": "2026-10-28",
+     "hecha": false
+    },
+    {
+     "id": "llegada-3-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Salvador de Bahía",
+     "notas": "Llegada estimada: 02/11 18:00",
+     "vence": "2026-11-02",
+     "hecha": false
+    },
+    {
+     "id": "estadia-3-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Salvador de Bahía · 9 días de descanso",
+     "notas": "Del 02/11 18:00 al 12/11 09:00",
+     "vence": "2026-11-02",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-3-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Salvador de Bahía → Recife",
+     "notas": "Zarpada planificada: 12/11 09:00\nLlegada estimada: 15/11 18:00\n400 MN",
+     "vence": "2026-11-12",
+     "hecha": false
+    },
+    {
+     "id": "llegada-4-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Recife",
+     "notas": "Llegada estimada: 15/11 18:00",
+     "vence": "2026-11-15",
+     "hecha": false
+    },
+    {
+     "id": "estadia-4-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Recife · 9 días de descanso",
+     "notas": "Del 15/11 18:00 al 25/11 09:00",
+     "vence": "2026-11-15",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-4-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Recife → Bonaire",
+     "notas": "Zarpada planificada: 25/11 09:00\nLlegada estimada: 07/12 18:00\n2.600 MN",
+     "vence": "2026-11-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-5-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Bonaire",
+     "notas": "Llegada estimada: 07/12 18:00",
+     "vence": "2026-12-07",
+     "hecha": false
+    },
+    {
+     "id": "estadia-5-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Bonaire · 12 días de descanso",
+     "notas": "Del 07/12 18:00 al 20/12 09:00",
+     "vence": "2026-12-07",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-5-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Bonaire → San Blas",
+     "notas": "Zarpada planificada: 20/12 09:00\nLlegada estimada: 23/12 18:00\n550 MN",
+     "vence": "2026-12-20",
+     "hecha": false
+    },
+    {
+     "id": "llegada-6-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a San Blas",
+     "notas": "Llegada estimada: 23/12 18:00",
+     "vence": "2026-12-23",
+     "hecha": false
+    },
+    {
+     "id": "estadia-6-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en San Blas · 12 días de descanso",
+     "notas": "Del 23/12 18:00 al 05/01 09:00",
+     "vence": "2026-12-23",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-6-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de San Blas → Canal de Panamá",
+     "notas": "Zarpada planificada: 05/01 09:00\nLlegada estimada: 06/01 18:00\n60 MN",
+     "vence": "2027-01-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-7-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Canal de Panamá",
+     "notas": "Llegada estimada: 06/01 18:00",
+     "vence": "2027-01-06",
+     "hecha": false
+    },
+    {
+     "id": "estadia-7-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Canal de Panamá · 8 días de descanso",
+     "notas": "Del 06/01 18:00 al 15/01 09:00",
+     "vence": "2027-01-06",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-7-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Canal de Panamá → Islas Galápagos",
+     "notas": "Zarpada planificada: 15/01 09:00\nLlegada estimada: 20/01 18:00\n950 MN",
+     "vence": "2027-01-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-8-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Islas Galápagos",
+     "notas": "Llegada estimada: 20/01 18:00",
+     "vence": "2027-01-20",
+     "hecha": false
+    },
+    {
+     "id": "estadia-8-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Islas Galápagos · 12 días de descanso",
+     "notas": "Del 20/01 18:00 al 02/02 09:00",
+     "vence": "2027-01-20",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-8-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Islas Galápagos → Hiva Oa",
+     "notas": "Zarpada planificada: 02/02 09:00\nLlegada estimada: 18/02 18:00\n3.000 MN",
+     "vence": "2027-02-02",
+     "hecha": false
+    },
+    {
+     "id": "llegada-9-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Hiva Oa",
+     "notas": "Llegada estimada: 18/02 18:00",
+     "vence": "2027-02-18",
+     "hecha": false
+    },
+    {
+     "id": "estadia-9-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Hiva Oa · 14 días de descanso",
+     "notas": "Del 18/02 18:00 al 05/03 09:00",
+     "vence": "2027-02-18",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-9-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Hiva Oa → Tahití",
+     "notas": "Zarpada planificada: 05/03 09:00\nLlegada estimada: 09/03 18:00\n750 MN",
+     "vence": "2027-03-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-10-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Tahití",
+     "notas": "Llegada estimada: 09/03 18:00",
+     "vence": "2027-03-09",
+     "hecha": false
+    },
+    {
+     "id": "estadia-10-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Tahití · 20 días de descanso",
+     "notas": "Del 09/03 18:00 al 30/03 09:00",
+     "vence": "2027-03-09",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-10-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Tahití → Rarotonga",
+     "notas": "Zarpada planificada: 30/03 09:00\nLlegada estimada: 03/04 18:00\n620 MN",
+     "vence": "2027-03-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-11-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Rarotonga",
+     "notas": "Llegada estimada: 03/04 18:00",
+     "vence": "2027-04-03",
+     "hecha": false
+    },
+    {
+     "id": "estadia-11-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Rarotonga · 8 días de descanso",
+     "notas": "Del 03/04 18:00 al 12/04 09:00",
+     "vence": "2027-04-03",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-11-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Rarotonga → Suva",
+     "notas": "Zarpada planificada: 12/04 09:00\nLlegada estimada: 17/04 18:00\n1.100 MN",
+     "vence": "2027-04-12",
+     "hecha": false
+    },
+    {
+     "id": "llegada-12-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Suva",
+     "notas": "Llegada estimada: 17/04 18:00",
+     "vence": "2027-04-17",
+     "hecha": false
+    },
+    {
+     "id": "estadia-12-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Suva · 17 días de descanso",
+     "notas": "Del 17/04 18:00 al 05/05 09:00",
+     "vence": "2027-04-17",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-12-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Suva → Brisbane",
+     "notas": "Zarpada planificada: 05/05 09:00\nLlegada estimada: 13/05 18:00\n1.550 MN",
+     "vence": "2027-05-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-13-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Brisbane",
+     "notas": "Llegada estimada: 13/05 18:00",
+     "vence": "2027-05-13",
+     "hecha": false
+    },
+    {
+     "id": "llegada-14-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Halifax",
+     "notas": "Llegada estimada: 15/05 18:00",
+     "vence": "2027-05-15",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-14-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Halifax → Gaspé",
+     "notas": "Zarpada planificada: 15/05 09:00\nLlegada estimada: 17/05 18:00\n190 MN",
+     "vence": "2027-05-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-15-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Gaspé",
+     "notas": "Llegada estimada: 17/05 18:00",
+     "vence": "2027-05-17",
+     "hecha": false
+    },
+    {
+     "id": "estadia-15-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Gaspé · 6 días de descanso",
+     "notas": "Del 17/05 18:00 al 24/05 09:00",
+     "vence": "2027-05-17",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-15-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Gaspé → San Juan",
+     "notas": "Zarpada planificada: 24/05 09:00\nLlegada estimada: 27/05 18:00\n560 MN",
+     "vence": "2027-05-24",
+     "hecha": false
+    },
+    {
+     "id": "llegada-16-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a San Juan",
+     "notas": "Llegada estimada: 27/05 18:00",
+     "vence": "2027-05-27",
+     "hecha": false
+    },
+    {
+     "id": "estadia-16-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en San Juan · 6 días de descanso",
+     "notas": "Del 27/05 18:00 al 03/06 09:00",
+     "vence": "2027-05-27",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-16-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de San Juan → Qaqortoq",
+     "notas": "Zarpada planificada: 03/06 09:00\nLlegada estimada: 06/06 18:00\n250 MN",
+     "vence": "2027-06-03",
+     "hecha": false
+    },
+    {
+     "id": "llegada-17-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Qaqortoq",
+     "notas": "Llegada estimada: 06/06 18:00",
+     "vence": "2027-06-06",
+     "hecha": false
+    },
+    {
+     "id": "estadia-17-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Qaqortoq · 6 días de descanso",
+     "notas": "Del 06/06 18:00 al 13/06 09:00",
+     "vence": "2027-06-06",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-17-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Qaqortoq → Nuuk",
+     "notas": "Zarpada planificada: 13/06 09:00\nLlegada estimada: 14/06 18:00\n550 MN",
+     "vence": "2027-06-13",
+     "hecha": false
+    },
+    {
+     "id": "llegada-18-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Nuuk",
+     "notas": "Llegada estimada: 14/06 18:00",
+     "vence": "2027-06-14",
+     "hecha": false
+    },
+    {
+     "id": "estadia-18-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Nuuk · 6 días de descanso",
+     "notas": "Del 14/06 18:00 al 21/06 09:00",
+     "vence": "2027-06-14",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-18-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Nuuk → Tasiilaq",
+     "notas": "Zarpada planificada: 21/06 09:00\nLlegada estimada: 24/06 18:00\n390 MN",
+     "vence": "2027-06-21",
+     "hecha": false
+    },
+    {
+     "id": "llegada-19-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Tasiilaq",
+     "notas": "Llegada estimada: 24/06 18:00",
+     "vence": "2027-06-24",
+     "hecha": false
+    },
+    {
+     "id": "estadia-19-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Tasiilaq · 6 días de descanso",
+     "notas": "Del 24/06 18:00 al 01/07 09:00",
+     "vence": "2027-06-24",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-19-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Tasiilaq → Reikiavik",
+     "notas": "Zarpada planificada: 01/07 09:00\nLlegada estimada: 03/07 18:00\n290 MN",
+     "vence": "2027-07-01",
+     "hecha": false
+    },
+    {
+     "id": "llegada-20-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Reikiavik",
+     "notas": "Llegada estimada: 03/07 18:00",
+     "vence": "2027-07-03",
+     "hecha": false
+    },
+    {
+     "id": "estadia-20-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Reikiavik · 6 días de descanso",
+     "notas": "Del 03/07 18:00 al 10/07 09:00",
+     "vence": "2027-07-03",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-20-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Reikiavik → Akureyri",
+     "notas": "Zarpada planificada: 10/07 09:00\nLlegada estimada: 12/07 18:00\n280 MN",
+     "vence": "2027-07-10",
+     "hecha": false
+    },
+    {
+     "id": "llegada-21-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Akureyri",
+     "notas": "Llegada estimada: 12/07 18:00",
+     "vence": "2027-07-12",
+     "hecha": false
+    },
+    {
+     "id": "estadia-21-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Akureyri · 6 días de descanso",
+     "notas": "Del 12/07 18:00 al 19/07 09:00",
+     "vence": "2027-07-12",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-21-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Akureyri → Islas Feroe",
+     "notas": "Zarpada planificada: 19/07 09:00\nLlegada estimada: 20/07 18:00\n350 MN",
+     "vence": "2027-07-19",
+     "hecha": false
+    },
+    {
+     "id": "llegada-22-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Islas Feroe",
+     "notas": "Llegada estimada: 20/07 18:00",
+     "vence": "2027-07-20",
+     "hecha": false
+    },
+    {
+     "id": "estadia-22-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Islas Feroe · 6 días de descanso",
+     "notas": "Del 20/07 18:00 al 27/07 09:00",
+     "vence": "2027-07-20",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-22-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Islas Feroe → Bergen",
+     "notas": "Zarpada planificada: 27/07 09:00\nLlegada estimada: 27/07 18:00\n540 MN",
+     "vence": "2027-07-27",
+     "hecha": false
+    },
+    {
+     "id": "llegada-23-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Bergen",
+     "notas": "Llegada estimada: 27/07 18:00",
+     "vence": "2027-07-27",
+     "hecha": false
+    },
+    {
+     "id": "estadia-23-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Bergen · 8 días de descanso",
+     "notas": "Del 27/07 18:00 al 05/08 09:00",
+     "vence": "2027-07-27",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-23-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Bergen → Islas Lofoten",
+     "notas": "Zarpada planificada: 05/08 09:00\nLlegada estimada: 06/08 18:00\n130 MN",
+     "vence": "2027-08-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-24-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Islas Lofoten",
+     "notas": "Llegada estimada: 06/08 18:00",
+     "vence": "2027-08-06",
+     "hecha": false
+    },
+    {
+     "id": "estadia-24-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Islas Lofoten · 8 días de descanso",
+     "notas": "Del 06/08 18:00 al 15/08 09:00",
+     "vence": "2027-08-06",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-24-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Islas Lofoten → Tromsø",
+     "notas": "Zarpada planificada: 15/08 09:00\nLlegada estimada: 15/08 18:00\n510 MN",
+     "vence": "2027-08-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-25-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Tromsø",
+     "notas": "Llegada estimada: 15/08 18:00",
+     "vence": "2027-08-15",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-25-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Tromsø → Svalbard",
+     "notas": "Zarpada planificada: 15/08 09:00\nLlegada estimada: 18/08 18:00\n490 MN",
+     "vence": "2027-08-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-26-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Svalbard",
+     "notas": "Llegada estimada: 18/08 18:00",
+     "vence": "2027-08-18",
+     "hecha": false
+    },
+    {
+     "id": "estadia-26-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Svalbard · 6 días de descanso",
+     "notas": "Del 18/08 18:00 al 25/08 09:00",
+     "vence": "2027-08-18",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-26-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Svalbard → Cabo Norte",
+     "notas": "Zarpada planificada: 25/08 09:00\nLlegada estimada: 28/08 18:00\n580 MN",
+     "vence": "2027-08-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-27-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Cabo Norte",
+     "notas": "Llegada estimada: 28/08 18:00",
+     "vence": "2027-08-28",
+     "hecha": false
+    },
+    {
+     "id": "estadia-27-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Cabo Norte · 6 días de descanso",
+     "notas": "Del 28/08 18:00 al 04/09 09:00",
+     "vence": "2027-08-28",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-27-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Cabo Norte → Trondheim",
+     "notas": "Zarpada planificada: 04/09 09:00\nLlegada estimada: 08/09 18:00\n420 MN",
+     "vence": "2027-09-04",
+     "hecha": false
+    },
+    {
+     "id": "llegada-28-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Trondheim",
+     "notas": "Llegada estimada: 08/09 18:00",
+     "vence": "2027-09-08",
+     "hecha": false
+    },
+    {
+     "id": "estadia-28-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Trondheim · 6 días de descanso",
+     "notas": "Del 08/09 18:00 al 15/09 09:00",
+     "vence": "2027-09-08",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-28-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Trondheim → Oslo",
+     "notas": "Zarpada planificada: 15/09 09:00\nLlegada estimada: 17/09 18:00\n50 MN",
+     "vence": "2027-09-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-29-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Oslo",
+     "notas": "Llegada estimada: 17/09 18:00",
+     "vence": "2027-09-17",
+     "hecha": false
+    },
+    {
+     "id": "estadia-29-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Oslo · 6 días de descanso",
+     "notas": "Del 17/09 18:00 al 24/09 09:00",
+     "vence": "2027-09-17",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-29-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Oslo → Estocolmo",
+     "notas": "Zarpada planificada: 24/09 09:00\nLlegada estimada: 27/09 18:00\n220 MN",
+     "vence": "2027-09-24",
+     "hecha": false
+    },
+    {
+     "id": "llegada-30-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Estocolmo",
+     "notas": "Llegada estimada: 27/09 18:00",
+     "vence": "2027-09-27",
+     "hecha": false
+    },
+    {
+     "id": "estadia-30-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Estocolmo · 6 días de descanso",
+     "notas": "Del 27/09 18:00 al 04/10 09:00",
+     "vence": "2027-09-27",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-30-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Estocolmo → Helsinki",
+     "notas": "Zarpada planificada: 04/10 09:00\nLlegada estimada: 05/10 18:00\n160 MN",
+     "vence": "2027-10-04",
+     "hecha": false
+    },
+    {
+     "id": "llegada-31-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Helsinki",
+     "notas": "Llegada estimada: 05/10 18:00",
+     "vence": "2027-10-05",
+     "hecha": false
+    },
+    {
+     "id": "estadia-31-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Helsinki · 6 días de descanso",
+     "notas": "Del 05/10 18:00 al 12/10 09:00",
+     "vence": "2027-10-05",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-31-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Helsinki → San Petersburgo",
+     "notas": "Zarpada planificada: 12/10 09:00\nLlegada estimada: 13/10 18:00\n900 MN",
+     "vence": "2027-10-12",
+     "hecha": false
+    },
+    {
+     "id": "llegada-32-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a San Petersburgo",
+     "notas": "Llegada estimada: 13/10 18:00",
+     "vence": "2027-10-13",
+     "hecha": false
+    },
+    {
+     "id": "llegada-33-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Cairns",
+     "notas": "Llegada estimada: 20/10 18:00",
+     "vence": "2027-10-20",
+     "hecha": false
+    },
+    {
+     "id": "estadia-33-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Cairns · 35 días de descanso",
+     "notas": "Del 20/10 18:00 al 25/11 09:00",
+     "vence": "2027-10-20",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-33-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Cairns → Bali",
+     "notas": "Zarpada planificada: 25/11 09:00\nLlegada estimada: 09/11 18:00\n1.300 MN",
+     "vence": "2027-11-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-34-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Bali",
+     "notas": "Llegada estimada: 09/11 18:00",
+     "vence": "2027-11-09",
+     "hecha": false
+    },
+    {
+     "id": "estadia-34-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Bali · 15 días de descanso",
+     "notas": "Del 09/11 18:00 al 25/11 09:00",
+     "vence": "2027-11-09",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-34-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Bali → Langkawi",
+     "notas": "Zarpada planificada: 25/11 09:00\nLlegada estimada: 01/12 18:00\n1.300 MN",
+     "vence": "2027-11-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-35-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Langkawi",
+     "notas": "Llegada estimada: 01/12 18:00",
+     "vence": "2027-12-01",
+     "hecha": false
+    },
+    {
+     "id": "estadia-35-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Langkawi · 13 días de descanso",
+     "notas": "Del 01/12 18:00 al 15/12 09:00",
+     "vence": "2027-12-01",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-35-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Langkawi → Phuket",
+     "notas": "Zarpada planificada: 15/12 09:00\nLlegada estimada: 16/12 18:00\n130 MN",
+     "vence": "2027-12-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-36-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Phuket",
+     "notas": "Llegada estimada: 16/12 18:00",
+     "vence": "2027-12-16",
+     "hecha": false
+    },
+    {
+     "id": "estadia-36-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Phuket · 19 días de descanso",
+     "notas": "Del 16/12 18:00 al 05/01 09:00",
+     "vence": "2027-12-16",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-36-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Phuket → Malé",
+     "notas": "Zarpada planificada: 05/01 09:00\nLlegada estimada: 14/01 18:00\n1.650 MN",
+     "vence": "2028-01-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-37-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Malé",
+     "notas": "Llegada estimada: 14/01 18:00",
+     "vence": "2028-01-14",
+     "hecha": false
+    },
+    {
+     "id": "estadia-37-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Malé · 13 días de descanso",
+     "notas": "Del 14/01 18:00 al 28/01 09:00",
+     "vence": "2028-01-14",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-37-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Malé → Salalah",
+     "notas": "Zarpada planificada: 28/01 09:00\nLlegada estimada: 04/02 18:00\n1.400 MN",
+     "vence": "2028-01-28",
+     "hecha": false
+    },
+    {
+     "id": "llegada-38-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Salalah",
+     "notas": "Llegada estimada: 04/02 18:00",
+     "vence": "2028-02-04",
+     "hecha": false
+    },
+    {
+     "id": "estadia-38-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Salalah · 7 días de descanso",
+     "notas": "Del 04/02 18:00 al 12/02 09:00",
+     "vence": "2028-02-04",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-38-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Salalah → Yeda",
+     "notas": "Zarpada planificada: 12/02 09:00\nLlegada estimada: 21/02 18:00\n1.500 MN",
+     "vence": "2028-02-12",
+     "hecha": false
+    },
+    {
+     "id": "llegada-39-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Yeda",
+     "notas": "Llegada estimada: 21/02 18:00",
+     "vence": "2028-02-21",
+     "hecha": false
+    },
+    {
+     "id": "estadia-39-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Yeda · 12 días de descanso",
+     "notas": "Del 21/02 18:00 al 05/03 09:00",
+     "vence": "2028-02-21",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-39-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Yeda → Puerto Suez",
+     "notas": "Zarpada planificada: 05/03 09:00\nLlegada estimada: 14/03 18:00\n650 MN",
+     "vence": "2028-03-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-40-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Puerto Suez",
+     "notas": "Llegada estimada: 14/03 18:00",
+     "vence": "2028-03-14",
+     "hecha": false
+    },
+    {
+     "id": "estadia-40-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Puerto Suez · 10 días de descanso",
+     "notas": "Del 14/03 18:00 al 25/03 09:00",
+     "vence": "2028-03-14",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-40-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Puerto Suez → Rodas",
+     "notas": "Zarpada planificada: 25/03 09:00\nLlegada estimada: 07/04 18:00\n500 MN",
+     "vence": "2028-03-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-41-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Rodas",
+     "notas": "Llegada estimada: 07/04 18:00",
+     "vence": "2028-04-07",
+     "hecha": false
+    },
+    {
+     "id": "estadia-41-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Rodas · 8 días de descanso",
+     "notas": "Del 07/04 18:00 al 16/04 09:00",
+     "vence": "2028-04-07",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-41-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Rodas → Santorini",
+     "notas": "Zarpada planificada: 16/04 09:00\nLlegada estimada: 09/04 18:00\n150 MN",
+     "vence": "2028-04-16",
+     "hecha": false
+    },
+    {
+     "id": "llegada-42-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Santorini",
+     "notas": "Llegada estimada: 09/04 18:00",
+     "vence": "2028-04-09",
+     "hecha": false
+    },
+    {
+     "id": "estadia-42-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Santorini · 6 días de descanso",
+     "notas": "Del 09/04 18:00 al 16/04 09:00",
+     "vence": "2028-04-09",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-42-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Santorini → Atenas",
+     "notas": "Zarpada planificada: 16/04 09:00\nLlegada estimada: 19/04 18:00\n120 MN",
+     "vence": "2028-04-16",
+     "hecha": false
+    },
+    {
+     "id": "llegada-43-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Atenas",
+     "notas": "Llegada estimada: 19/04 18:00",
+     "vence": "2028-04-19",
+     "hecha": false
+    },
+    {
+     "id": "estadia-43-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Atenas · 10 días de descanso",
+     "notas": "Del 19/04 18:00 al 30/04 09:00",
+     "vence": "2028-04-19",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-43-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Atenas → Corfú",
+     "notas": "Zarpada planificada: 30/04 09:00\nLlegada estimada: 02/05 18:00\n320 MN",
+     "vence": "2028-04-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-44-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Corfú",
+     "notas": "Llegada estimada: 02/05 18:00",
+     "vence": "2028-05-02",
+     "hecha": false
+    },
+    {
+     "id": "estadia-44-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Corfú · 9 días de descanso",
+     "notas": "Del 02/05 18:00 al 12/05 09:00",
+     "vence": "2028-05-02",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-44-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Corfú → Kotor",
+     "notas": "Zarpada planificada: 12/05 09:00\nLlegada estimada: 14/05 18:00\n200 MN",
+     "vence": "2028-05-12",
+     "hecha": false
+    },
+    {
+     "id": "llegada-45-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Kotor",
+     "notas": "Llegada estimada: 14/05 18:00",
+     "vence": "2028-05-14",
+     "hecha": false
+    },
+    {
+     "id": "estadia-45-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Kotor · 10 días de descanso",
+     "notas": "Del 14/05 18:00 al 25/05 09:00",
+     "vence": "2028-05-14",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-45-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Kotor → Dubrovnik",
+     "notas": "Zarpada planificada: 25/05 09:00\nLlegada estimada: 26/05 18:00\n40 MN",
+     "vence": "2028-05-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-46-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Dubrovnik",
+     "notas": "Llegada estimada: 26/05 18:00",
+     "vence": "2028-05-26",
+     "hecha": false
+    },
+    {
+     "id": "estadia-46-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Dubrovnik · 9 días de descanso",
+     "notas": "Del 26/05 18:00 al 05/06 09:00",
+     "vence": "2028-05-26",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-46-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Dubrovnik → Hvar / Vis",
+     "notas": "Zarpada planificada: 05/06 09:00\nLlegada estimada: 06/06 18:00\n110 MN",
+     "vence": "2028-06-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-47-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Hvar / Vis",
+     "notas": "Llegada estimada: 06/06 18:00",
+     "vence": "2028-06-06",
+     "hecha": false
+    },
+    {
+     "id": "estadia-47-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Hvar / Vis · 13 días de descanso",
+     "notas": "Del 06/06 18:00 al 20/06 09:00",
+     "vence": "2028-06-06",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-47-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Hvar / Vis → Split / Kornati",
+     "notas": "Zarpada planificada: 20/06 09:00\nLlegada estimada: 21/06 18:00\n80 MN",
+     "vence": "2028-06-20",
+     "hecha": false
+    },
+    {
+     "id": "llegada-48-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Split / Kornati",
+     "notas": "Llegada estimada: 21/06 18:00",
+     "vence": "2028-06-21",
+     "hecha": false
+    },
+    {
+     "id": "estadia-48-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Split / Kornati · 13 días de descanso",
+     "notas": "Del 21/06 18:00 al 05/07 09:00",
+     "vence": "2028-06-21",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-48-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Split / Kornati → Venecia",
+     "notas": "Zarpada planificada: 05/07 09:00\nLlegada estimada: 08/07 18:00\n180 MN",
+     "vence": "2028-07-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-49-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Venecia",
+     "notas": "Llegada estimada: 08/07 18:00",
+     "vence": "2028-07-08",
+     "hecha": false
+    },
+    {
+     "id": "estadia-49-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Venecia · 13 días de descanso",
+     "notas": "Del 08/07 18:00 al 22/07 09:00",
+     "vence": "2028-07-08",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-49-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Venecia → Taormina",
+     "notas": "Zarpada planificada: 22/07 09:00\nLlegada estimada: 27/07 18:00\n620 MN",
+     "vence": "2028-07-22",
+     "hecha": false
+    },
+    {
+     "id": "llegada-50-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Taormina",
+     "notas": "Llegada estimada: 27/07 18:00",
+     "vence": "2028-07-27",
+     "hecha": false
+    },
+    {
+     "id": "estadia-50-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Taormina · 11 días de descanso",
+     "notas": "Del 27/07 18:00 al 08/08 09:00",
+     "vence": "2028-07-27",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-50-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Taormina → Islas Eolias",
+     "notas": "Zarpada planificada: 08/08 09:00\nLlegada estimada: 09/08 18:00\n60 MN",
+     "vence": "2028-08-08",
+     "hecha": false
+    },
+    {
+     "id": "llegada-51-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Islas Eolias",
+     "notas": "Llegada estimada: 09/08 18:00",
+     "vence": "2028-08-09",
+     "hecha": false
+    },
+    {
+     "id": "estadia-51-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Islas Eolias · 10 días de descanso",
+     "notas": "Del 09/08 18:00 al 20/08 09:00",
+     "vence": "2028-08-09",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-51-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Islas Eolias → La Valeta",
+     "notas": "Zarpada planificada: 20/08 09:00\nLlegada estimada: 22/08 18:00\n160 MN",
+     "vence": "2028-08-20",
+     "hecha": false
+    },
+    {
+     "id": "llegada-52-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a La Valeta",
+     "notas": "Llegada estimada: 22/08 18:00",
+     "vence": "2028-08-22",
+     "hecha": false
+    },
+    {
+     "id": "estadia-52-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en La Valeta · 13 días de descanso",
+     "notas": "Del 22/08 18:00 al 05/09 09:00",
+     "vence": "2028-08-22",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-52-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de La Valeta → Sidi Bou Said",
+     "notas": "Zarpada planificada: 05/09 09:00\nLlegada estimada: 08/09 18:00\n240 MN",
+     "vence": "2028-09-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-53-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Sidi Bou Said",
+     "notas": "Llegada estimada: 08/09 18:00",
+     "vence": "2028-09-08",
+     "hecha": false
+    },
+    {
+     "id": "estadia-53-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Sidi Bou Said · 16 días de descanso",
+     "notas": "Del 08/09 18:00 al 25/09 09:00",
+     "vence": "2028-09-08",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-53-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Sidi Bou Said → Argel",
+     "notas": "Zarpada planificada: 25/09 09:00\nLlegada estimada: 29/09 18:00\n400 MN",
+     "vence": "2028-09-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-54-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Argel",
+     "notas": "Llegada estimada: 29/09 18:00",
+     "vence": "2028-09-29",
+     "hecha": false
+    },
+    {
+     "id": "estadia-54-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Argel · 15 días de descanso",
+     "notas": "Del 29/09 18:00 al 15/10 09:00",
+     "vence": "2028-09-29",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-54-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Argel → Málaga / Marbella",
+     "notas": "Zarpada planificada: 15/10 09:00\nLlegada estimada: 18/10 18:00\n420 MN",
+     "vence": "2028-10-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-55-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Málaga / Marbella",
+     "notas": "Llegada estimada: 18/10 18:00",
+     "vence": "2028-10-18",
+     "hecha": false
+    },
+    {
+     "id": "estadia-55-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Málaga / Marbella · 22 días de descanso",
+     "notas": "Del 18/10 18:00 al 10/11 09:00",
+     "vence": "2028-10-18",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-55-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Málaga / Marbella → Tánger",
+     "notas": "Zarpada planificada: 10/11 09:00\nLlegada estimada: 11/11 18:00\n70 MN",
+     "vence": "2028-11-10",
+     "hecha": false
+    },
+    {
+     "id": "llegada-56-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Tánger",
+     "notas": "Llegada estimada: 11/11 18:00",
+     "vence": "2028-11-11",
+     "hecha": false
+    },
+    {
+     "id": "estadia-56-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Tánger · 18 días de descanso",
+     "notas": "Del 11/11 18:00 al 30/11 09:00",
+     "vence": "2028-11-11",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-56-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Tánger → Gibraltar",
+     "notas": "Zarpada planificada: 30/11 09:00\nLlegada estimada: 01/12 18:00\n35 MN",
+     "vence": "2028-11-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-57-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Gibraltar",
+     "notas": "Llegada estimada: 01/12 18:00",
+     "vence": "2028-12-01",
+     "hecha": false
+    },
+    {
+     "id": "estadia-57-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Gibraltar · 54 días de descanso",
+     "notas": "Del 01/12 18:00 al 25/01 09:00",
+     "vence": "2028-12-01",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-57-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Gibraltar → Cartagena / Alicante",
+     "notas": "Zarpada planificada: 25/01 09:00\nLlegada estimada: 07/01 18:00\n240 MN",
+     "vence": "2029-01-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-58-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Cartagena / Alicante",
+     "notas": "Llegada estimada: 07/01 18:00",
+     "vence": "2029-01-07",
+     "hecha": false
+    },
+    {
+     "id": "estadia-58-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Cartagena / Alicante · 17 días de descanso",
+     "notas": "Del 07/01 18:00 al 25/01 09:00",
+     "vence": "2029-01-07",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-58-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Cartagena / Alicante → Ibiza / Formentera",
+     "notas": "Zarpada planificada: 25/01 09:00\nLlegada estimada: 26/01 18:00\n110 MN",
+     "vence": "2029-01-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-59-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Ibiza / Formentera",
+     "notas": "Llegada estimada: 26/01 18:00",
+     "vence": "2029-01-26",
+     "hecha": false
+    },
+    {
+     "id": "estadia-59-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Ibiza / Formentera · 19 días de descanso",
+     "notas": "Del 26/01 18:00 al 15/02 09:00",
+     "vence": "2029-01-26",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-59-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Ibiza / Formentera → Palma de Mallorca",
+     "notas": "Zarpada planificada: 15/02 09:00\nLlegada estimada: 16/02 18:00\n70 MN",
+     "vence": "2029-02-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-60-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Palma de Mallorca",
+     "notas": "Llegada estimada: 16/02 18:00",
+     "vence": "2029-02-16",
+     "hecha": false
+    },
+    {
+     "id": "estadia-60-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Palma de Mallorca · 21 días de descanso",
+     "notas": "Del 16/02 18:00 al 10/03 09:00",
+     "vence": "2029-02-16",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-60-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Palma de Mallorca → Menorca",
+     "notas": "Zarpada planificada: 10/03 09:00\nLlegada estimada: 11/03 18:00\n80 MN",
+     "vence": "2029-03-10",
+     "hecha": false
+    },
+    {
+     "id": "llegada-61-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Menorca",
+     "notas": "Llegada estimada: 11/03 18:00",
+     "vence": "2029-03-11",
+     "hecha": false
+    },
+    {
+     "id": "estadia-61-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Menorca · 18 días de descanso",
+     "notas": "Del 11/03 18:00 al 30/03 09:00",
+     "vence": "2029-03-11",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-61-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Menorca → Costa Brava",
+     "notas": "Zarpada planificada: 30/03 09:00\nLlegada estimada: 01/04 18:00\n130 MN",
+     "vence": "2029-03-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-62-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Costa Brava",
+     "notas": "Llegada estimada: 01/04 18:00",
+     "vence": "2029-04-01",
+     "hecha": false
+    },
+    {
+     "id": "estadia-62-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Costa Brava · 13 días de descanso",
+     "notas": "Del 01/04 18:00 al 15/04 09:00",
+     "vence": "2029-04-01",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-62-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Costa Brava → Saint-Tropez",
+     "notas": "Zarpada planificada: 15/04 09:00\nLlegada estimada: 18/04 18:00\n160 MN",
+     "vence": "2029-04-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-63-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Saint-Tropez",
+     "notas": "Llegada estimada: 18/04 18:00",
+     "vence": "2029-04-18",
+     "hecha": false
+    },
+    {
+     "id": "estadia-63-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Saint-Tropez · 13 días de descanso",
+     "notas": "Del 18/04 18:00 al 02/05 09:00",
+     "vence": "2029-04-18",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-63-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Saint-Tropez → Cannes / Antibes",
+     "notas": "Zarpada planificada: 02/05 09:00\nLlegada estimada: 03/05 18:00\n25 MN",
+     "vence": "2029-05-02",
+     "hecha": false
+    },
+    {
+     "id": "llegada-64-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Cannes / Antibes",
+     "notas": "Llegada estimada: 03/05 18:00",
+     "vence": "2029-05-03",
+     "hecha": false
+    },
+    {
+     "id": "estadia-64-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Cannes / Antibes · 13 días de descanso",
+     "notas": "Del 03/05 18:00 al 17/05 09:00",
+     "vence": "2029-05-03",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-64-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Cannes / Antibes → Mónaco",
+     "notas": "Zarpada planificada: 17/05 09:00\nLlegada estimada: 18/05 18:00\n15 MN",
+     "vence": "2029-05-17",
+     "hecha": false
+    },
+    {
+     "id": "llegada-65-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Mónaco",
+     "notas": "Llegada estimada: 18/05 18:00",
+     "vence": "2029-05-18",
+     "hecha": false
+    },
+    {
+     "id": "estadia-65-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Mónaco · 11 días de descanso",
+     "notas": "Del 18/05 18:00 al 30/05 09:00",
+     "vence": "2029-05-18",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-65-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Mónaco → Niza / Villefranche",
+     "notas": "Zarpada planificada: 30/05 09:00\nLlegada estimada: 31/05 18:00\n10 MN",
+     "vence": "2029-05-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-66-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Niza / Villefranche",
+     "notas": "Llegada estimada: 31/05 18:00",
+     "vence": "2029-05-31",
+     "hecha": false
+    },
+    {
+     "id": "estadia-66-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Niza / Villefranche · 14 días de descanso",
+     "notas": "Del 31/05 18:00 al 15/06 09:00",
+     "vence": "2029-05-31",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-66-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Niza / Villefranche → Bonifacio",
+     "notas": "Zarpada planificada: 15/06 09:00\nLlegada estimada: 17/06 18:00\n120 MN",
+     "vence": "2029-06-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-67-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Bonifacio",
+     "notas": "Llegada estimada: 17/06 18:00",
+     "vence": "2029-06-17",
+     "hecha": false
+    },
+    {
+     "id": "estadia-67-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Bonifacio · 12 días de descanso",
+     "notas": "Del 17/06 18:00 al 30/06 09:00",
+     "vence": "2029-06-17",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-67-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Bonifacio → Maddalena",
+     "notas": "Zarpada planificada: 30/06 09:00\nLlegada estimada: 01/07 18:00\n15 MN",
+     "vence": "2029-06-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-68-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Maddalena",
+     "notas": "Llegada estimada: 01/07 18:00",
+     "vence": "2029-07-01",
+     "hecha": false
+    },
+    {
+     "id": "estadia-68-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Maddalena · 13 días de descanso",
+     "notas": "Del 01/07 18:00 al 15/07 09:00",
+     "vence": "2029-07-01",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-68-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Maddalena → Isla de Elba",
+     "notas": "Zarpada planificada: 15/07 09:00\nLlegada estimada: 16/07 18:00\n110 MN",
+     "vence": "2029-07-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-69-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Isla de Elba",
+     "notas": "Llegada estimada: 16/07 18:00",
+     "vence": "2029-07-16",
+     "hecha": false
+    },
+    {
+     "id": "estadia-69-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Isla de Elba · 9 días de descanso",
+     "notas": "Del 16/07 18:00 al 26/07 09:00",
+     "vence": "2029-07-16",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-69-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Isla de Elba → Costa Amalfitana",
+     "notas": "Zarpada planificada: 26/07 09:00\nLlegada estimada: 28/07 18:00\n220 MN",
+     "vence": "2029-07-26",
+     "hecha": false
+    },
+    {
+     "id": "llegada-70-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Costa Amalfitana",
+     "notas": "Llegada estimada: 28/07 18:00",
+     "vence": "2029-07-28",
+     "hecha": false
+    },
+    {
+     "id": "estadia-70-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Costa Amalfitana · 17 días de descanso",
+     "notas": "Del 28/07 18:00 al 15/08 09:00",
+     "vence": "2029-07-28",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-70-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Costa Amalfitana → Gibraltar",
+     "notas": "Zarpada planificada: 15/08 09:00\nLlegada estimada: 20/09 18:00\n950 MN",
+     "vence": "2029-08-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-71-vuelta_al_mundo",
+     "titulo": "Enterprise · 🛬 Llegar a Gibraltar",
+     "notas": "Llegada estimada: 20/09 18:00",
+     "vence": "2029-09-20",
+     "hecha": false
+    },
+    {
+     "id": "estadia-71-vuelta_al_mundo",
+     "titulo": "Enterprise · ⚓ Estadía en Gibraltar · 41 días de descanso",
+     "notas": "Del 20/09 18:00 al 01/11 09:00",
+     "vence": "2029-09-20",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-71-vuelta_al_mundo",
+     "titulo": "Enterprise · ⛵ Zarpar de Gibraltar → Mar del Plata",
+     "notas": "Zarpada planificada: 01/11 09:00\n~5.500 (cruce atlántico) MN",
+     "vence": "2029-11-01",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-73-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de San Petersburgo → Copenhague",
+     "notas": "Zarpada planificada: 01/08 09:00\nLlegada estimada: 06/08 18:00\n650 MN",
+     "vence": "2030-08-01",
+     "hecha": false
+    },
+    {
+     "id": "llegada-74-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Copenhague",
+     "notas": "Llegada estimada: 06/08 18:00",
+     "vence": "2030-08-06",
+     "hecha": false
+    },
+    {
+     "id": "estadia-74-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Copenhague · 7 días de descanso",
+     "notas": "Del 06/08 18:00 al 14/08 09:00",
+     "vence": "2030-08-06",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-74-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Copenhague → Cherburgo",
+     "notas": "Zarpada planificada: 14/08 09:00\nLlegada estimada: 21/08 18:00\n800 MN",
+     "vence": "2030-08-14",
+     "hecha": false
+    },
+    {
+     "id": "llegada-75-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Cherburgo",
+     "notas": "Llegada estimada: 21/08 18:00",
+     "vence": "2030-08-21",
+     "hecha": false
+    },
+    {
+     "id": "estadia-75-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Cherburgo · 8 días de descanso",
+     "notas": "Del 21/08 18:00 al 30/08 09:00",
+     "vence": "2030-08-21",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-75-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Cherburgo → Las Palmas",
+     "notas": "Zarpada planificada: 30/08 09:00\nLlegada estimada: 10/09 18:00\n1.500 MN",
+     "vence": "2030-08-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-76-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Las Palmas",
+     "notas": "Llegada estimada: 10/09 18:00",
+     "vence": "2030-09-10",
+     "hecha": false
+    },
+    {
+     "id": "estadia-76-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Las Palmas · 14 días de descanso",
+     "notas": "Del 10/09 18:00 al 25/09 09:00",
+     "vence": "2030-09-10",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-76-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Las Palmas → Mindelo",
+     "notas": "Zarpada planificada: 25/09 09:00\nLlegada estimada: 30/09 18:00\n850 MN",
+     "vence": "2030-09-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-77-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Mindelo",
+     "notas": "Llegada estimada: 30/09 18:00",
+     "vence": "2030-09-30",
+     "hecha": false
+    },
+    {
+     "id": "estadia-77-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Mindelo · 7 días de descanso",
+     "notas": "Del 30/09 18:00 al 08/10 09:00",
+     "vence": "2030-09-30",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-77-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Mindelo → Salvador de Bahía",
+     "notas": "Zarpada planificada: 08/10 09:00\nLlegada estimada: 22/10 18:00\n2.100 MN",
+     "vence": "2030-10-08",
+     "hecha": false
+    },
+    {
+     "id": "llegada-78-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Salvador de Bahía",
+     "notas": "Llegada estimada: 22/10 18:00",
+     "vence": "2030-10-22",
+     "hecha": false
+    },
+    {
+     "id": "estadia-78-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Salvador de Bahía · 13 días de descanso",
+     "notas": "Del 22/10 18:00 al 05/11 09:00",
+     "vence": "2030-10-22",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-78-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Salvador de Bahía → Mar del Plata",
+     "notas": "Zarpada planificada: 05/11 09:00\nLlegada estimada: 14/11 18:00\n1.550 MN",
+     "vence": "2030-11-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-79-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Mar del Plata",
+     "notas": "Llegada estimada: 14/11 18:00",
+     "vence": "2030-11-14",
+     "hecha": false
+    },
+    {
+     "id": "estadia-79-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Mar del Plata · 15 días de descanso",
+     "notas": "Del 14/11 18:00 al 30/11 09:00",
+     "vence": "2030-11-14",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-79-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Mar del Plata → Ushuaia",
+     "notas": "Zarpada planificada: 30/11 09:00\nLlegada estimada: 10/12 18:00\n1.450 MN",
+     "vence": "2030-11-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-80-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Ushuaia",
+     "notas": "Llegada estimada: 10/12 18:00",
+     "vence": "2030-12-10",
+     "hecha": false
+    },
+    {
+     "id": "estadia-80-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Ushuaia · 22 días de descanso",
+     "notas": "Del 10/12 18:00 al 02/01 09:00",
+     "vence": "2030-12-10",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-80-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Ushuaia → Isla Decepción",
+     "notas": "Zarpada planificada: 02/01 09:00\nLlegada estimada: 07/01 18:00\n600 MN",
+     "vence": "2031-01-02",
+     "hecha": false
+    },
+    {
+     "id": "llegada-81-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Isla Decepción",
+     "notas": "Llegada estimada: 07/01 18:00",
+     "vence": "2031-01-07",
+     "hecha": false
+    },
+    {
+     "id": "estadia-81-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Isla Decepción · 7 días de descanso",
+     "notas": "Del 07/01 18:00 al 15/01 09:00",
+     "vence": "2031-01-07",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-81-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Isla Decepción → Puerto Lockroy",
+     "notas": "Zarpada planificada: 15/01 09:00\nLlegada estimada: 16/01 18:00\n120 MN",
+     "vence": "2031-01-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-82-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Puerto Lockroy",
+     "notas": "Llegada estimada: 16/01 18:00",
+     "vence": "2031-01-16",
+     "hecha": false
+    },
+    {
+     "id": "estadia-82-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Puerto Lockroy · 8 días de descanso",
+     "notas": "Del 16/01 18:00 al 25/01 09:00",
+     "vence": "2031-01-16",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-82-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Puerto Lockroy → Canal Lemaire",
+     "notas": "Zarpada planificada: 25/01 09:00\nLlegada estimada: 26/01 18:00\n30 MN",
+     "vence": "2031-01-25",
+     "hecha": false
+    },
+    {
+     "id": "llegada-83-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Canal Lemaire",
+     "notas": "Llegada estimada: 26/01 18:00",
+     "vence": "2031-01-26",
+     "hecha": false
+    },
+    {
+     "id": "estadia-83-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Canal Lemaire · 9 días de descanso",
+     "notas": "Del 26/01 18:00 al 05/02 09:00",
+     "vence": "2031-01-26",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-83-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Canal Lemaire → Bahía Paraíso",
+     "notas": "Zarpada planificada: 05/02 09:00\nLlegada estimada: 06/02 18:00\n40 MN",
+     "vence": "2031-02-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-84-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Bahía Paraíso",
+     "notas": "Llegada estimada: 06/02 18:00",
+     "vence": "2031-02-06",
+     "hecha": false
+    },
+    {
+     "id": "estadia-84-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Bahía Paraíso · 8 días de descanso",
+     "notas": "Del 06/02 18:00 al 15/02 09:00",
+     "vence": "2031-02-06",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-84-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Bahía Paraíso → Islas Georgias del Sur",
+     "notas": "Zarpada planificada: 15/02 09:00\nLlegada estimada: 25/02 18:00\n1.300 MN",
+     "vence": "2031-02-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-85-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Islas Georgias del Sur",
+     "notas": "Llegada estimada: 25/02 18:00",
+     "vence": "2031-02-25",
+     "hecha": false
+    },
+    {
+     "id": "estadia-85-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Islas Georgias del Sur · 10 días de descanso",
+     "notas": "Del 25/02 18:00 al 08/03 09:00",
+     "vence": "2031-02-25",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-85-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Islas Georgias del Sur → Islas Malvinas",
+     "notas": "Zarpada planificada: 08/03 09:00\nLlegada estimada: 14/03 18:00\n800 MN",
+     "vence": "2031-03-08",
+     "hecha": false
+    },
+    {
+     "id": "llegada-86-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Islas Malvinas",
+     "notas": "Llegada estimada: 14/03 18:00",
+     "vence": "2031-03-14",
+     "hecha": false
+    },
+    {
+     "id": "estadia-86-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Islas Malvinas · 9 días de descanso",
+     "notas": "Del 14/03 18:00 al 24/03 09:00",
+     "vence": "2031-03-14",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-86-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Islas Malvinas → Mar del Plata",
+     "notas": "Zarpada planificada: 24/03 09:00\nLlegada estimada: 02/04 18:00\n1.150 MN",
+     "vence": "2031-03-24",
+     "hecha": false
+    },
+    {
+     "id": "llegada-87-vuelta_al_mundo",
+     "titulo": "Irizar II · 🛬 Llegar a Mar del Plata",
+     "notas": "Llegada estimada: 02/04 18:00",
+     "vence": "2031-04-02",
+     "hecha": false
+    },
+    {
+     "id": "estadia-87-vuelta_al_mundo",
+     "titulo": "Irizar II · ⚓ Estadía en Mar del Plata · 1 día de descanso",
+     "notas": "Del 02/04 18:00 al 04/04 09:00",
+     "vence": "2031-04-02",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-87-vuelta_al_mundo",
+     "titulo": "Irizar II · ⛵ Zarpar de Mar del Plata → Buenos Aires",
+     "notas": "Zarpada planificada: 04/04 09:00\nLlegada estimada: 06/04 18:00\n230 MN",
+     "vence": "2031-04-04",
+     "hecha": false
+    },
+    {
+     "id": "llegada-88-vuelta_al_mundo",
+     "titulo": "Irizar II · 🏁 Llegada final a Buenos Aires",
+     "notas": "Llegada estimada: 06/04 18:00",
+     "vence": "2031-04-06",
+     "hecha": false
+    }
+   ]
+  },
+  {
+   "clave": "lehg_ii_vuelta_al_mundo",
+   "lista": "Lehg ii - Vuelta al mundo (vito dumas)",
+   "tareas": [
+    {
+     "id": "zarpe-1-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⛵ Zarpar de Buenos Aires → Ciudad del Cabo",
+     "notas": "Zarpada real: 27/06 09:00\nLlegada estimada: 24/08 16:30\n4560 MN",
+     "vence": "2026-06-27",
+     "hecha": true
+    },
+    {
+     "id": "llegada-2-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · 🛬 Llegar a Ciudad del Cabo",
+     "notas": "Llegada real: 24/08 16:30",
+     "vence": "2026-08-24",
+     "hecha": true
+    },
+    {
+     "id": "estadia-2-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⚓ Estadía en Ciudad del Cabo · 20 días de descanso",
+     "notas": "Del 24/08 16:30 al 14/09 10:00",
+     "vence": "2026-08-24",
+     "hecha": true
+    },
+    {
+     "id": "zarpe-2-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⛵ Zarpar de Ciudad del Cabo → Wellington",
+     "notas": "Zarpada real: 14/09 10:00\nLlegada estimada: 27/12 10:00\n7400 MN",
+     "vence": "2026-09-14",
+     "hecha": true
+    },
+    {
+     "id": "llegada-3-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · 🛬 Llegar a Wellington",
+     "notas": "Llegada estimada: 27/12 10:00",
+     "vence": "2026-12-27",
+     "hecha": false
+    },
+    {
+     "id": "estadia-3-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⚓ Estadía en Wellington · 33 días de descanso",
+     "notas": "Del 27/12 10:00 al 30/01 09:00",
+     "vence": "2026-12-27",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-3-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⛵ Zarpar de Wellington → Valparaíso",
+     "notas": "Zarpada planificada: 30/01 09:00\nLlegada estimada: 12/04 09:00\n5400 MN",
+     "vence": "2027-01-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-4-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · 🛬 Llegar a Valparaíso",
+     "notas": "Llegada estimada: 12/04 09:00",
+     "vence": "2027-04-12",
+     "hecha": false
+    },
+    {
+     "id": "estadia-4-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⚓ Estadía en Valparaíso · 47 días de descanso",
+     "notas": "Del 12/04 09:00 al 30/05 09:00",
+     "vence": "2027-04-12",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-4-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⛵ Zarpar de Valparaíso → Mar del Plata",
+     "notas": "Zarpada planificada: 30/05 09:00\nLlegada estimada: 07/07 09:00\n3200 MN",
+     "vence": "2027-05-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-5-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · 🛬 Llegar a Mar del Plata",
+     "notas": "Llegada estimada: 07/07 09:00",
+     "vence": "2027-07-07",
+     "hecha": false
+    },
+    {
+     "id": "estadia-5-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⚓ Estadía en Mar del Plata · 7 días de descanso",
+     "notas": "Del 07/07 09:00 al 15/07 09:00",
+     "vence": "2027-07-07",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-5-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · ⛵ Zarpar de Mar del Plata → Buenos Aires",
+     "notas": "Zarpada planificada: 15/07 09:00\nLlegada estimada: 08/08 09:00\n260 MN",
+     "vence": "2027-07-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-6-lehg_ii_vuelta_al_mundo",
+     "titulo": "Lehg II · 🏁 Llegada final a Buenos Aires",
+     "notas": "Llegada estimada: 08/08 09:00",
+     "vence": "2027-08-08",
+     "hecha": false
+    }
+   ]
+  },
+  {
+   "clave": "glory_ilha_grande_croacia",
+   "lista": "Glory: ilha grande → croacia",
+   "tareas": [
+    {
+     "id": "zarpe-1-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Ilha Grande → Salvador de Bahía",
+     "notas": "Zarpada planificada: 28/10 09:00\nLlegada estimada: 02/11 18:00\n840 MN",
+     "vence": "2026-10-28",
+     "hecha": false
+    },
+    {
+     "id": "llegada-2-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Salvador de Bahía",
+     "notas": "Llegada estimada: 02/11 18:00",
+     "vence": "2026-11-02",
+     "hecha": false
+    },
+    {
+     "id": "estadia-2-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Salvador de Bahía · 9 días de descanso",
+     "notas": "Del 02/11 18:00 al 12/11 09:00",
+     "vence": "2026-11-02",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-2-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Salvador de Bahía → Recife",
+     "notas": "Zarpada planificada: 12/11 09:00\nLlegada estimada: 15/11 18:00\n410 MN",
+     "vence": "2026-11-12",
+     "hecha": false
+    },
+    {
+     "id": "llegada-3-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Recife",
+     "notas": "Llegada estimada: 15/11 18:00",
+     "vence": "2026-11-15",
+     "hecha": false
+    },
+    {
+     "id": "estadia-3-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Recife · 48 días de descanso",
+     "notas": "Del 15/11 18:00 al 03/01 09:00",
+     "vence": "2026-11-15",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-3-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Recife → Fernando de Noronha",
+     "notas": "Zarpada planificada: 03/01 09:00\nLlegada estimada: 05/01 18:00\n310 MN",
+     "vence": "2027-01-03",
+     "hecha": false
+    },
+    {
+     "id": "llegada-4-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Fernando de Noronha",
+     "notas": "Llegada estimada: 05/01 18:00",
+     "vence": "2027-01-05",
+     "hecha": false
+    },
+    {
+     "id": "estadia-4-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Fernando de Noronha · 14 días de descanso",
+     "notas": "Del 05/01 18:00 al 20/01 09:00",
+     "vence": "2027-01-05",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-4-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Fernando de Noronha → Praia",
+     "notas": "Zarpada planificada: 20/01 09:00\nLlegada estimada: 28/01 18:00\n1.290 MN",
+     "vence": "2027-01-20",
+     "hecha": false
+    },
+    {
+     "id": "llegada-5-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Praia",
+     "notas": "Llegada estimada: 28/01 18:00",
+     "vence": "2027-01-28",
+     "hecha": false
+    },
+    {
+     "id": "estadia-5-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Praia · 20 días de descanso",
+     "notas": "Del 28/01 18:00 al 18/02 09:00",
+     "vence": "2027-01-28",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-5-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Praia → Mindelo",
+     "notas": "Zarpada planificada: 18/02 09:00\nLlegada estimada: 20/02 18:00\n180 MN",
+     "vence": "2027-02-18",
+     "hecha": false
+    },
+    {
+     "id": "llegada-6-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Mindelo",
+     "notas": "Llegada estimada: 20/02 18:00",
+     "vence": "2027-02-20",
+     "hecha": false
+    },
+    {
+     "id": "estadia-6-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Mindelo · 6 días de descanso",
+     "notas": "Del 20/02 18:00 al 27/02 09:00",
+     "vence": "2027-02-20",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-6-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Mindelo → La Restinga",
+     "notas": "Zarpada planificada: 27/02 09:00\nLlegada estimada: 05/03 18:00\n780 MN",
+     "vence": "2027-02-27",
+     "hecha": false
+    },
+    {
+     "id": "llegada-7-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a La Restinga",
+     "notas": "Llegada estimada: 05/03 18:00",
+     "vence": "2027-03-05",
+     "hecha": false
+    },
+    {
+     "id": "estadia-7-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en La Restinga · 6 días de descanso",
+     "notas": "Del 05/03 18:00 al 12/03 09:00",
+     "vence": "2027-03-05",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-7-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de La Restinga → San Sebastián",
+     "notas": "Zarpada planificada: 12/03 09:00\nLlegada estimada: 13/03 18:00\n60 MN",
+     "vence": "2027-03-12",
+     "hecha": false
+    },
+    {
+     "id": "llegada-8-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a San Sebastián",
+     "notas": "Llegada estimada: 13/03 18:00",
+     "vence": "2027-03-13",
+     "hecha": false
+    },
+    {
+     "id": "estadia-8-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en San Sebastián · 6 días de descanso",
+     "notas": "Del 13/03 18:00 al 20/03 09:00",
+     "vence": "2027-03-13",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-8-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de San Sebastián → Santa Cruz de Tenerife",
+     "notas": "Zarpada planificada: 20/03 09:00\nLlegada estimada: 21/03 18:00\n70 MN",
+     "vence": "2027-03-20",
+     "hecha": false
+    },
+    {
+     "id": "llegada-9-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Santa Cruz de Tenerife",
+     "notas": "Llegada estimada: 21/03 18:00",
+     "vence": "2027-03-21",
+     "hecha": false
+    },
+    {
+     "id": "estadia-9-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Santa Cruz de Tenerife · 6 días de descanso",
+     "notas": "Del 21/03 18:00 al 28/03 09:00",
+     "vence": "2027-03-21",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-9-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Santa Cruz de Tenerife → Las Palmas",
+     "notas": "Zarpada planificada: 28/03 09:00\nLlegada estimada: 29/03 18:00\n50 MN",
+     "vence": "2027-03-28",
+     "hecha": false
+    },
+    {
+     "id": "llegada-10-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Las Palmas",
+     "notas": "Llegada estimada: 29/03 18:00",
+     "vence": "2027-03-29",
+     "hecha": false
+    },
+    {
+     "id": "estadia-10-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Las Palmas · 6 días de descanso",
+     "notas": "Del 29/03 18:00 al 05/04 09:00",
+     "vence": "2027-03-29",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-10-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Las Palmas → Arrecife",
+     "notas": "Zarpada planificada: 05/04 09:00\nLlegada estimada: 06/04 18:00\n110 MN",
+     "vence": "2027-04-05",
+     "hecha": false
+    },
+    {
+     "id": "llegada-11-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Arrecife",
+     "notas": "Llegada estimada: 06/04 18:00",
+     "vence": "2027-04-06",
+     "hecha": false
+    },
+    {
+     "id": "estadia-11-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Arrecife · 10 días de descanso",
+     "notas": "Del 06/04 18:00 al 17/04 09:00",
+     "vence": "2027-04-06",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-11-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Arrecife → Funchal",
+     "notas": "Zarpada planificada: 17/04 09:00\nLlegada estimada: 19/04 18:00\n310 MN",
+     "vence": "2027-04-17",
+     "hecha": false
+    },
+    {
+     "id": "llegada-12-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Funchal",
+     "notas": "Llegada estimada: 19/04 18:00",
+     "vence": "2027-04-19",
+     "hecha": false
+    },
+    {
+     "id": "estadia-12-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Funchal · 6 días de descanso",
+     "notas": "Del 19/04 18:00 al 26/04 09:00",
+     "vence": "2027-04-19",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-12-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Funchal → Lisboa",
+     "notas": "Zarpada planificada: 26/04 09:00\nLlegada estimada: 30/04 18:00\n540 MN",
+     "vence": "2027-04-26",
+     "hecha": false
+    },
+    {
+     "id": "llegada-13-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Lisboa",
+     "notas": "Llegada estimada: 30/04 18:00",
+     "vence": "2027-04-30",
+     "hecha": false
+    },
+    {
+     "id": "estadia-13-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Lisboa · 12 días de descanso",
+     "notas": "Del 30/04 18:00 al 13/05 09:00",
+     "vence": "2027-04-30",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-13-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Lisboa → Lagos",
+     "notas": "Zarpada planificada: 13/05 09:00\nLlegada estimada: 14/05 18:00\n140 MN",
+     "vence": "2027-05-13",
+     "hecha": false
+    },
+    {
+     "id": "llegada-14-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Lagos",
+     "notas": "Llegada estimada: 14/05 18:00",
+     "vence": "2027-05-14",
+     "hecha": false
+    },
+    {
+     "id": "estadia-14-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Lagos · 6 días de descanso",
+     "notas": "Del 14/05 18:00 al 21/05 09:00",
+     "vence": "2027-05-14",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-14-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Lagos → Gibraltar",
+     "notas": "Zarpada planificada: 21/05 09:00\nLlegada estimada: 23/05 18:00\n190 MN",
+     "vence": "2027-05-21",
+     "hecha": false
+    },
+    {
+     "id": "llegada-15-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Gibraltar",
+     "notas": "Llegada estimada: 23/05 18:00",
+     "vence": "2027-05-23",
+     "hecha": false
+    },
+    {
+     "id": "estadia-15-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Gibraltar · 6 días de descanso",
+     "notas": "Del 23/05 18:00 al 30/05 09:00",
+     "vence": "2027-05-23",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-15-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Gibraltar → Cartagena",
+     "notas": "Zarpada planificada: 30/05 09:00\nLlegada estimada: 01/06 18:00\n250 MN",
+     "vence": "2027-05-30",
+     "hecha": false
+    },
+    {
+     "id": "llegada-16-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Cartagena",
+     "notas": "Llegada estimada: 01/06 18:00",
+     "vence": "2027-06-01",
+     "hecha": false
+    },
+    {
+     "id": "estadia-16-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Cartagena · 6 días de descanso",
+     "notas": "Del 01/06 18:00 al 08/06 09:00",
+     "vence": "2027-06-01",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-16-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Cartagena → Sant Antoni",
+     "notas": "Zarpada planificada: 08/06 09:00\nLlegada estimada: 09/06 18:00\n150 MN",
+     "vence": "2027-06-08",
+     "hecha": false
+    },
+    {
+     "id": "llegada-17-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Sant Antoni",
+     "notas": "Llegada estimada: 09/06 18:00",
+     "vence": "2027-06-09",
+     "hecha": false
+    },
+    {
+     "id": "estadia-17-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Sant Antoni · 6 días de descanso",
+     "notas": "Del 09/06 18:00 al 16/06 09:00",
+     "vence": "2027-06-09",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-17-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Sant Antoni → Palma de Mallorca",
+     "notas": "Zarpada planificada: 16/06 09:00\nLlegada estimada: 17/06 18:00\n90 MN",
+     "vence": "2027-06-16",
+     "hecha": false
+    },
+    {
+     "id": "llegada-18-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Palma de Mallorca",
+     "notas": "Llegada estimada: 17/06 18:00",
+     "vence": "2027-06-17",
+     "hecha": false
+    },
+    {
+     "id": "estadia-18-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Palma de Mallorca · 6 días de descanso",
+     "notas": "Del 17/06 18:00 al 24/06 09:00",
+     "vence": "2027-06-17",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-18-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Palma de Mallorca → Mahón",
+     "notas": "Zarpada planificada: 24/06 09:00\nLlegada estimada: 25/06 18:00\n110 MN",
+     "vence": "2027-06-24",
+     "hecha": false
+    },
+    {
+     "id": "llegada-19-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Mahón",
+     "notas": "Llegada estimada: 25/06 18:00",
+     "vence": "2027-06-25",
+     "hecha": false
+    },
+    {
+     "id": "estadia-19-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Mahón · 6 días de descanso",
+     "notas": "Del 25/06 18:00 al 02/07 09:00",
+     "vence": "2027-06-25",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-19-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Mahón → Cagliari",
+     "notas": "Zarpada planificada: 02/07 09:00\nLlegada estimada: 04/07 18:00\n260 MN",
+     "vence": "2027-07-02",
+     "hecha": false
+    },
+    {
+     "id": "llegada-20-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Cagliari",
+     "notas": "Llegada estimada: 04/07 18:00",
+     "vence": "2027-07-04",
+     "hecha": false
+    },
+    {
+     "id": "estadia-20-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Cagliari · 6 días de descanso",
+     "notas": "Del 04/07 18:00 al 11/07 09:00",
+     "vence": "2027-07-04",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-20-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Cagliari → Trapani",
+     "notas": "Zarpada planificada: 11/07 09:00\nLlegada estimada: 13/07 18:00\n180 MN",
+     "vence": "2027-07-11",
+     "hecha": false
+    },
+    {
+     "id": "llegada-21-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Trapani",
+     "notas": "Llegada estimada: 13/07 18:00",
+     "vence": "2027-07-13",
+     "hecha": false
+    },
+    {
+     "id": "estadia-21-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Trapani · 6 días de descanso",
+     "notas": "Del 13/07 18:00 al 20/07 09:00",
+     "vence": "2027-07-13",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-21-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Trapani → Lipari",
+     "notas": "Zarpada planificada: 20/07 09:00\nLlegada estimada: 21/07 18:00\n130 MN",
+     "vence": "2027-07-20",
+     "hecha": false
+    },
+    {
+     "id": "llegada-22-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Lipari",
+     "notas": "Llegada estimada: 21/07 18:00",
+     "vence": "2027-07-21",
+     "hecha": false
+    },
+    {
+     "id": "estadia-22-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Lipari · 6 días de descanso",
+     "notas": "Del 21/07 18:00 al 28/07 09:00",
+     "vence": "2027-07-21",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-22-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Lipari → Corfú",
+     "notas": "Zarpada planificada: 28/07 09:00\nLlegada estimada: 30/07 18:00\n320 MN",
+     "vence": "2027-07-28",
+     "hecha": false
+    },
+    {
+     "id": "llegada-23-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Corfú",
+     "notas": "Llegada estimada: 30/07 18:00",
+     "vence": "2027-07-30",
+     "hecha": false
+    },
+    {
+     "id": "estadia-23-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Corfú · 6 días de descanso",
+     "notas": "Del 30/07 18:00 al 06/08 09:00",
+     "vence": "2027-07-30",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-23-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Corfú → Kotor",
+     "notas": "Zarpada planificada: 06/08 09:00\nLlegada estimada: 08/08 18:00\n210 MN",
+     "vence": "2027-08-06",
+     "hecha": false
+    },
+    {
+     "id": "llegada-24-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Kotor",
+     "notas": "Llegada estimada: 08/08 18:00",
+     "vence": "2027-08-08",
+     "hecha": false
+    },
+    {
+     "id": "estadia-24-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Kotor · 6 días de descanso",
+     "notas": "Del 08/08 18:00 al 15/08 09:00",
+     "vence": "2027-08-08",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-24-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Kotor → Dubrovnik",
+     "notas": "Zarpada planificada: 15/08 09:00\nLlegada estimada: 16/08 18:00\n40 MN",
+     "vence": "2027-08-15",
+     "hecha": false
+    },
+    {
+     "id": "llegada-25-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Dubrovnik",
+     "notas": "Llegada estimada: 16/08 18:00",
+     "vence": "2027-08-16",
+     "hecha": false
+    },
+    {
+     "id": "estadia-25-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Dubrovnik · 6 días de descanso",
+     "notas": "Del 16/08 18:00 al 23/08 09:00",
+     "vence": "2027-08-16",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-25-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Dubrovnik → Korčula",
+     "notas": "Zarpada planificada: 23/08 09:00\nLlegada estimada: 24/08 18:00\n60 MN",
+     "vence": "2027-08-23",
+     "hecha": false
+    },
+    {
+     "id": "llegada-26-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Korčula",
+     "notas": "Llegada estimada: 24/08 18:00",
+     "vence": "2027-08-24",
+     "hecha": false
+    },
+    {
+     "id": "estadia-26-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Korčula · 6 días de descanso",
+     "notas": "Del 24/08 18:00 al 31/08 09:00",
+     "vence": "2027-08-24",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-26-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Korčula → Hvar",
+     "notas": "Zarpada planificada: 31/08 09:00\nLlegada estimada: 01/09 18:00\n30 MN",
+     "vence": "2027-08-31",
+     "hecha": false
+    },
+    {
+     "id": "llegada-27-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🛬 Llegar a Hvar",
+     "notas": "Llegada estimada: 01/09 18:00",
+     "vence": "2027-09-01",
+     "hecha": false
+    },
+    {
+     "id": "estadia-27-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⚓ Estadía en Hvar · 6 días de descanso",
+     "notas": "Del 01/09 18:00 al 08/09 09:00",
+     "vence": "2027-09-01",
+     "hecha": false
+    },
+    {
+     "id": "zarpe-27-glory_ilha_grande_croacia",
+     "titulo": "Glory · ⛵ Zarpar de Hvar → Split",
+     "notas": "Zarpada planificada: 08/09 09:00\nLlegada estimada: 09/09 18:00\n40 MN",
+     "vence": "2027-09-08",
+     "hecha": false
+    },
+    {
+     "id": "llegada-28-glory_ilha_grande_croacia",
+     "titulo": "Glory · 🏁 Llegada final a Split",
+     "notas": "Llegada estimada: 09/09 18:00",
+     "vence": "2027-09-09",
+     "hecha": false
+    }
+   ]
+  }
+ ]
+}
