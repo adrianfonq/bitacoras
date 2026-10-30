@@ -1,0 +1,51 @@
+# Pronosticos listos para los ruteos, sin ninguna computadora prendida.
+# compartir.py publica este archivo en el repo PUBLICO de las bitacoras (.github/workflows/pronosticos.yml), junto con
+# pronosticos.py: ahi los minutos de Actions son gratis e ilimitados.
+# Cada 20 minutos (GitHub la corre cada pocas horas) mira si Open-Meteo publico una corrida nueva de algun modelo y,
+# ~2 veces por dia, la baja a lo largo de los proximos destinos de cada velero que navega (ruta cargada en Sailaway o
+# puertos de su bitacora: veleros.json y destinos.json) y la deja en la rama «pronos» (un solo commit sin historial:
+# los archivos son grandes y se reemplazan). Las paginas la usan al armar un ruteo, sin bajar nada si ya cubre el camino.
+name: Pronósticos
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pronosticos
+  cancel-in-progress: false
+
+jobs:
+  pronos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Traer lo bajado antes
+        run: |
+          mkdir -p pronos
+          if git ls-remote --exit-code origin pronos >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin pronos
+            git --work-tree=pronos checkout origin/pronos -- .
+            git reset -q
+          fi
+      - name: Bajar las corridas nuevas
+        id: bajar
+        run: python pronosticos.py --previo pronos
+      - name: Dejarlo en la rama pronos
+        if: steps.bajar.outputs.cambios != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd pronos
+          git init -q -b pronos
+          git add -A
+          git -c user.name="Pronósticos" -c user.email="pronosticos@users.noreply.github.com" commit -q -m "Pronósticos $(date -u +%d/%m\ %H:%M) UTC"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" pronos
