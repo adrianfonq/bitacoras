@@ -1,0 +1,58 @@
+# WP activo de tus veleros, sin ninguna computadora ni el juego prendidos.
+# compartir.py publica este archivo en el repo PUBLICO de las bitacoras (.github/workflows/wp_activo.yml),
+# junto con sailaway_wp.py y veleros.json: ahi los minutos de Actions son gratis e ilimitados.
+# Cada ~10 minutos entra a sailaway.world con tu usuario, lee los tildes de la lista de waypoints (WP activo), la polar
+# que publica Sailaway de cada velero y lo que navega (viento, angulo y velocidad, acumulado), y deja
+# wp_activo.json en la rama "datos" (publicar reemplaza solo la rama main, asi que no se borra).
+# Las copias publicas de las bitacoras y de la flota lo leen de ahi.
+# Necesita, en ESE repo, los secretos SAILAWAY_EMAIL y SAILAWAY_PASSWORD (no se ven en los registros).
+name: WP activo
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wp-activo
+  cancel-in-progress: true
+
+jobs:
+  wp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Leer el WP activo en sailaway.world
+        env:
+          SAILAWAY_EMAIL: ${{ secrets.SAILAWAY_EMAIL }}
+          SAILAWAY_PASSWORD: ${{ secrets.SAILAWAY_PASSWORD }}
+        # --previo: la lectura anterior (polares de Sailaway y lo medido, que se va acumulando)
+        # --olas: la medicion de como frena la ola a cada velero (se acumula en medicion_olas.json, la analiza analisis_olas.py)
+        run: >-
+          python sailaway_wp.py --json wp_activo.json --previo "https://raw.githubusercontent.com/${{ github.repository }}/datos/wp_activo.json"
+          --olas medicion_olas.json --olas-previo "https://raw.githubusercontent.com/${{ github.repository }}/datos/medicion_olas.json"
+      - name: Dejarlo en la rama datos
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          REPO=${{ github.repository }}
+          [ -f wp_activo.json ] || { echo "sin datos nuevos"; exit 0; }
+          # la rama datos se crea la primera vez, a partir de main
+          if ! gh api "repos/$REPO/branches/datos" >/dev/null 2>&1; then
+            SHA=$(gh api "repos/$REPO/git/ref/heads/main" --jq .object.sha)
+            gh api -X POST "repos/$REPO/git/refs" -f ref=refs/heads/datos -f sha="$SHA" >/dev/null
+          fi
+          for F in wp_activo.json medicion_olas.json; do
+            [ -f "$F" ] || continue
+            PREV=$(gh api "repos/$REPO/contents/$F?ref=datos" --jq .sha 2>/dev/null || true)
+            # el pedido va en un archivo (con muchos veleros no entra en la linea de comandos)
+            F="$F" PREV="$PREV" python -c "import base64,json,os;f=os.environ['F'];b={'message':'WP activo','branch':'datos','content':base64.b64encode(open(f,'rb').read()).decode()};p=os.environ.get('PREV');b.update({'sha':p} if p else {});json.dump(b,open('pedido.json','w'))"
+            gh api -X PUT "repos/$REPO/contents/$F" --input pedido.json >/dev/null
+          done
